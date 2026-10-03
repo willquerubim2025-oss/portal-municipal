@@ -14,6 +14,13 @@ Usuários de teste **só na homologação** (senha `Teste@Homologacao2026`):
 - `editor.teste@exemplo.gov.br`: editor de Jeriquara
 - `secke.teste@exemplo.gov.br`: equipe da plataforma (SECKE)
 
+## Publicar (D-27)
+```bash
+npm run deploy:homologacao   # build com .env.homologacao + Worker painel-municipal-homologacao
+npm run deploy:producao      # build com .env.producao + Worker painel-municipal
+```
+O painel é estático: as variáveis entram no build (por isso um build por ambiente). Depois de publicar num endereço novo, cadastrar `https://<painel>/redefinir-senha` nas Redirect URLs do Auth do projeto Supabase correspondente.
+
 ## Estrutura
 | Arquivo | Papel |
 |---|---|

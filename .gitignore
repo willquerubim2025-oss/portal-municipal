@@ -24,3 +24,7 @@ desktop.ini
 senhas*.txt
 *senha*.txt
 *.senhas
+
+# Modos de build do painel: só chaves publicáveis (o RLS protege os dados), versionados (D-27)
+!painel/.env.homologacao
+!painel/.env.producao

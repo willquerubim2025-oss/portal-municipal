@@ -20,11 +20,13 @@ export default defineConfig({
   },
   env: {
     schema: {
-      SUPABASE_URL: envField.string({ context: 'server', access: 'public' }),
-      // Chave publicável (anon): segura no servidor e no navegador, o RLS só libera o que está publicado.
-      SUPABASE_PUBLISHABLE_KEY: envField.string({ context: 'server', access: 'public' }),
+      // access 'secret' = lido em tempo de execução (variáveis do Worker), não embutido no build.
+      // Assim o mesmo build serve à homologação e à produção, cada uma com as suas variáveis
+      // em wrangler.jsonc (D-27). A chave publicável não é segredo: o RLS só libera o publicado.
+      SUPABASE_URL: envField.string({ context: 'server', access: 'secret' }),
+      SUPABASE_PUBLISHABLE_KEY: envField.string({ context: 'server', access: 'secret' }),
       // Só no desenvolvimento: força o domínio usado para descobrir o município (localhost não está cadastrado).
-      DOMINIO_DEV: envField.string({ context: 'server', access: 'public', optional: true }),
+      DOMINIO_DEV: envField.string({ context: 'server', access: 'secret', optional: true }),
     },
   },
 });

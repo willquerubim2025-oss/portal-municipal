@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Painel administrativo: só arquivos estáticos (SPA). Produção é o padrão; homologação no env.
+  // Build: `npm run build:homologacao` ou `npm run build:producao` (variáveis em .env.<modo>).
+  "name": "painel-municipal",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./dist", "not_found_handling": "single-page-application" },
+  "env": {
+    "homologacao": { "name": "painel-municipal-homologacao" }
+  }
+}

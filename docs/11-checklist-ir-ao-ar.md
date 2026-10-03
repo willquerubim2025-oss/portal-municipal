@@ -15,7 +15,7 @@
 ## Contas e infraestrutura (uma vez para o produto)
 - [ ] **E-mail do sistema (SMTP próprio)** nos dois projetos Supabase (*Authentication → Emails → SMTP*), com remetente do domínio da SECKE, SPF e DKIM. Sem isso, convite e "esqueci minha senha" não chegam por e-mail.
 - [ ] **Painel publicado** e o endereço dele cadastrado no login da produção (*Authentication → URL Configuration*: Site URL e Redirect URL `https://<painel>/redefinir-senha`).
-- [ ] **Portal publicado** no Cloudflare Workers, com as variáveis `SUPABASE_URL` e `SUPABASE_PUBLISHABLE_KEY` **da produção** (não da homologação).
+- [ ] **Portal publicado** no Worker `portal-municipal` (build **sem** `CLOUDFLARE_ENV`; confira na saída do deploy que `SUPABASE_URL` é `qgywucdnaeheqndcxtho`, a produção) e **painel** com `npm run deploy:producao` (D-27).
 - [ ] **Backup extra** (D-05): GitHub Action `pg_dump` diário → Cloudflare R2, 30 dias de retenção, **com um teste de restauração feito**.
 - [ ] **Monitoramento de disponibilidade** (UptimeRobot ou Better Stack) com alerta para a equipe.
 - [ ] **Verificação de links quebrados** (RF18) e **exportação completa** (RF19) funcionando.

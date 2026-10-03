@@ -10,7 +10,8 @@ export function usePortal(): string | null {
     if (import.meta.env.DEV && import.meta.env.VITE_PORTAL_DEV) { setUrl(import.meta.env.VITE_PORTAL_DEV); return; }
     if (!atual) return;
     supabase.from('municipio_dominios').select('dominio').eq('municipio_id', atual.municipio.id)
-      .eq('ambiente', 'producao').eq('principal', true).maybeSingle()
+      // Painel de homologação aponta para o portal de homologação (D-27).
+      .eq('ambiente', import.meta.env.VITE_AMBIENTE === 'homologacao' ? 'homologacao' : 'producao').eq('principal', true).maybeSingle()
       .then(({ data }) => setUrl(data ? `https://${data.dominio}` : null));
   }, [atual]);
   return url;

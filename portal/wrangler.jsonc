@@ -1,7 +1,22 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
+  // Produção (padrão). Homologação: env "homologacao" (build com CLOUDFLARE_ENV=homologacao).
+  // As chaves abaixo são publicáveis (não são segredo): o RLS do banco só libera conteúdo publicado.
   "name": "portal-municipal",
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
-  "observability": { "enabled": true }
+  "observability": { "enabled": true },
+  "vars": {
+    "SUPABASE_URL": "https://qgywucdnaeheqndcxtho.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_5hNTishJduD5ApO7MTuUqQ_lqbfTMOF"
+  },
+  "env": {
+    "homologacao": {
+      "name": "portal-municipal-homologacao",
+      "vars": {
+        "SUPABASE_URL": "https://kvilgamsyneenjtlllcf.supabase.co",
+        "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_Be47d2VktOMB_5vhUi8Y7A_oQU9yTsv"
+      }
+    }
+  }
 }

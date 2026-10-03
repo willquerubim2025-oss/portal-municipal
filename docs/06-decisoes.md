@@ -166,3 +166,12 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **Não interfere na migração:** arquivo acima do limite é pulado e anotado; o resto do post migra. Rodar a migração de novo depois de resolver o limite envia só os que faltaram e os anexa ao documento (a ferramenta é repetível).
 - A migração gera `migracao/relatorios/arquivos-grandes-<municipio>.csv` e mostra um aviso ao final de cada rodada.
 - **Lembrete:** item no topo de `docs/11-checklist-ir-ao-ar.md` ("Não esquecer"). Resolver antes da migração final: a prefeitura comprime e reenvia os arquivos da lista **ou** desligar o teto com alerta de gasto.
+
+**D-27 · 03/10/2026 · Homologação publicada na Cloudflare (conta da SECKE) e variáveis por ambiente**
+- Conta Cloudflare **`comercial@seckesistemas.com`** (da empresa), subdomínio `portal-municipal.workers.dev`. Login do Wrangler por OAuth nesta máquina.
+- **Portal:** Worker `portal-municipal-homologacao` → https://portal-municipal-homologacao.portal-municipal.workers.dev (cadastrado em `municipio_dominios` da homologação como principal; `noindex` automático). Produção será o Worker `portal-municipal`.
+- **Painel:** Worker só de arquivos (SPA) `painel-municipal-homologacao` → https://painel-municipal-homologacao.portal-municipal.workers.dev. Produção: `painel-municipal`.
+- **Portal lê o banco em tempo de execução:** as variáveis do Astro passaram a `access: 'secret'` (antes `public`, que **embutia** a URL do banco no build). O mesmo build serve aos dois ambientes; cada Worker tem as suas `vars` em `portal/wrangler.jsonc` (produção no topo, `env.homologacao`). Evita publicar na produção um build apontado para a homologação.
+- **Painel (SPA) precisa de build por ambiente** (o navegador recebe as variáveis): `npm run deploy:homologacao` / `deploy:producao`, com `painel/.env.homologacao` e `.env.producao` **versionados** (só chaves publicáveis). `VITE_AMBIENTE` faz o "Ver o site" apontar para o portal do mesmo ambiente.
+- O adaptador do Astro criou um KV `portal-municipal-homologacao-session` (sessões, não usado; gratuito).
+- Testes no publicado: todas as rotas 200, 404 real, `noindex` + `robots` bloqueando, 301 de notícia e de PDF antigos num salto, login no painel e retorno à página pedida. Tempo de resposta 0,8–2 s sem cache na borda (pendência).

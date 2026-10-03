@@ -30,5 +30,11 @@ npm run dev             # http://localhost:4321
 - **Sem fontes externas** (Google Fonts etc.): desempenho e LGPD.
 - Contraste mínimo 4,5:1. Cores do município em `tema.cor_primaria` / `tema.cor_secundaria`; texto sobre a cor primária é branco, então a cor precisa ser escura o bastante.
 
-## Variáveis (Cloudflare → Worker → Settings → Variables)
-`SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` (não são segredo: o RLS protege os dados). `DOMINIO_DEV` só no desenvolvimento.
+## Publicar (D-27)
+```bash
+npx wrangler login                                     # uma vez por máquina (conta da SECKE)
+CLOUDFLARE_ENV=homologacao npx astro build && npx wrangler deploy   # homologação
+npx astro build && npx wrangler deploy                              # produção
+```
+Variáveis `SUPABASE_URL` e `SUPABASE_PUBLISHABLE_KEY` ficam em `wrangler.jsonc` (produção no topo, `env.homologacao`) e são lidas **em tempo de execução** (`access: 'secret'` no Astro). Não são segredo: o RLS protege os dados. `DOMINIO_DEV` só no desenvolvimento (no `.env`, que também define o banco usado pelo `astro dev`: **mantenha apontando para a homologação**).
+Endereço novo de um portal (ex.: `*.workers.dev` ou domínio da prefeitura) precisa estar em `municipio_dominios`; senão o portal responde "Nenhum portal está configurado para este endereço".
