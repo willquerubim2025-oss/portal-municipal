@@ -1,0 +1,66 @@
+---
+import Base from '../../layouts/Base.astro';
+import { noticia } from '../../lib/consultas';
+import { urlMidia } from '../../lib/supabase';
+import { dataExtenso, resumir } from '../../lib/formato';
+import { htmlSeguro } from '../../lib/html';
+
+const { municipio: m, dominioPrincipal } = Astro.locals.contexto;
+const n = await noticia(m.id, Astro.params.slug!);
+if (!n) return Astro.rewrite('/404');
+
+const img = urlMidia(n.imagem?.storage_path);
+const galeria = (n.galeria ?? []).sort((a: any, b: any) => a.ordem - b.ordem);
+const atualizado = n.atualizado_em && new Date(n.atualizado_em).getTime() - new Date(n.publicado_em).getTime() > 3600_000;
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  headline: n.titulo,
+  datePublished: n.publicado_em,
+  dateModified: n.atualizado_em ?? n.publicado_em,
+  ...(img && { image: [img] }),
+  ...(n.resumo && { description: n.resumo }),
+  mainEntityOfPage: `https://${dominioPrincipal}/noticias/${n.slug}`,
+  publisher: { '@id': `https://${dominioPrincipal}/#organizacao` },
+  author: { '@id': `https://${dominioPrincipal}/#organizacao` },
+};
+---
+<Base titulo={n.titulo} descricao={n.resumo || resumir(n.corpo_html)} imagem={img} tipoOg="article" jsonLd={ld}
+  migalhas={[{ nome: 'Notícias', href: '/noticias' }, { nome: n.titulo }]}>
+  <article class="container">
+    <header class="cabecalho-pagina">
+      <h1>{n.titulo}</h1>
+      {n.resumo && <p>{n.resumo}</p>}
+      <p class="meta">
+        Publicado em <time datetime={n.publicado_em}>{dataExtenso(n.publicado_em)}</time>
+        {atualizado && <> · atualizado em <time datetime={n.atualizado_em}>{dataExtenso(n.atualizado_em)}</time></>}
+        {n.orgao && <> · <a href={`/estrutura-organizacional/${n.orgao.slug}`}>{n.orgao.nome}</a></>}
+      </p>
+    </header>
+    {img && (
+      <figure class="figura-destaque">
+        <img src={img} alt={n.imagem.texto_alternativo ?? ''} width="1200" height="675" fetchpriority="high" />
+      </figure>
+    )}
+    <div class="conteudo" set:html={htmlSeguro(n.corpo_html)} />
+    {galeria.length > 0 && (
+      <section aria-labelledby="titulo-galeria">
+        <h2 id="titulo-galeria">Galeria de fotos</h2>
+        <ul class="galeria">
+          {galeria.map((g: any) => (
+            <li>
+              <figure>
+                <a href={urlMidia(g.midia.storage_path)}><img src={urlMidia(g.midia.storage_path)} alt={g.midia.texto_alternativo ?? ''} loading="lazy" width="400" height="300" /></a>
+                {g.legenda && <figcaption>{g.legenda}</figcaption>}
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+    {n.categorias?.length > 0 && (
+      <p class="meta">Categorias: {n.categorias.map((c: any, i: number) => <>{i > 0 && ', '}<a href={`/noticias?categoria=${c.categoria.slug}`}>{c.categoria.nome}</a></>)}</p>
+    )}
+    <p><a href="/noticias">← Voltar para as notícias</a></p>
+  </article>
+</Base>

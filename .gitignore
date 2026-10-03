@@ -1,0 +1,26 @@
+# Dependências e builds
+node_modules/
+dist/
+.astro/
+.wrangler/
+
+# Segredos e configuração local (nunca versionar)
+.env
+.env.*
+!.env.example
+.dev.vars
+
+# Gerados pela migração e pelos testes
+migracao/relatorios/
+migracao/cache/
+painel/e2e/prints/
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Anotações locais com senhas (nunca versionar)
+senhas*.txt
+*senha*.txt
+*.senhas

@@ -1,0 +1,247 @@
+---
+// Layout de todas as páginas do portal: acessibilidade (eMAG), SEO (D-15) e
+// identidade visual do município (municipios.tema / config). Nada de prefeitura
+// específica aqui (D-10).
+import '../styles/global.css';
+import { destaques, menu, type ItemMenu } from '../lib/consultas';
+import { moduloAtivo, nomeCurto } from '../lib/municipio';
+import { urlMidia } from '../lib/supabase';
+import MenuItens from '../components/MenuItens.astro';
+
+export interface Migalha { nome: string; href?: string }
+interface Props {
+  titulo?: string;             // ausente = página inicial
+  descricao?: string;
+  imagem?: string | null;      // URL absoluta para Open Graph
+  tipoOg?: 'website' | 'article';
+  jsonLd?: object | object[];
+  migalhas?: Migalha[];        // breadcrumb (sem "Início", que é automático)
+  noindex?: boolean;
+}
+
+const { titulo, descricao, imagem, tipoOg = 'website', jsonLd, migalhas = [], noindex = false } = Astro.props;
+const { municipio: m, dominioPrincipal, homologacao } = Astro.locals.contexto;
+const cfg = m.config;
+const tema = m.tema;
+const origem = `https://${dominioPrincipal}`;
+
+// Canônico: domínio principal + caminho + só os parâmetros que mudam o conteúdo.
+const params = new URLSearchParams();
+for (const p of ['categoria', 'ano', 'pagina', 'situacao']) {
+  const v = Astro.url.searchParams.get(p);
+  if (v && !(p === 'pagina' && v === '1')) params.set(p, v);
+}
+const canonico = `${origem}${Astro.url.pathname === '/' ? '' : Astro.url.pathname}${params.size ? `?${params}` : ''}`;
+const tituloCompleto = titulo ? `${titulo} — ${m.nome}` : m.nome;
+const desc = descricao || cfg.slogan || `Portal oficial da ${m.nome}: notícias, serviços, legislação e transparência.`;
+const brasao = urlMidia(tema.brasao_path);
+const imagemOg = imagem ?? urlMidia(cfg.seo?.imagem_compartilhamento_path) ?? brasao;
+
+const [principal, rodape, alertas] = await Promise.all([
+  menu(m.id, 'principal'),
+  menu(m.id, 'rodape'),
+  moduloAtivo(m, 'destaques') ? destaques(m.id).then((d) => d.filter((x) => x.tipo === 'alerta')) : Promise.resolve([]),
+]);
+
+// Sem menu cadastrado, o portal monta um menu padrão a partir dos módulos ligados.
+const menuPadrao: ItemMenu[] = [
+  { rotulo: 'Início', href: '/', novaAba: false, filhos: [] },
+  { rotulo: 'Notícias', href: '/noticias', novaAba: false, filhos: [] },
+  moduloAtivo(m, 'carta_servicos') && { rotulo: 'Serviços', href: '/servicos', novaAba: false, filhos: [] },
+  moduloAtivo(m, 'legislacao') && { rotulo: 'Legislação', href: '/legislacao', novaAba: false, filhos: [] },
+  { rotulo: 'Documentos', href: '/documentos', novaAba: false, filhos: [] },
+  { rotulo: 'Transparência', href: '/transparencia', novaAba: false, filhos: [] },
+  moduloAtivo(m, 'agenda') && { rotulo: 'Agenda', href: '/eventos', novaAba: false, filhos: [] },
+  moduloAtivo(m, 'estrutura_organizacional') && { rotulo: 'Estrutura', href: '/estrutura-organizacional', novaAba: false, filhos: [] },
+].filter(Boolean) as ItemMenu[];
+const itensMenu = principal.length ? principal : menuPadrao;
+
+const linksObrigatorios = [
+  { rotulo: 'Acesso à Informação', href: '/acesso-a-informacao' },
+  { rotulo: 'Ouvidoria', href: '/ouvidoria' },
+  { rotulo: 'Transparência', href: '/transparencia' },
+  { rotulo: 'Privacidade', href: '/privacidade' },
+  { rotulo: 'Acessibilidade', href: '/acessibilidade' },
+];
+
+// Dados estruturados: o município em toda página + o que a página informar.
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'GovernmentOrganization',
+  '@id': `${origem}/#organizacao`,
+  name: m.nome,
+  url: origem,
+  ...(brasao && { logo: brasao }),
+  ...(cfg.telefone && { telephone: cfg.telefone }),
+  ...(cfg.email && { email: cfg.email }),
+  ...(cfg.endereco && { address: { '@type': 'PostalAddress', streetAddress: cfg.endereco, addressRegion: m.uf, addressCountry: 'BR' } }),
+  ...(cfg.redes && { sameAs: Object.values(cfg.redes) }),
+};
+const migalhaLd = migalhas.length ? {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [{ nome: 'Início', href: '/' }, ...migalhas].map((x, i) => ({
+    '@type': 'ListItem', position: i + 1, name: x.nome, ...(x.href && { item: `${origem}${x.href}` }),
+  })),
+} : null;
+const ld = [orgLd, ...(Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : []), ...(migalhaLd ? [migalhaLd] : [])];
+// Escapa o sinal de menor (<) para o JSON não fechar a tag do JSON-LD antes da hora.
+// (Não escrever o nome da tag neste comentário: o scanner do Vite o confunde com uma tag real.)
+const ldJson = JSON.stringify(ld).replaceAll(String.fromCharCode(60), '\\u003c');
+
+const estiloTema = [
+  tema.cor_primaria && `--cor-primaria:${tema.cor_primaria}`,
+  tema.cor_secundaria && `--cor-secundaria:${tema.cor_secundaria}`,
+].filter(Boolean).join(';');
+const caminhoAtual = Astro.url.pathname;
+---
+<!doctype html>
+<html lang="pt-BR" style={estiloTema || undefined}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{tituloCompleto}</title>
+  <meta name="description" content={desc} />
+  <link rel="canonical" href={canonico} />
+  {(noindex || homologacao) && <meta name="robots" content="noindex, nofollow" />}
+  {cfg.seo?.google_site_verification && <meta name="google-site-verification" content={cfg.seo.google_site_verification} />}
+  {brasao && <link rel="icon" href={brasao} />}
+  <meta name="theme-color" content={tema.cor_primaria ?? '#0b4f8a'} />
+
+  <meta property="og:site_name" content={m.nome} />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:type" content={tipoOg} />
+  <meta property="og:title" content={titulo ?? m.nome} />
+  <meta property="og:description" content={desc} />
+  <meta property="og:url" content={canonico} />
+  {imagemOg && <meta property="og:image" content={imagemOg} />}
+  <meta name="twitter:card" content={imagemOg ? 'summary_large_image' : 'summary'} />
+
+  <link rel="alternate" type="application/xml" title="Mapa do site" href="/sitemap.xml" />
+  <script type="application/ld+json" set:html={ldJson} />
+  <!-- Alto contraste antes da pintura, para não piscar. -->
+  <script is:inline>
+    try { if (localStorage.getItem('contraste') === '1') document.documentElement.classList.add('contraste'); } catch {}
+  </script>
+</head>
+<body>
+  {homologacao && <div class="faixa-homologacao" role="note">Ambiente de homologação — conteúdo de teste, não indexado.</div>}
+
+  <!-- Barra de acessibilidade (eMAG 3.1): atalhos numéricos e alto contraste. -->
+  <div class="barra-acessibilidade">
+    <div class="container">
+      <ul class="atalhos" aria-label="Atalhos de teclado">
+        <li><a href="#conteudo" accesskey="1">Ir para o conteúdo <span>1</span></a></li>
+        <li><a href="#menu" accesskey="2">Ir para o menu <span>2</span></a></li>
+        <li><a href="#busca" accesskey="3">Ir para a busca <span>3</span></a></li>
+        <li><a href="#rodape" accesskey="4">Ir para o rodapé <span>4</span></a></li>
+      </ul>
+      <ul class="ferramentas">
+        <li><a href="/acessibilidade">Acessibilidade</a></li>
+        <li><button type="button" id="botao-contraste" aria-pressed="false">Alto contraste</button></li>
+      </ul>
+    </div>
+  </div>
+
+  <header class="cabecalho">
+    <div class="container cabecalho-linha">
+      <a href="/" class="marca" aria-label={`${m.nome} — página inicial`}>
+        {brasao && <img src={brasao} alt="" width="64" height="64" />}
+        <span class="marca-texto">
+          <span class="marca-tipo">Prefeitura de</span>
+          <span class="marca-nome">{nomeCurto(m)}</span>
+        </span>
+      </a>
+      <form class="busca" action="/busca" method="get" role="search">
+        <label for="busca" class="sr-only">Buscar no portal</label>
+        <input id="busca" name="q" type="search" placeholder="O que você procura?" required />
+        <button type="submit">Buscar</button>
+      </form>
+    </div>
+    <nav id="menu" class="menu-principal" aria-label="Menu principal">
+      <details class="container menu-movel" open>
+        <summary>Menu</summary>
+        <MenuItens itens={itensMenu} atual={caminhoAtual} />
+      </details>
+    </nav>
+  </header>
+
+  {alertas.length > 0 && (
+    <section class="alertas" aria-label="Alertas">
+      {alertas.map((a) => (
+        <div class={`alerta alerta-${a.nivel}`} role={a.nivel === 'urgente' ? 'alert' : undefined}>
+          <div class="container">
+            <strong>{a.titulo}</strong>{a.texto && <> — {a.texto}</>}
+            {a.url && <> <a href={a.url} target={a.nova_aba ? '_blank' : undefined} rel={a.nova_aba ? 'noopener' : undefined}>Saiba mais</a></>}
+          </div>
+        </div>
+      ))}
+    </section>
+  )}
+
+  {migalhas.length > 0 && (
+    <nav class="container migalhas" aria-label="Você está em">
+      <ol>
+        <li><a href="/">Início</a></li>
+        {migalhas.map((x, i) => (
+          <li>{x.href && i < migalhas.length - 1 ? <a href={x.href}>{x.nome}</a> : <span aria-current="page">{x.nome}</span>}</li>
+        ))}
+      </ol>
+    </nav>
+  )}
+
+  <main id="conteudo" tabindex="-1">
+    <slot />
+  </main>
+
+  <footer id="rodape" class="rodape">
+    <div class="container rodape-grade">
+      <section>
+        <h2>{m.nome}</h2>
+        <address>
+          {cfg.endereco && <p>{cfg.endereco}</p>}
+          {cfg.telefone && <p>Telefone: <a href={`tel:${cfg.telefone.replace(/\D/g, '')}`}>{cfg.telefone}</a></p>}
+          {cfg.email && <p>E-mail: <a href={`mailto:${cfg.email}`}>{cfg.email}</a></p>}
+          {cfg.horario && <p>Atendimento: {cfg.horario}</p>}
+          {(m.cnpj ?? cfg.cnpj) && <p>CNPJ: {m.cnpj ?? cfg.cnpj}</p>}
+        </address>
+      </section>
+      <nav aria-label="Links institucionais">
+        <h2>Institucional</h2>
+        <ul>{linksObrigatorios.map((l) => <li><a href={l.href}>{l.rotulo}</a></li>)}</ul>
+      </nav>
+      {rodape.length > 0 && (
+        <nav aria-label="Links do rodapé">
+          <h2>Links úteis</h2>
+          <MenuItens itens={rodape} atual={caminhoAtual} />
+        </nav>
+      )}
+      {cfg.redes && Object.keys(cfg.redes).length > 0 && (
+        <nav aria-label="Redes sociais">
+          <h2>Redes sociais</h2>
+          <ul>{Object.entries(cfg.redes).map(([rede, url]) => <li><a href={url} rel="noopener" target="_blank">{rede.charAt(0).toUpperCase() + rede.slice(1)}<span class="sr-only"> (abre em nova aba)</span></a></li>)}</ul>
+        </nav>
+      )}
+    </div>
+    <div class="rodape-base"><div class="container"><a href="/sitemap.xml">Mapa do site</a></div></div>
+  </footer>
+
+  <script>
+    const botao = document.getElementById('botao-contraste');
+    const raiz = document.documentElement;
+    const sincronizar = () => botao?.setAttribute('aria-pressed', String(raiz.classList.contains('contraste')));
+    sincronizar();
+    botao?.addEventListener('click', () => {
+      raiz.classList.toggle('contraste');
+      try { localStorage.setItem('contraste', raiz.classList.contains('contraste') ? '1' : '0'); } catch {}
+      sincronizar();
+    });
+    // No celular o menu começa fechado; no desktop fica sempre aberto.
+    const menuMovel = document.querySelector<HTMLDetailsElement>('.menu-movel');
+    const mq = matchMedia('(max-width: 800px)');
+    const ajustar = () => { if (menuMovel) menuMovel.open = !mq.matches; };
+    ajustar();
+    mq.addEventListener('change', ajustar);
+  </script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import { centralTransparencia } from '../lib/consultas';
+
+const { municipio: m } = Astro.locals.contexto;
+// Seções sem nenhum item ativo não aparecem (o município ainda não cadastrou os links).
+const secoes = (await centralTransparencia(m.id)).filter((s) => s.itens.length > 0);
+---
+<Base titulo="Transparência"
+  descricao={`Central de Transparência da ${m.nome}: receitas, despesas, licitações, contratos, pessoal, acesso à informação e mais.`}
+  migalhas={[{ nome: 'Transparência' }]}>
+  <div class="container">
+    <header class="cabecalho-pagina">
+      <h1>Central de Transparência</h1>
+      <p>Informações de interesse público reunidas em um só lugar (Lei nº 12.527/2011 e Lei Complementar nº 131/2009).</p>
+    </header>
+    {secoes.length === 0 && <p>A Central de Transparência ainda está sendo organizada.</p>}
+    <div class="secoes-transparencia">
+      {secoes.map((s) => (
+        <section class="secao-transparencia" id={s.slug} aria-labelledby={`t-${s.slug}`}>
+          <h2 id={`t-${s.slug}`}>{s.titulo}</h2>
+          {s.descricao && <p class="meta">{s.descricao}</p>}
+          <ul>
+            {s.itens.map((i: any) => (
+              <li>
+                <a href={i.href} target={i.externo ? '_blank' : undefined} rel={i.externo ? 'noopener' : undefined}>
+                  {i.titulo}{i.externo && <span class="sr-only"> (abre em nova aba, sistema externo)</span>}
+                </a>
+                {i.descricao && <span class="meta"> — {i.descricao}</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  </div>
+</Base>

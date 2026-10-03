@@ -1,0 +1,239 @@
+{
+  "_comentario": "Mapa de migração de Jeriquara (proposta da SECKE, 03/10/2026, aguardando validação do Município — RM05). O motor (classificar.mjs) é genérico; só este arquivo é específico da prefeitura (D-10, D-22).",
+  "municipio_slug": "jeriquara",
+  "site_antigo": "https://www.jeriquara.sp.gov.br",
+  "fuso": "-03:00",
+  "categorias_novas": {
+    "publicacao": [
+      [
+        "saude",
+        "Saúde"
+      ],
+      [
+        "educacao",
+        "Educação"
+      ],
+      [
+        "assistencia-social",
+        "Assistência Social"
+      ],
+      [
+        "agricultura-e-meio-ambiente",
+        "Agricultura e Meio Ambiente"
+      ],
+      [
+        "esporte",
+        "Esporte"
+      ],
+      [
+        "cultura",
+        "Cultura"
+      ],
+      [
+        "gabinete",
+        "Gabinete"
+      ],
+      [
+        "obras",
+        "Obras"
+      ],
+      [
+        "cursos-e-capacitacao",
+        "Cursos e Capacitação"
+      ],
+      [
+        "covid-19",
+        "Covid-19 (arquivo)"
+      ]
+    ],
+    "documento": [
+      [
+        "planos-municipais",
+        "Planos Municipais"
+      ],
+      [
+        "conselhos-municipais",
+        "Conselhos Municipais"
+      ],
+      [
+        "outros-documentos",
+        "Outros Documentos"
+      ]
+    ]
+  },
+  "_regras": "Ordem: 1) licitação por modalidade; 2) categoria de documento direta; 3) categoria genérica resolvida pelo título; 4) notícia. 'arquivo': notícia que sai das listagens (expira_em = publicação), mas o link continua. Notícia sem categoria temática: tenta pelo prefixo do título (antes de \":\"), em noticia_por_prefixo.",
+  "modalidades": {
+    "35": "Intenção de Registro de Preços",
+    "158": "Concorrência Pública",
+    "162": "Inexigibilidade",
+    "164": "Leilão",
+    "165": "Pregão Presencial",
+    "166": "Pregão Eletrônico",
+    "167": "Tomada de Preços",
+    "168": "Ata de Abertura e Julgamento",
+    "224": "Dispensa de Licitação"
+  },
+  "documento_direto": {
+    "153": "planos-municipais",
+    "154": "planos-municipais",
+    "155": "convenios",
+    "156": "prestacao-de-contas",
+    "161": "chamamentos-publicos",
+    "169": "planejamento",
+    "175": "conselhos-municipais",
+    "212": "outros-documentos",
+    "213": "outros-documentos",
+    "222": "planos-municipais",
+    "223": "planos-municipais",
+    "225": "prestacao-de-contas",
+    "230": "conselhos-municipais",
+    "232": "planos-municipais",
+    "233": "outros-documentos",
+    "234": "planos-municipais",
+    "235": "conselhos-municipais",
+    "236": "conselhos-municipais",
+    "237": "conselhos-municipais",
+    "238": "planos-municipais",
+    "239": "planos-municipais",
+    "242": "planejamento",
+    "243": "planejamento",
+    "244": "prestacao-de-contas",
+    "255": "outros-documentos",
+    "258": "planejamento",
+    "259": "planejamento"
+  },
+  "documento_pelo_titulo": [
+    "218",
+    "260",
+    "261",
+    "227",
+    "228",
+    "229",
+    "231",
+    "170",
+    "226",
+    "343",
+    "217",
+    "221",
+    "159"
+  ],
+  "titulo": [
+    {
+      "padrao": "^BOLETIM\\b",
+      "arquivo": "covid-19"
+    },
+    {
+      "padrao": "^LEI\\s+COMPLEMENTAR",
+      "categoria_documento": "leis-complementares"
+    },
+    {
+      "padrao": "^LEI\\s+ORG[AÂ]NICA",
+      "categoria_documento": "lei-organica"
+    },
+    {
+      "padrao": "^(LEI\\b|C[OÓ]DIGO\\s+TRIBUT)",
+      "categoria_documento": "leis-ordinarias"
+    },
+    {
+      "padrao": "^DECRETO",
+      "categoria_documento": "decretos"
+    },
+    {
+      "padrao": "^PORTARIA",
+      "categoria_documento": "portarias"
+    },
+    {
+      "padrao": "^RESOLU[CÇ][AÃ]O",
+      "categoria_documento": "resolucoes"
+    },
+    {
+      "padrao": "PROCESSO\\s+SELETIVO",
+      "categoria_documento": "processos-seletivos"
+    },
+    {
+      "padrao": "CONCURSO",
+      "categoria_documento": "concursos-publicos"
+    },
+    {
+      "padrao": "^(AVISO DE (DISPENSA|LICITA|PREG)|PREG[AÃ]O|PP\\b|EDITAL DE LICITA)",
+      "categoria_documento": "licitacoes"
+    },
+    {
+      "padrao": "^(ATA\\b|EDITAL\\b|PLANTA|NOTA\\b|PROCESSO\\b)",
+      "categoria_documento": "outros-documentos"
+    }
+  ],
+  "titulo_padrao_documento": "outros-documentos",
+  "noticia": {
+    "1": null,
+    "37": null,
+    "38": null,
+    "45": "saude",
+    "46": "educacao",
+    "47": "esporte",
+    "49": "cultura",
+    "51": "obras",
+    "55": "gabinete",
+    "62": null,
+    "194": "agricultura-e-meio-ambiente",
+    "195": "assistencia-social",
+    "196": "assistencia-social",
+    "206": "gabinete",
+    "219": "saude",
+    "220": "covid-19",
+    "240": "educacao",
+    "241": "saude",
+    "251": "cursos-e-capacitacao",
+    "252": "gabinete",
+    "253": "gabinete"
+  },
+  "noticia_categoria_padrao": "geral",
+  "arquivo_categorias": {
+    "220": "covid-19"
+  },
+  "padrao_por_categoria": {
+    "170": "leis-ordinarias",
+    "217": "leis-ordinarias",
+    "221": "leis-ordinarias",
+    "226": "leis-ordinarias",
+    "231": "leis-ordinarias",
+    "343": "leis-ordinarias"
+  },
+  "_confirmar_com_municipio": [
+    "Todos os posts com título \"Boletim...\" (195, de 2020 a 2022) foram tratados como boletins da Covid e vão para o arquivo (fora das listagens, link mantido)."
+  ],
+  "noticia_por_prefixo": [
+    {
+      "padrao": "SAUDE|NOVEMBRO AZUL|OUTUBRO ROSA|VACINA|DENGUE|UBS",
+      "categoria": "saude"
+    },
+    {
+      "padrao": "ASSISTENCIA SOCIAL|ACAO SOCIAL|SOLIDARIEDADE|CRAS|FUNDO SOCIAL",
+      "categoria": "assistencia-social"
+    },
+    {
+      "padrao": "EDUCACAO|ESCOLA|EMEB|MATRICULA",
+      "categoria": "educacao"
+    },
+    {
+      "padrao": "QUALIFICACAO|CAPACITACAO|CURSO",
+      "categoria": "cursos-e-capacitacao"
+    },
+    {
+      "padrao": "ESPORTE|FUTEBOL|CAMPEONATO",
+      "categoria": "esporte"
+    },
+    {
+      "padrao": "CULTURA|FESTA|SHOW",
+      "categoria": "cultura"
+    },
+    {
+      "padrao": "AGRICULTURA|MEIO AMBIENTE|CAUSA ANIMAL|RURAL",
+      "categoria": "agricultura-e-meio-ambiente"
+    },
+    {
+      "padrao": "OBRA|PAVIMENTA|INFRAESTRUTURA",
+      "categoria": "obras"
+    }
+  ]
+}

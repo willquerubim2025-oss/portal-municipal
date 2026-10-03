@@ -1,0 +1,46 @@
+---
+import Base from '../../layouts/Base.astro';
+import Paginacao from '../../components/Paginacao.astro';
+import { eventos } from '../../lib/consultas';
+import { moduloAtivo } from '../../lib/municipio';
+import { diaMes, hora, paramInt } from '../../lib/formato';
+
+const { municipio: m } = Astro.locals.contexto;
+if (!moduloAtivo(m, 'agenda')) return Astro.rewrite('/404');
+const passados = Astro.url.searchParams.get('periodo') === 'anteriores';
+const pagina = paramInt(Astro.url.searchParams.get('pagina'));
+const lista = await eventos(m.id, { pagina, passados });
+if (pagina > lista.paginas) return Astro.rewrite('/404');
+const titulo = passados ? 'Eventos anteriores' : 'Agenda';
+---
+<Base titulo={titulo} descricao={`Agenda de eventos e compromissos da ${m.nome}.`}
+  migalhas={passados ? [{ nome: 'Agenda', href: '/eventos' }, { nome: 'Anteriores' }] : [{ nome: 'Agenda' }]}>
+  <div class="container">
+    <header class="cabecalho-pagina"><h1>{titulo}</h1></header>
+    <ul class="chips">
+      <li><a href="/eventos" aria-current={!passados ? 'true' : undefined}>Próximos</a></li>
+      <li><a href="/eventos?periodo=anteriores" aria-current={passados ? 'true' : undefined}>Anteriores</a></li>
+    </ul>
+    {lista.itens.length === 0 && <p>{passados ? 'Nenhum evento anterior.' : 'Nenhum evento agendado.'}</p>}
+    <ul class="lista-simples">
+      {lista.itens.map((e) => {
+        const d = diaMes(e.inicio_em);
+        return (
+          <li class="evento">
+            <div class="evento-data" aria-hidden="true"><strong>{d.dia}</strong><span>{d.mes}</span></div>
+            <div>
+              <h2><a href={`/eventos/${e.slug}`}>{e.titulo}</a></h2>
+              <p class="meta">
+                <time datetime={e.inicio_em}>{new Date(e.inicio_em).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })}{!e.dia_inteiro && `, ${hora(e.inicio_em)}`}</time>
+                {e.local && ` · ${e.local}`}
+                {e.tipo === 'agenda_autoridade' && ' · Agenda de autoridade'}
+              </p>
+              {e.resumo && <p>{e.resumo}</p>}
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+    <Paginacao pagina={lista.pagina} paginas={lista.paginas} />
+  </div>
+</Base>

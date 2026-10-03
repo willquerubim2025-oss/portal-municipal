@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+// Status 404 real (D-15). O middleware ainda confere a tabela de redirecionamentos.
+Astro.response.status = 404;
+---
+<Base titulo="Página não encontrada" noindex>
+  <div class="container">
+    <header class="cabecalho-pagina">
+      <h1>Página não encontrada</h1>
+      <p>O endereço pode ter mudado ou o conteúdo foi removido.</p>
+    </header>
+    <form class="filtros" action="/busca" method="get" role="search">
+      <label>Procure o que você precisa <input type="search" name="q" required /></label>
+      <button class="botao" type="submit">Buscar</button>
+    </form>
+    <p><a href="/">Ir para a página inicial</a></p>
+  </div>
+</Base>

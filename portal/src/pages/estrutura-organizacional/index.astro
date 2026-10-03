@@ -1,0 +1,40 @@
+---
+import Base from '../../layouts/Base.astro';
+import { orgaos } from '../../lib/consultas';
+import { moduloAtivo } from '../../lib/municipio';
+
+const { municipio: m } = Astro.locals.contexto;
+if (!moduloAtivo(m, 'estrutura_organizacional')) return Astro.rewrite('/404');
+const lista = await orgaos(m.id);
+
+// Árvore: órgãos de primeiro nível (gabinete, secretarias...) com os subordinados.
+const filhos = new Map<string | null, any[]>();
+for (const o of lista) {
+  const pai = lista.some((x) => x.id === o.parent_id) ? o.parent_id : null;
+  filhos.set(pai, [...(filhos.get(pai) ?? []), o]);
+}
+const raiz = filhos.get(null) ?? [];
+---
+<Base titulo="Estrutura organizacional"
+  descricao={`Gabinete, secretarias e demais órgãos da ${m.nome}: responsáveis, competências, endereços, telefones e horários de atendimento.`}
+  migalhas={[{ nome: 'Estrutura organizacional' }]}>
+  <div class="container">
+    <header class="cabecalho-pagina">
+      <h1>Estrutura organizacional</h1>
+      <p>Órgãos da administração municipal, seus responsáveis e contatos (Lei nº 12.527/2011, art. 8º).</p>
+    </header>
+    {raiz.length === 0 && <p>A estrutura organizacional ainda não foi cadastrada.</p>}
+    <ul class="lista-simples">
+      {raiz.map((o) => (
+        <li>
+          <h2><a href={`/estrutura-organizacional/${o.slug}`}>{o.nome}{o.sigla && ` (${o.sigla})`}</a></h2>
+          {o.responsavel_nome && <p>{o.responsavel_cargo ? `${o.responsavel_cargo}: ` : ''}{o.responsavel_nome}</p>}
+          <p class="meta">{[o.telefone, o.email].filter(Boolean).join(' · ')}</p>
+          {(filhos.get(o.id) ?? []).length > 0 && (
+            <ul>{filhos.get(o.id)!.map((f) => <li><a href={`/estrutura-organizacional/${f.slug}`}>{f.nome}</a></li>)}</ul>
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
+</Base>

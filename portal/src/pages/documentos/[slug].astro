@@ -1,0 +1,97 @@
+---
+import Base from '../../layouts/Base.astro';
+import { documento } from '../../lib/consultas';
+import { urlMidia } from '../../lib/supabase';
+import { htmlSeguro } from '../../lib/html';
+import { data, RELACAO, resumir, SITUACAO, tamanhoArquivo } from '../../lib/formato';
+
+const { municipio: m, dominioPrincipal } = Astro.locals.contexto;
+const d = await documento(m.id, Astro.params.slug!);
+if (!d) return Astro.rewrite('/404');
+
+const arquivos = (d.arquivos ?? []).sort((a: any, b: any) => a.ordem - b.ordem);
+// Relações com documentos publicados (o RLS esconde os não publicados: alvo/origem nulos).
+const relacoes = [
+  ...(d.relacoes ?? []).filter((r: any) => r.alvo).map((r: any) => ({ rotulo: RELACAO[r.tipo]?.[0] ?? r.tipo, doc: r.alvo, obs: r.observacao })),
+  ...(d.relacionado_por ?? []).filter((r: any) => r.origem).map((r: any) => ({ rotulo: RELACAO[r.tipo]?.[1] ?? r.tipo, doc: r.origem, obs: r.observacao })),
+];
+const normativo = !!d.situacao;
+const url = `https://${dominioPrincipal}/documentos/${d.slug}`;
+const ld = normativo ? {
+  '@context': 'https://schema.org',
+  '@type': 'Legislation',
+  name: d.titulo,
+  url,
+  ...(d.numero && { legislationIdentifier: d.ano ? `${d.numero}/${d.ano}` : d.numero }),
+  ...(d.data_documento && { legislationDate: d.data_documento }),
+  ...(d.ementa && { abstract: d.ementa }),
+  legislationLegalForce: d.situacao === 'revogado' || d.situacao === 'sem_efeito' ? 'https://schema.org/NotInForce'
+    : d.situacao === 'alterado' ? 'https://schema.org/PartiallyInForce' : 'https://schema.org/InForce',
+  legislationJurisdiction: `${m.nome}`,
+  legislationPassedBy: { '@id': `https://${dominioPrincipal}/#organizacao` },
+} : {
+  '@context': 'https://schema.org',
+  '@type': 'DigitalDocument',
+  name: d.titulo,
+  url,
+  ...(d.ementa && { abstract: d.ementa }),
+  ...(d.data_documento && { dateCreated: d.data_documento }),
+  publisher: { '@id': `https://${dominioPrincipal}/#organizacao` },
+};
+const meta = d.metadados && typeof d.metadados === 'object' ? Object.entries(d.metadados).filter(([, v]) => v !== null && v !== '' && typeof v !== 'object') : [];
+const rotuloMeta = (k: string) => k.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase());
+---
+<Base titulo={d.titulo} descricao={d.ementa || resumir(d.descricao_html) || `${d.categoria?.nome ?? 'Documento'} da ${m.nome}.`}
+  tipoOg="article" jsonLd={ld}
+  migalhas={[
+    { nome: 'Documentos', href: '/documentos' },
+    ...(d.categoria ? [{ nome: d.categoria.nome, href: `/documentos?categoria=${d.categoria.slug}` }] : []),
+    { nome: d.titulo },
+  ]}>
+  <article class="container">
+    <header class="cabecalho-pagina">
+      <h1>{d.titulo}</h1>
+      {d.ementa && <p>{d.ementa}</p>}
+    </header>
+    <dl class="ficha">
+      {d.categoria && <><dt>Tipo</dt><dd><a href={`/documentos?categoria=${d.categoria.slug}`}>{d.categoria.nome}</a></dd></>}
+      {d.numero && <><dt>Número</dt><dd>{d.numero}{d.ano && `/${d.ano}`}</dd></>}
+      {d.data_documento && <><dt>Data</dt><dd><time datetime={d.data_documento}>{data(d.data_documento)}</time></dd></>}
+      {d.situacao && <><dt>Situação</dt><dd><span class={`situacao situacao-${d.situacao}`}>{SITUACAO[d.situacao]}</span></dd></>}
+      {d.orgao && <><dt>Órgão</dt><dd><a href={`/estrutura-organizacional/${d.orgao.slug}`}>{d.orgao.nome}</a></dd></>}
+      {meta.map(([k, v]) => <><dt>{rotuloMeta(k)}</dt><dd>{String(v)}</dd></>)}
+      <dt>Publicado no portal</dt><dd><time datetime={d.publicado_em}>{data(d.publicado_em)}</time></dd>
+    </dl>
+
+    {d.descricao_html && <div class="conteudo" set:html={htmlSeguro(d.descricao_html)} />}
+
+    {arquivos.length > 0 && (
+      <section aria-labelledby="titulo-arquivos">
+        <h2 id="titulo-arquivos">Arquivos</h2>
+        <ul class="arquivos">
+          {arquivos.map((a: any) => {
+            const href = a.midia ? urlMidia(a.midia.storage_path) : a.url_externa;
+            const formato = a.midia?.mime_type === 'application/pdf' ? 'PDF' : a.midia?.mime_type?.split('/')[1]?.toUpperCase();
+            return (
+              <li>
+                <a href={href} target={a.url_externa ? '_blank' : undefined} rel={a.url_externa ? 'noopener' : undefined}>
+                  {a.rotulo}{a.url_externa && <span class="sr-only"> (abre em nova aba)</span>}
+                </a>
+                <span class="meta">{[formato, tamanhoArquivo(a.midia?.tamanho_bytes)].filter(Boolean).join(' · ')}</span>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    )}
+
+    {relacoes.length > 0 && (
+      <section aria-labelledby="titulo-relacoes">
+        <h2 id="titulo-relacoes">Atos relacionados</h2>
+        <ul>
+          {relacoes.map((r) => <li>{r.rotulo}: <a href={`/documentos/${r.doc.slug}`}>{r.doc.titulo}</a>{r.obs && ` (${r.obs})`}</li>)}
+        </ul>
+      </section>
+    )}
+  </article>
+</Base>

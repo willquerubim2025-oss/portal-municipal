@@ -1,0 +1,13 @@
+{
+  "name": "migracao-wordpress",
+  "private": true,
+  "type": "module",
+  "description": "Migração de sites WordPress de prefeituras para o Portal Municipal (D-22)",
+  "scripts": {
+    "simular": "node migrar.mjs --simular",
+    "migrar": "node migrar.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.2"
+  }
+}

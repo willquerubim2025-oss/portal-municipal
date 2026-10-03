@@ -1,0 +1,58 @@
+---
+import Base from '../../layouts/Base.astro';
+import { categorias, servicos } from '../../lib/consultas';
+import { moduloAtivo } from '../../lib/municipio';
+
+const { municipio: m } = Astro.locals.contexto;
+if (!moduloAtivo(m, 'carta_servicos')) return Astro.rewrite('/404');
+const categoria = Astro.url.searchParams.get('categoria') || undefined;
+const termo = Astro.url.searchParams.get('q')?.trim() || undefined;
+const [lista, cats] = await Promise.all([servicos(m.id, { categoria, termo }), categorias(m.id, 'servico')]);
+const catAtual = cats.find((c) => c.slug === categoria);
+if (categoria && !catAtual) return Astro.rewrite('/404');
+
+// Agrupa por categoria quando não há filtro.
+const grupos = new Map<string, any[]>();
+for (const s of lista) {
+  const nome = s.categoria?.nome ?? 'Outros serviços';
+  grupos.set(nome, [...(grupos.get(nome) ?? []), s]);
+}
+const titulo = catAtual ? `Serviços: ${catAtual.nome}` : 'Carta de Serviços';
+---
+<Base titulo={titulo} noindex={!!termo}
+  descricao={`Carta de Serviços ao Usuário da ${m.nome} (Lei 13.460/2017): o que é, quem pode solicitar, documentos, prazos e onde ser atendido.`}
+  migalhas={catAtual ? [{ nome: 'Serviços', href: '/servicos' }, { nome: catAtual.nome }] : [{ nome: 'Serviços' }]}>
+  <div class="container">
+    <header class="cabecalho-pagina">
+      <h1>{titulo}</h1>
+      <p>Informações sobre os serviços prestados ao cidadão, conforme a Lei nº 13.460/2017.</p>
+    </header>
+    <form class="filtros" method="get" role="search" aria-label="Buscar serviço">
+      <label>Buscar serviço <input type="search" name="q" value={termo ?? ''} /></label>
+      {categoria && <input type="hidden" name="categoria" value={categoria} />}
+      <button class="botao" type="submit">Buscar</button>
+    </form>
+    {cats.length > 1 && (
+      <nav aria-label="Público">
+        <ul class="chips">
+          <li><a href="/servicos" aria-current={!categoria ? 'true' : undefined}>Todos</a></li>
+          {cats.map((c) => <li><a href={`/servicos?categoria=${c.slug}`} aria-current={c.slug === categoria ? 'true' : undefined}>{c.nome}</a></li>)}
+        </ul>
+      </nav>
+    )}
+    {lista.length === 0 && <p>Nenhum serviço encontrado.</p>}
+    {[...grupos].map(([nome, itens]) => (
+      <section>
+        {!categoria && <h2>{nome}</h2>}
+        <ul class="lista-simples">
+          {itens.map((s) => (
+            <li>
+              <h3><a href={`/servicos/${s.slug}`}>{s.titulo}</a></h3>
+              {s.descricao && <p>{s.descricao}</p>}
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+</Base>

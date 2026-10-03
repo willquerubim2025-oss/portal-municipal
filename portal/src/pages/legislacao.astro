@@ -1,0 +1,23 @@
+---
+import Base from '../layouts/Base.astro';
+import ListaDocumentos from '../components/ListaDocumentos.astro';
+import { moduloAtivo } from '../lib/municipio';
+
+const { municipio: m } = Astro.locals.contexto;
+if (!moduloAtivo(m, 'legislacao')) return Astro.rewrite('/404');
+// Categorias de atos normativos: configuráveis por município; padrão = as do provisionamento (0007).
+const somente = m.config.legislacao_categorias ?? [
+  'lei-organica', 'leis-complementares', 'leis-ordinarias', 'decretos', 'portarias', 'resolucoes',
+];
+---
+<Base titulo="Legislação municipal" noindex={Astro.url.searchParams.has('q')}
+  descricao={`Lei Orgânica, leis, decretos, portarias e resoluções da ${m.nome}, com situação de vigência.`}
+  migalhas={[{ nome: 'Legislação' }]}>
+  <div class="container">
+    <header class="cabecalho-pagina">
+      <h1>Legislação municipal</h1>
+      <p>Pesquise os atos normativos do município e veja se estão vigentes, alterados ou revogados.</p>
+    </header>
+    <ListaDocumentos municipioId={m.id} somente={somente} comSituacao />
+  </div>
+</Base>

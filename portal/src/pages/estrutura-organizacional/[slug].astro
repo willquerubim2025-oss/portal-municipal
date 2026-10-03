@@ -1,0 +1,61 @@
+---
+import Base from '../../layouts/Base.astro';
+import { orgao, orgaos } from '../../lib/consultas';
+import { moduloAtivo } from '../../lib/municipio';
+import { urlMidia } from '../../lib/supabase';
+import { htmlSeguro } from '../../lib/html';
+import { resumir } from '../../lib/formato';
+
+const { municipio: m, dominioPrincipal } = Astro.locals.contexto;
+if (!moduloAtivo(m, 'estrutura_organizacional')) return Astro.rewrite('/404');
+const o = await orgao(m.id, Astro.params.slug!);
+if (!o) return Astro.rewrite('/404');
+const todos = await orgaos(m.id);
+const pai = todos.find((x) => x.id === o.parent_id);
+const subordinados = todos.filter((x) => x.parent_id === o.id);
+const foto = urlMidia(o.foto?.storage_path);
+
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'GovernmentOrganization',
+  name: o.nome,
+  ...(o.sigla && { alternateName: o.sigla }),
+  url: `https://${dominioPrincipal}/estrutura-organizacional/${o.slug}`,
+  ...(o.telefone && { telephone: o.telefone }),
+  ...(o.email && { email: o.email }),
+  ...(o.endereco && { address: o.endereco }),
+  parentOrganization: { '@id': `https://${dominioPrincipal}/#organizacao` },
+  ...(o.responsavel_nome && { employee: { '@type': 'Person', name: o.responsavel_nome, ...(o.responsavel_cargo && { jobTitle: o.responsavel_cargo }) } }),
+};
+---
+<Base titulo={o.nome} jsonLd={ld}
+  descricao={resumir(o.competencias_html) || `${o.nome}: responsável, contatos e horário de atendimento.`}
+  migalhas={[{ nome: 'Estrutura organizacional', href: '/estrutura-organizacional' }, ...(pai ? [{ nome: pai.nome, href: `/estrutura-organizacional/${pai.slug}` }] : []), { nome: o.nome }]}>
+  <article class="container">
+    <header class="cabecalho-pagina">
+      <h1>{o.nome}{o.sigla && ` (${o.sigla})`}</h1>
+    </header>
+    {o.responsavel_nome && (
+      <section class="evento" aria-label="Responsável">
+        {foto && <img src={foto} alt={o.foto?.texto_alternativo ?? `Foto de ${o.responsavel_nome}`} width="120" height="150" style="border-radius:8px;object-fit:cover" />}
+        <div>
+          <h2 style="margin-top:0">{o.responsavel_nome}</h2>
+          {o.responsavel_cargo && <p>{o.responsavel_cargo}</p>}
+        </div>
+      </section>
+    )}
+    <dl class="ficha">
+      {o.endereco && <><dt>Endereço</dt><dd>{o.endereco}</dd></>}
+      {o.telefone && <><dt>Telefone</dt><dd><a href={`tel:${o.telefone.replace(/\D/g, '')}`}>{o.telefone}</a></dd></>}
+      {o.email && <><dt>E-mail</dt><dd><a href={`mailto:${o.email}`}>{o.email}</a></dd></>}
+      {o.horario_atendimento && <><dt>Atendimento</dt><dd>{o.horario_atendimento}</dd></>}
+    </dl>
+    {o.competencias_html && <section class="conteudo"><h2>Competências</h2><div set:html={htmlSeguro(o.competencias_html)} /></section>}
+    {o.responsavel_curriculo_html && <section class="conteudo"><h2>Currículo do responsável</h2><div set:html={htmlSeguro(o.responsavel_curriculo_html)} /></section>}
+    {subordinados.length > 0 && (
+      <section><h2>Unidades vinculadas</h2>
+        <ul>{subordinados.map((s) => <li><a href={`/estrutura-organizacional/${s.slug}`}>{s.nome}</a></li>)}</ul>
+      </section>
+    )}
+  </article>
+</Base>

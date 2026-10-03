@@ -1,0 +1,72 @@
+---
+// Listagem filtrável de documentos, usada em /documentos e /legislacao.
+import Paginacao from './Paginacao.astro';
+import { anosDocumentos, categorias, documentos } from '../lib/consultas';
+import { data, paramInt, SITUACAO } from '../lib/formato';
+
+interface Props {
+  municipioId: string;
+  /** Restringe às categorias com estes slugs (ex.: legislação). Vazio = todas. */
+  somente?: string[];
+  /** Mostra o filtro de situação (vigente/revogado...). */
+  comSituacao?: boolean;
+}
+const { municipioId, somente = [], comSituacao = false } = Astro.props;
+const sp = Astro.url.searchParams;
+const categoria = sp.get('categoria') || undefined;
+const ano = sp.get('ano') ? paramInt(sp.get('ano'), 0) || undefined : undefined;
+const termo = sp.get('q')?.trim() || undefined;
+const situacao = comSituacao && sp.get('situacao') && SITUACAO[sp.get('situacao')!] ? sp.get('situacao')! : undefined;
+const pagina = paramInt(sp.get('pagina'));
+
+const [todas, anos] = await Promise.all([categorias(municipioId, 'documento'), anosDocumentos(municipioId)]);
+const cats = somente.length ? todas.filter((c) => somente.includes(c.slug)) : todas;
+const filtroCats = categoria ? [categoria].filter((c) => cats.some((x) => x.slug === c)) : somente;
+const lista = await documentos(municipioId, { pagina, categorias: filtroCats, ano, termo, situacao });
+const filtrando = !!(categoria || ano || termo || situacao);
+---
+<form class="filtros" method="get" role="search" aria-label="Filtrar documentos">
+  <label>Palavra-chave ou número
+    <input type="search" name="q" value={termo ?? ''} />
+  </label>
+  <label>Tipo
+    <select name="categoria">
+      <option value="">Todos</option>
+      {cats.map((c) => <option value={c.slug} selected={c.slug === categoria}>{c.nome}</option>)}
+    </select>
+  </label>
+  <label>Ano
+    <select name="ano">
+      <option value="">Todos</option>
+      {anos.map((a) => <option value={a} selected={a === ano}>{a}</option>)}
+    </select>
+  </label>
+  {comSituacao && (
+    <label>Situação
+      <select name="situacao">
+        <option value="">Todas</option>
+        {Object.entries(SITUACAO).map(([v, r]) => <option value={v} selected={v === situacao}>{r}</option>)}
+      </select>
+    </label>
+  )}
+  <button class="botao" type="submit">Filtrar</button>
+  {filtrando && <a href={Astro.url.pathname}>Limpar filtros</a>}
+</form>
+
+<p class="meta" role="status">{lista.total} {lista.total === 1 ? 'documento encontrado' : 'documentos encontrados'}</p>
+{lista.itens.length > 0 && (
+  <ul class="lista-simples">
+    {lista.itens.map((d) => (
+      <li>
+        <h2><a href={`/documentos/${d.slug}`}>{d.titulo}</a></h2>
+        {d.ementa && <p>{d.ementa}</p>}
+        <p class="meta">
+          {d.categoria?.nome}
+          {d.data_documento && <> · <time datetime={d.data_documento}>{data(d.data_documento)}</time></>}
+          {d.situacao && <> · <span class={`situacao situacao-${d.situacao}`}>{SITUACAO[d.situacao]}</span></>}
+        </p>
+      </li>
+    ))}
+  </ul>
+)}
+<Paginacao pagina={lista.pagina} paginas={lista.paginas} />

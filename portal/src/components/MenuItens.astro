@@ -1,0 +1,19 @@
+---
+import type { ItemMenu } from '../lib/consultas';
+interface Props { itens: ItemMenu[]; atual: string; nivel?: number }
+const { itens, atual, nivel = 0 } = Astro.props;
+const ativo = (href: string | null) => !!href && (href === '/' ? atual === '/' : atual === href || atual.startsWith(`${href}/`));
+---
+<ul class={nivel ? 'submenu' : 'menu-lista'}>
+  {itens.map((item) => (
+    <li class={item.filhos.length ? 'tem-submenu' : undefined}>
+      {item.href
+        ? <a href={item.href} aria-current={ativo(item.href) ? 'page' : undefined}
+            target={item.novaAba ? '_blank' : undefined} rel={item.novaAba ? 'noopener' : undefined}>
+            {item.rotulo}{item.novaAba && <span class="sr-only"> (abre em nova aba)</span>}
+          </a>
+        : <span class="menu-grupo">{item.rotulo}</span>}
+      {item.filhos.length > 0 && <Astro.self itens={item.filhos} atual={atual} nivel={nivel + 1} />}
+    </li>
+  ))}
+</ul>

@@ -1,0 +1,34 @@
+---
+import Base from '../../layouts/Base.astro';
+import CartaoNoticia from '../../components/CartaoNoticia.astro';
+import Paginacao from '../../components/Paginacao.astro';
+import { categorias, noticias } from '../../lib/consultas';
+import { paramInt } from '../../lib/formato';
+
+const { municipio: m } = Astro.locals.contexto;
+const categoria = Astro.url.searchParams.get('categoria') ?? undefined;
+const pagina = paramInt(Astro.url.searchParams.get('pagina'));
+const [lista, cats] = await Promise.all([noticias(m.id, { pagina, categoria }), categorias(m.id, 'publicacao')]);
+const catAtual = cats.find((c) => c.slug === categoria);
+if (pagina > lista.paginas || (categoria && !catAtual)) return Astro.rewrite('/404');
+const titulo = catAtual ? `Notícias: ${catAtual.nome}` : 'Notícias';
+---
+<Base titulo={pagina > 1 ? `${titulo} (página ${pagina})` : titulo}
+  descricao={`Notícias e avisos da ${m.nome}.`}
+  migalhas={catAtual ? [{ nome: 'Notícias', href: '/noticias' }, { nome: catAtual.nome }] : [{ nome: 'Notícias' }]}>
+  <div class="container">
+    <header class="cabecalho-pagina"><h1>{titulo}</h1></header>
+    {cats.length > 1 && (
+      <nav aria-label="Categorias de notícias">
+        <ul class="chips">
+          <li><a href="/noticias" aria-current={!categoria ? 'true' : undefined}>Todas</a></li>
+          {cats.map((c) => <li><a href={`/noticias?categoria=${c.slug}`} aria-current={c.slug === categoria ? 'true' : undefined}>{c.nome}</a></li>)}
+        </ul>
+      </nav>
+    )}
+    {lista.itens.length === 0
+      ? <p>Nenhuma notícia encontrada.</p>
+      : <div class="grade">{lista.itens.map((n) => <CartaoNoticia noticia={n} nivel={2} />)}</div>}
+    <Paginacao pagina={lista.pagina} paginas={lista.paginas} />
+  </div>
+</Base>

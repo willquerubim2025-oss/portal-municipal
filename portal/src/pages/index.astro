@@ -1,0 +1,96 @@
+---
+import Base from '../layouts/Base.astro';
+import CartaoNoticia from '../components/CartaoNoticia.astro';
+import { destaques, eventos, menu, noticias } from '../lib/consultas';
+import { moduloAtivo } from '../lib/municipio';
+import { urlMidia } from '../lib/supabase';
+import { diaMes, hora } from '../lib/formato';
+
+const { municipio: m, dominioPrincipal } = Astro.locals.contexto;
+const [banners, ultimas, proximos, atalhosMenu] = await Promise.all([
+  moduloAtivo(m, 'destaques') ? destaques(m.id).then((d) => d.filter((x) => x.tipo === 'banner' && x.imagem)) : Promise.resolve([]),
+  noticias(m.id, { limite: 7 }),
+  moduloAtivo(m, 'agenda') ? eventos(m.id, { limite: 4 }) : Promise.resolve(null),
+  menu(m.id, 'atalhos'),
+]);
+
+// Acesso rápido: menu "atalhos" do município; sem ele, os serviços mais procurados em qualquer prefeitura.
+const atalhos = atalhosMenu.length
+  ? atalhosMenu.filter((a) => a.href).map((a) => ({ rotulo: a.rotulo, href: a.href!, novaAba: a.novaAba }))
+  : [
+      moduloAtivo(m, 'carta_servicos') && { rotulo: 'Carta de Serviços', href: '/servicos' },
+      { rotulo: 'Transparência', href: '/transparencia' },
+      moduloAtivo(m, 'legislacao') && { rotulo: 'Legislação', href: '/legislacao' },
+      { rotulo: 'Licitações', href: '/documentos?categoria=licitacoes' },
+      { rotulo: 'Concursos', href: '/documentos?categoria=concursos-publicos' },
+      { rotulo: 'Ouvidoria', href: '/ouvidoria' },
+      { rotulo: 'e-SIC', href: '/e-sic' },
+      moduloAtivo(m, 'perguntas_frequentes') && { rotulo: 'Perguntas frequentes', href: '/perguntas-frequentes' },
+    ].filter(Boolean).map((a: any) => ({ ...a, novaAba: false }));
+
+const [principal, ...demais] = ultimas.itens;
+const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: m.nome, url: `https://${dominioPrincipal}` };
+---
+<Base jsonLd={siteLd}>
+  <h1 class="sr-only">{m.nome}</h1>
+  <div class="container">
+    {banners.length > 0 && (
+      <section aria-label="Destaques" class="home-destaques">
+        {banners.slice(0, 2).map((b) => (
+          <a class="banner" href={b.url ?? '#'} target={b.nova_aba ? '_blank' : undefined} rel={b.nova_aba ? 'noopener' : undefined}>
+            <img src={urlMidia(b.imagem.storage_path)} alt={b.imagem.texto_alternativo ?? b.titulo} width="1200" height="514" />
+            <span>{b.titulo}</span>
+          </a>
+        ))}
+      </section>
+    )}
+
+    <section aria-labelledby="titulo-atalhos">
+      <h2 id="titulo-atalhos">Acesso rápido</h2>
+      <ul class="atalhos-home">
+        {atalhos.map((a) => (
+          <li><a href={a.href} target={a.novaAba ? '_blank' : undefined} rel={a.novaAba ? 'noopener' : undefined}>{a.rotulo}</a></li>
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="titulo-noticias">
+      <div class="secao-titulo">
+        <h2 id="titulo-noticias">Notícias</h2>
+        <a href="/noticias">Todas as notícias</a>
+      </div>
+      {ultimas.itens.length === 0
+        ? <p>Nenhuma notícia publicada ainda.</p>
+        : <div class="grade">
+            {principal && <CartaoNoticia noticia={principal} />}
+            {demais.map((n) => <CartaoNoticia noticia={n} />)}
+          </div>}
+    </section>
+
+    {proximos && proximos.itens.length > 0 && (
+      <section aria-labelledby="titulo-agenda">
+        <div class="secao-titulo">
+          <h2 id="titulo-agenda">Agenda</h2>
+          <a href="/eventos">Agenda completa</a>
+        </div>
+        <ul class="lista-simples">
+          {proximos.itens.map((e) => {
+            const d = diaMes(e.inicio_em);
+            return (
+              <li class="evento">
+                <div class="evento-data" aria-hidden="true"><strong>{d.dia}</strong><span>{d.mes}</span></div>
+                <div>
+                  <h3><a href={`/eventos/${e.slug}`}>{e.titulo}</a></h3>
+                  <p class="meta">
+                    <time datetime={e.inicio_em}>{new Date(e.inicio_em).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })}{!e.dia_inteiro && `, ${hora(e.inicio_em)}`}</time>
+                    {e.local && ` · ${e.local}`}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    )}
+  </div>
+</Base>

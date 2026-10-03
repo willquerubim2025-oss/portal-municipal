@@ -1,0 +1,25 @@
+---
+interface Props { pagina: number; paginas: number }
+const { pagina, paginas } = Astro.props;
+const link = (n: number) => {
+  const u = new URL(Astro.url);
+  n === 1 ? u.searchParams.delete('pagina') : u.searchParams.set('pagina', String(n));
+  return `${u.pathname}${u.search}`;
+};
+// Janela de até 5 números em torno da página atual.
+const inicio = Math.max(1, Math.min(pagina - 2, paginas - 4));
+const numeros = Array.from({ length: Math.min(5, paginas) }, (_, i) => inicio + i);
+---
+{paginas > 1 && (
+  <nav class="paginacao" aria-label="Paginação">
+    <ul>
+      {pagina > 1 && <li><a href={link(pagina - 1)} rel="prev">Anterior</a></li>}
+      {numeros.map((n) => (
+        <li>{n === pagina
+          ? <span aria-current="page">{n}<span class="sr-only"> (página atual)</span></span>
+          : <a href={link(n)}><span class="sr-only">Página </span>{n}</a>}</li>
+      ))}
+      {pagina < paginas && <li><a href={link(pagina + 1)} rel="next">Próxima</a></li>}
+    </ul>
+  </nav>
+)}

@@ -1,0 +1,46 @@
+---
+import Base from '../layouts/Base.astro';
+import { buscar } from '../lib/consultas';
+import { data, paramInt } from '../lib/formato';
+
+const { municipio: m } = Astro.locals.contexto;
+const termo = Astro.url.searchParams.get('q')?.trim() ?? '';
+const pagina = paramInt(Astro.url.searchParams.get('pagina'));
+const resultados = termo ? await buscar(m.id, termo, pagina) : [];
+const TIPO: Record<string, string> = {
+  noticia: 'Notícia', aviso: 'Aviso', pagina: 'Página', documento: 'Documento', servico: 'Serviço',
+  evento: 'Evento', pergunta: 'Pergunta frequente', orgao: 'Órgão',
+};
+const proxima = new URL(Astro.url); proxima.searchParams.set('pagina', String(pagina + 1));
+const anterior = new URL(Astro.url); anterior.searchParams.set('pagina', String(pagina - 1));
+---
+<!-- Resultado de busca interna nunca é indexado (D-15). -->
+<Base titulo={termo ? `Busca: ${termo}` : 'Busca'} noindex migalhas={[{ nome: 'Busca' }]}>
+  <div class="container">
+    <header class="cabecalho-pagina"><h1>Busca</h1></header>
+    <form class="filtros" action="/busca" method="get" role="search">
+      <label>Termo <input type="search" name="q" value={termo} required /></label>
+      <button class="botao" type="submit">Buscar</button>
+    </form>
+    {termo && (
+      <p class="meta" role="status">
+        {resultados.length === 0 && pagina === 1 ? `Nenhum resultado para “${termo}”.` : `Resultados para “${termo}”${pagina > 1 ? ` — página ${pagina}` : ''}`}
+      </p>
+    )}
+    <ul class="lista-simples">
+      {resultados.map((r) => (
+        <li>
+          <p class="meta">{TIPO[r.tipo] ?? r.tipo}{r.publicado_em && <> · <time datetime={r.publicado_em}>{data(r.publicado_em)}</time></>}</p>
+          <h2><a href={`/${r.caminho}`}>{r.titulo}</a></h2>
+          {r.resumo && <p>{r.resumo}</p>}
+        </li>
+      ))}
+    </ul>
+    <nav class="paginacao" aria-label="Paginação">
+      <ul>
+        {pagina > 1 && <li><a href={`${anterior.pathname}${anterior.search}`} rel="prev">Anterior</a></li>}
+        {resultados.length === 20 && <li><a href={`${proxima.pathname}${proxima.search}`} rel="next">Próxima</a></li>}
+      </ul>
+    </nav>
+  </div>
+</Base>

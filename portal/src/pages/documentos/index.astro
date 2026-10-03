@@ -1,0 +1,23 @@
+---
+import Base from '../../layouts/Base.astro';
+import ListaDocumentos from '../../components/ListaDocumentos.astro';
+import { categorias } from '../../lib/consultas';
+
+const { municipio: m } = Astro.locals.contexto;
+const slug = Astro.url.searchParams.get('categoria');
+const cat = slug ? (await categorias(m.id, 'documento')).find((c) => c.slug === slug) : undefined;
+const titulo = cat?.nome ?? 'Documentos';
+// Busca livre não deve virar página indexada (D-15).
+const noindex = Astro.url.searchParams.has('q');
+---
+<Base titulo={titulo} noindex={noindex}
+  descricao={cat?.descricao ?? `Leis, decretos, portarias, licitações, contratos, concursos e demais documentos oficiais da ${m.nome}.`}
+  migalhas={cat ? [{ nome: 'Documentos', href: '/documentos' }, { nome: cat.nome }] : [{ nome: 'Documentos' }]}>
+  <div class="container">
+    <header class="cabecalho-pagina">
+      <h1>{titulo}</h1>
+      {cat?.descricao && <p>{cat.descricao}</p>}
+    </header>
+    <ListaDocumentos municipioId={m.id} />
+  </div>
+</Base>

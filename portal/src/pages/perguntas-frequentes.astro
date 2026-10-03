@@ -1,0 +1,54 @@
+---
+import Base from '../layouts/Base.astro';
+import { perguntas } from '../lib/consultas';
+import { moduloAtivo } from '../lib/municipio';
+import { htmlSeguro } from '../lib/html';
+import { resumir } from '../lib/formato';
+
+const { municipio: m } = Astro.locals.contexto;
+if (!moduloAtivo(m, 'perguntas_frequentes')) return Astro.rewrite('/404');
+const lista = await perguntas(m.id);
+
+const grupos = new Map<string, { ordem: number; itens: any[] }>();
+for (const p of lista) {
+  const nome = p.categoria?.nome ?? 'Geral';
+  const g = grupos.get(nome) ?? { ordem: p.categoria?.ordem ?? 999, itens: [] };
+  g.itens.push(p);
+  grupos.set(nome, g);
+}
+const ordenados = [...grupos].sort((a, b) => a[1].ordem - b[1].ordem);
+// FAQPage: resultado enriquecido permitido pelo Google a sites governamentais (D-15).
+const ld = lista.length ? {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: lista.map((p) => ({
+    '@type': 'Question',
+    name: p.pergunta,
+    acceptedAnswer: { '@type': 'Answer', text: htmlSeguro(p.resposta_html) },
+  })),
+} : undefined;
+---
+<Base titulo="Perguntas frequentes" jsonLd={ld}
+  descricao={lista.length ? resumir(`Respostas da ${m.nome}: ${lista.slice(0, 3).map((p) => p.pergunta).join(' ')}`) : `Perguntas frequentes da ${m.nome}.`}
+  migalhas={[{ nome: 'Perguntas frequentes' }]}>
+  <div class="container">
+    <header class="cabecalho-pagina"><h1>Perguntas frequentes</h1></header>
+    {lista.length === 0 && <p>Nenhuma pergunta publicada ainda.</p>}
+    {ordenados.map(([nome, g]) => (
+      <section>
+        {grupos.size > 1 && <h2>{nome}</h2>}
+        {g.itens.map((p) => (
+          <details class="pergunta" id={p.id}>
+            <summary>{p.pergunta}</summary>
+            <div class="conteudo" set:html={htmlSeguro(p.resposta_html)} />
+          </details>
+        ))}
+      </section>
+    ))}
+  </div>
+  <script>
+    // Link direto para uma pergunta (ex.: vindo da busca): abre e rola até ela.
+    const alvo = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (alvo instanceof HTMLDetailsElement) { alvo.open = true; alvo.scrollIntoView(); }
+  </script>
+</Base>
