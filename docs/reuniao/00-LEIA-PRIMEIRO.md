@@ -39,6 +39,8 @@ Use como checklist durante a reunião. **B** = bloqueia o trabalho; **I** = impo
 - [ ] **I** Os 10 temas das notícias atendem?
 - [ ] **I** As 129 páginas do site atual (há duplicadas): quais manter.
 - [ ] **D** Situação de vigência das leis e decretos antigos (vigente, revogado...).
+- [ ] **I** **445 arquivos que já não existem no site atual** (2018–2022): há backup? Levar a lista `arquivos-ausentes-no-site-atual-jeriquara.csv`.
+- [ ] **I** 12 PDFs acima de 50 MB: pedir versão comprimida (lista `arquivos-grandes-jeriquara.csv`).
 
 ### 3. Transparência e sistemas
 - [ ] **B** Endereço (link) de cada sistema Fiorilli e de cada assunto da transparência (receitas, despesas, folha, diárias, obras...).

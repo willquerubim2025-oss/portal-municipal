@@ -29,8 +29,15 @@ const midias = await todas('midias', 'id, storage_path, tamanho_bytes, legado', 
 const usadas = new Set();
 const marcar = (id) => id && usadas.add(id);
 // Referências diretas.
-const { data: anexos } = await sb.from('documento_arquivos').select('midia_id, documento:documentos!inner(municipio_id)').eq('documento.municipio_id', MID).not('midia_id', 'is', null).limit(100000);
-(anexos ?? []).forEach((a) => marcar(a.midia_id));
+// Anexos de documentos: em páginas de 1.000 (o PostgREST devolve no máximo 1.000 linhas por consulta;
+// sem paginar, anexos além do milésimo pareciam "sem uso" e seriam apagados).
+for (let de = 0; ; de += 1000) {
+  const { data, error } = await sb.from('documento_arquivos').select('midia_id, documento:documentos!inner(municipio_id)')
+    .eq('documento.municipio_id', MID).not('midia_id', 'is', null).order('id').range(de, de + 999);
+  if (error) throw new Error(`documento_arquivos: ${error.message}`);
+  data.forEach((a) => marcar(a.midia_id));
+  if (data.length < 1000) break;
+}
 (await todas('publicacoes', 'imagem_destaque_id')).forEach((p) => marcar(p.imagem_destaque_id));
 (await todas('publicacao_midias', 'midia_id')).forEach((p) => marcar(p.midia_id));
 (await todas('orgaos', 'responsavel_foto_id')).forEach((o) => marcar(o.responsavel_foto_id));

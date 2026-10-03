@@ -31,3 +31,6 @@ Copiar `mapas/jeriquara.json` e ajustar: `municipio_slug`, `site_antigo`, `fuso`
 - O mesmo arquivo aparece com `http://` e `https://`: sem normalizar, 742 arquivos (1,1 GB) foram enviados em dobro na primeira rodada. Corrigido; as cópias foram removidas com `limpar-orfas.mjs`.
 - PDFs escaneados e assinados podem passar do limite de upload do Supabase (50 MB): aumentar o limite antes da rodada completa.
 - Segunda rodada da mesma amostra: 5 min (contra 30), 836 arquivos reaproveitados, nenhum duplicado.
+- **Rodada completa (D-28):** fotos de galeria anexadas ao post e não citadas no texto precisam ir para a galeria (`publicacao_midias`); PDFs anexados a notícias, para uma lista "Arquivos" no texto. Sem isso ficam órfãos.
+- **Paginação:** consultas que podem passar de 1.000 linhas precisam de `range()`. Sem isso, a limpeza de órfãs tratou anexos de licitações além do milésimo como "sem uso". **Sempre rodar `limpar-orfas.mjs` primeiro sem `--aplicar` e conferir o número.**
+- Arquivos que o WordPress lista mas o servidor não tem (404) vão para `relatorios/arquivos-ausentes-*.csv` com o documento de cada um, para a prefeitura procurar em backup.

@@ -65,6 +65,22 @@ Nos documentos, as **licitações** ficam com a modalidade registrada (Pregão P
 - **Bloqueia?** Não.
 - **Resposta:** ____________________________________________
 
+## 2.7 Arquivos que já não existem no site atual
+- **Informar e pedir à prefeitura:** na migração completa, **445 arquivos** (PDFs de licitações, contratos, aditivos…) ligados a **173 documentos e notícias** dão "não encontrado" **no próprio site atual**. O WordPress ainda tem o registro, mas o arquivo sumiu do servidor. São quase todos de **2018 a 2022**, o que sugere perda numa troca de servidor ou hospedagem. Hoje, quem clica nesses links no site atual já não consegue abrir o documento.
+- **O que precisamos:** saber se a prefeitura, ou a empresa que hospeda ou hospedou o site, tem **backup antigo da pasta de arquivos** do WordPress (`wp-content/uploads`), ou se os setores (Licitações, Compras) têm esses PDFs guardados.
+- **Material para levar:** `migracao/relatorios/arquivos-ausentes-no-site-atual-jeriquara.csv`, que abre no Excel e lista data, documento, página no site atual e nome de cada arquivo.
+- **O que muda conforme a resposta:**
+  | Resposta | Efeito |
+  |---|---|
+  | Há backup ou os PDFs com os setores | Enviamos os arquivos e rodamos a migração de novo: eles entram nos documentos certos, automaticamente |
+  | Não há | Os documentos ficam sem esses anexos; a prefeitura pode anexar depois pelo painel o que encontrar. Vale registrar a situação, pois é um ponto de atenção para a transparência |
+- **Bloqueia?** Não.
+- **Resposta:** ____________________________________________
+
+## 2.8 Arquivos grandes (acima de 50 MB)
+- **Pedir à prefeitura:** **12 arquivos** (PDFs escaneados ou assinados) passam do limite de upload e não migraram. A lista está em `migracao/relatorios/arquivos-grandes-jeriquara.csv`. Pedir que os setores **comprimam** esses PDFs (normalmente caem para menos de 10 MB) e os enviem; ou a SECKE decide aumentar o limite (D-26).
+- **Bloqueia?** Não; resolver antes da migração final.
+
 ## 2.6 Descrição das imagens (acessibilidade)
 - **Informar à prefeitura:** o site atual não tem descrição nas imagens (texto alternativo, usado por quem tem deficiência visual). Na migração, as imagens recebem uma descrição automática ("Imagem: título da notícia"), marcada para revisão. Revisar é opcional e pode ser feito aos poucos pelo painel. As imagens novas exigem descrição.
 - **Bloqueia?** Não.

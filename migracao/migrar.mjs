@@ -129,12 +129,12 @@ async function migrarArquivo(url, titulo, dataPost) {
   try {
     // Nomes com acento: codificar a URL (doc 05, descoberta 4).
     resp = await fetch(encodeURI(url), { headers: { 'User-Agent': 'SECKE-Migracao/1.0 (contrato com o Municipio)' } });
-  } catch (e) { relatorio.arquivos_falha.push({ url, erro: String(e) }); return null; }
-  if (!resp.ok) { relatorio.arquivos_falha.push({ url, erro: `HTTP ${resp.status}` }); return null; }
+  } catch (e) { relatorio.arquivos_falha.push({ url, post: titulo, erro: String(e) }); return null; }
+  if (!resp.ok) { relatorio.arquivos_falha.push({ url, post: titulo, erro: `HTTP ${resp.status}` }); return null; }
   const corpo = Buffer.from(await resp.arrayBuffer());
   const mime = resp.headers.get('content-type')?.split(';')[0] ?? 'application/octet-stream';
   const up = await sb.storage.from('midias').upload(caminho, corpo, { contentType: mime, cacheControl: '31536000', upsert: true });
-  if (up.error) { relatorio.arquivos_falha.push({ url, erro: up.error.message }); return null; }
+  if (up.error) { relatorio.arquivos_falha.push({ url, post: titulo, erro: up.error.message }); return null; }
   const tituloMedia = media ? textoPlano(media.title?.rendered) : '';
   const alt = mime.startsWith('image/') ? (tituloMedia && !/^(img|image|whatsapp|dsc|foto)?[-_ ]?\d/i.test(tituloMedia) ? tituloMedia : `Imagem: ${titulo}`) : null;
   const { data: midia, error } = await sb.from('midias').insert({
@@ -147,7 +147,7 @@ async function migrarArquivo(url, titulo, dataPost) {
     const { data: igual } = await sb.from('midias').select('id, storage_path, mime_type, texto_alternativo').eq('storage_path', caminho).single();
     relatorio.arquivos_reaproveitados++; cacheMidias.set(url, igual); return igual;
   }
-  if (error) { relatorio.arquivos_falha.push({ url, erro: error.message }); return null; }
+  if (error) { relatorio.arquivos_falha.push({ url, post: titulo, erro: error.message }); return null; }
   relatorio.arquivos_enviados++;
   // O endereço antigo do arquivo passa a redirecionar para o novo (links externos e Google).
   const origem = caminhoAntigo(url);
@@ -217,6 +217,13 @@ async function migrarPost(post, c) {
   const slug = await slugLivre(tabela, slugificar(decodeURIComponent(post.slug)), post.id);
   const destino = `/${c.tipo === 'documento' ? 'documentos' : 'noticias'}/${slug}`;
 
+  // Arquivo já usado dentro do texto (imagem ou link) não precisa aparecer de novo.
+  // Os demais anexados ao post no WordPress viram anexos (documento) ou galeria/lista (notícia):
+  // sem isso, as fotos de galeria das notícias ficavam sem lugar (descoberto na rodada completa).
+  const unicas = [...new Map(midias.map((m) => [m.id, m])).values()];
+  const noTexto = (m) => html.includes(m.storage_path);
+  const rotulo = (m) => textoPlano(mediaPorUrl.get(urlOriginal(m.url))?.title?.rendered) || nomeArquivo(urlOriginal(m.url)).original;
+
   let id;
   if (c.tipo === 'documento') {
     const { numero, ano } = numeroEAno(post.title.rendered, post.date);
@@ -225,29 +232,43 @@ async function migrarPost(post, c) {
       data_documento: post.date.slice(0, 10), ementa: texto ? texto.slice(0, 500) : null, descricao_html: html || null,
       metadados: c.modalidade ? { modalidade: c.modalidade } : {}, status: 'publicado', publicado_em: publicadoEm, legado,
     });
-    // Arquivos que não são imagem viram anexos do documento (PDF, ZIP, DOC...).
-    const anexos = midias.filter((m) => !m.mime_type.startsWith('image/'));
+    // Todo arquivo anexado e não citado no texto vira anexo (PDF, ZIP, DOC e também imagens escaneadas).
+    const anexos = unicas.filter((m) => !noTexto(m));
     await sb.from('documento_arquivos').delete().eq('documento_id', id);
     if (anexos.length) {
       const { error } = await sb.from('documento_arquivos').insert(anexos.map((m, i) => ({
-        documento_id: id, midia_id: m.id, ordem: i,
-        rotulo: textoPlano(mediaPorUrl.get(urlOriginal(m.url))?.title?.rendered) || nomeArquivo(urlOriginal(m.url)).original,
+        documento_id: id, midia_id: m.id, ordem: i, rotulo: rotulo(m),
       })));
       if (error) relatorio.erros.push({ wp: post.id, erro: `anexos: ${error.message}` });
     }
     relatorio.documentos++;
   } else {
-    const imagens = midias.filter((m) => m.mime_type.startsWith('image/'));
+    const imagens = unicas.filter((m) => m.mime_type.startsWith('image/'));
+    const destaque = imagens[0] ?? null;
+    // Galeria: fotos anexadas que não são a de destaque nem aparecem no texto.
+    const galeria = imagens.filter((m) => m.id !== destaque?.id && !noTexto(m));
+    // PDFs e outros arquivos anexados à notícia e não citados no texto: lista "Arquivos" no fim.
+    const outros = unicas.filter((m) => !m.mime_type.startsWith('image/') && !noTexto(m));
+    const publica = (m) => sb.storage.from('midias').getPublicUrl(m.storage_path).data.publicUrl;
+    const corpo = outros.length
+      ? `${html}\n<h2>Arquivos</h2>\n<ul>${outros.map((m) => `<li><a href="${publica(m)}">${rotulo(m).replace(/</g, '&lt;')}</a></li>`).join('')}</ul>`
+      : html;
     id = await gravar('publicacoes', post.id, {
       municipio_id: MID, tipo: /^AVISO\b/i.test(titulo) ? 'aviso' : 'noticia', titulo, slug,
       resumo: texto ? (texto.length > 250 ? `${texto.slice(0, 247).replace(/\s+\S*$/, '')}…` : texto) : null,
-      corpo_html: html || null, imagem_destaque_id: imagens[0]?.id ?? null, status: 'publicado', publicado_em: publicadoEm,
+      corpo_html: corpo || null, imagem_destaque_id: destaque?.id ?? null, status: 'publicado', publicado_em: publicadoEm,
       // Arquivo (ex.: boletins da Covid): sai das listagens logo após a publicação; o link continua.
       expira_em: c.arquivo ? new Date(new Date(publicadoEm).getTime() + 60_000).toISOString() : null,
       legado,
     });
     await sb.from('publicacao_categorias').delete().eq('publicacao_id', id);
     await sb.from('publicacao_categorias').insert((c.categoriasNoticia ?? []).map((s) => ({ publicacao_id: id, categoria_id: idCategoria('publicacao', s) })));
+    await sb.from('publicacao_midias').delete().eq('publicacao_id', id);
+    if (galeria.length) {
+      const { error } = await sb.from('publicacao_midias').insert(galeria.map((m, i) => ({ municipio_id: MID, publicacao_id: id, midia_id: m.id, ordem: i })));
+      if (error) relatorio.erros.push({ wp: post.id, erro: `galeria: ${error.message}` });
+      relatorio.fotos_galeria = (relatorio.fotos_galeria ?? 0) + galeria.length;
+    }
     relatorio.noticias++;
   }
   const origem = caminhoAntigo(post.link);
