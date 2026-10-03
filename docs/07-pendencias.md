@@ -20,7 +20,7 @@
 - [ ] **Arquivos acima de 50 MB: decidido manter o teto de gastos (D-26); resolver antes da migração final, ver o topo de `docs/11-checklist-ir-ao-ar.md`.** Histórico: O limite de 50 MB vem do **spend cap** (teto de gastos) do Supabase; só sobe (até 500 GB) desligando o teto, o que passa a cobrar o excedente da franquia do Pro (100 GB de armazenamento, 250 GB de tráfego/mês). Opções: **A)** desligar o teto e criar alerta de gasto (Billing → Usage alerts); **B, recomendada)** manter o teto e tratar os ~25 PDFs grandes à parte (lista para a prefeitura comprimir e reenviar pelo painel; o relatório da migração já lista os que falharam por tamanho). Amostra: 6 em 1.016 PDFs (~0,6%). "Image transformation" ligado não gera custo com o teto ativo (o portal ainda não usa).
 - [ ] **Validar com a prefeitura o mapa da migração** (`docs/reuniao/02-migracao-do-site-atual.md`): boletins, temas das notícias, o que descartar (coluna Destino), vigência das leis.
 - [ ] Migração: páginas migradas na homologação (D-29); ajustar o mapa conforme a reunião (2.4: História oficial, departamentos, webmail) e rodar `--paginas` de novo.
-- [ ] Imagens dentro do texto vindas do WordPress estão com descrição vazia (`alt=""`, ex.: foto da Prefeita), o que as esconde de leitores de tela. Preencher na migração com o texto alternativo da mídia (`Imagem: título`, marcado para revisão), como já é feito na imagem de destaque, e rodar de novo.
+- [ ] **Cache (D-30), falta o usuário:** cadastrar no Vault da **homologação** (*Supabase → branch homologacao → Integrations → Vault → Add secret*) `portal_cache_url` = `https://portal-municipal-homologacao.portal-municipal.workers.dev` e `portal_cache_segredo` = conteúdo do arquivo `cache-segredo-homologacao.txt` (o mesmo `CACHE_SEGREDO` já cadastrado no Worker). Até lá, o conteúdo novo aparece em até 10 min (validade do cache), sem limpeza imediata. Depois: publicar algo no painel e conferir no portal em ~1 min; então aplicar a 0011 na produção (ver o checklist).
 - [ ] Revisar aos poucos os textos alternativos automáticos das imagens migradas (`midias.legado.alt_automatico = true`; 552 só na amostra). Ideia: filtro no painel.
 - [ ] Usuário dedicado da SECKE para a migração na produção (aparece na auditoria).
 - [ ] Salvar uma cópia do PDF de requisitos em `docs/`.
@@ -36,15 +36,16 @@
 - [ ] Segurança (aviso aceito, ver doc 03 > Permissões): mover `is_plataforma()`/`tem_papel()` para um schema não exposto na Data API.
 - [ ] Carregar `pntp_criterios` com a matriz PNTP vigente e **conferir os nomes das 18 seções padrão da Central** (`provisionar_municipio`) com as dimensões dessa matriz.
 - [ ] Revisar os textos-guia das 6 páginas padrão do provisionamento (hoje é uma frase cada) e decidir se a SECKE oferece um modelo completo (ex.: política de privacidade).
-- [ ] Portal e painel precisam respeitar `config.modulos` (esconder menu e rotas do módulo desligado), `publicacoes.expira_em` e `destaques.fim_em` (as regras ficam na consulta, não no RLS).
 - [ ] Prioridade baixa do doc 08: Diário Oficial próprio, câmaras como cliente (`municipios.tipo`), `config.fuso_horario`, ampliar `sistemas_externos.categoria`.
 - [ ] Criação de usuários pelo admin do município: Edge Function com service_role (convite por e-mail) + linha em `membros`.
-- [ ] Definir como o Astro invalida o cache ao publicar (webhook do banco → purge no Cloudflare).
 
 ## Perguntas para a reunião inicial com o Município
 Tudo o que precisa ser levantado com a prefeitura está organizado em **[docs/reuniao/](reuniao/00-LEIA-PRIMEIRO.md)**: guia e pauta (00), acessos e domínio (01), migração (02), transparência e sistemas (03), dados e conteúdo institucional (04), identidade visual (05), usuários, suporte e contrato (06). **Ao incluir uma nova pergunta para a prefeitura, colocar lá**, no arquivo do assunto.
 
 ## Concluído
+- 03/10/2026: **cache na borda por município com limpeza ao publicar** (D-30): `portal/src/worker.ts`, cabeçalhos no middleware, migration 0011 na homologação, 71 testes de permissão. Falta o Vault (acima) e a produção.
+- 03/10/2026: descrição (alt) das imagens dentro do texto: 371 textos migrados corrigidos (`migracao/corrigir-alt.mjs`); a migração já preenche nas próximas prefeituras (`migracao/alt.mjs`).
+- 03/10/2026: conferido que o portal já respeita `config.modulos` (rotas, menus, sitemap), `publicacoes.expira_em` e `destaques.fim_em`. O painel mantém as telas de módulos desligados de propósito: a prefeitura pode preparar o conteúdo antes de ligar.
 - 02/10/2026: análise de requisitos e viabilidade (doc 01).
 - 02/10/2026: inventário do site atual (doc 05, planilha e JSON).
 - 02/10/2026: schema multi-prefeitura 0001–0006 + seed + 23 testes de RLS.

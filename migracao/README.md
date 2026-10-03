@@ -12,6 +12,7 @@ node migrar.mjs --mapa mapas/jeriquara.json --inventario ../inventario-bruto.jso
 node migrar.mjs --mapa mapas/jeriquara.json --inventario ../inventario-bruto.json --todos                          # tudo
 node migrar.mjs --mapa mapas/jeriquara.json --inventario ../inventario-bruto.json --paginas                        # páginas (D-29), depois dos posts
 node limpar-orfas.mjs --mapa mapas/jeriquara.json               # simula; --aplicar apaga mídias migradas que nada usa
+node corrigir-alt.mjs --mapa mapas/jeriquara.json               # simula; --aplicar preenche o alt vazio das imagens no texto já migrado
 ```
 Sempre na **homologação** primeiro (D-14). O usuário da migração aparece como autor na auditoria.
 
@@ -38,3 +39,6 @@ Copiar `mapas/jeriquara.json` e ajustar: `municipio_slug`, `site_antigo`, `fuso`
 
 ## Páginas (D-29)
 A seção `paginas` do mapa decide tudo: `migrar` (página do WP → caminho novo; pais antes dos filhos), `pais` (páginas novas que agrupam), `redirecionar` (endereço antigo → destino, interno ou sistema externo), `mesmo_endereco` (já existe no portal com o mesmo caminho) e `padrao` (para onde vai o que sobrar; o relatório lista em `paginas_para_padrao`). Em geral só uma fração das páginas do WordPress tem texto próprio: as demais são duplicadas, páginas vazias de menu ou atalhos para sistemas. `dados_institucionais` preenche o rodapé só onde está vazio ou com dado de exemplo.
+
+## Descrição das imagens no texto
+O WordPress grava `alt=""` nas imagens inseridas no conteúdo, o que as esconde de leitores de tela. A migração preenche com o texto alternativo da mídia (título dela ou `Imagem: <título do post>`, marcado em `midias.legado.alt_automatico` para revisão), pela função comum `alt.mjs`. Para conteúdo migrado antes disso, `corrigir-alt.mjs` (só mexe em registros com `legado`, nunca no que foi escrito no painel).

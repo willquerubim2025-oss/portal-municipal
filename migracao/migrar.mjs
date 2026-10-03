@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createClient } from '@supabase/supabase-js';
 import { classificar, decodificar, numeroEAno, textoPlano } from './classificar.mjs';
+import { preencherAlt } from './alt.mjs';
 
 // ------------------------------------------------------------------ configuração
 const args = Object.fromEntries(process.argv.slice(2).reduce((acc, a, i, arr) => {
@@ -186,6 +187,9 @@ function reescreverLinks(html) {
   });
 }
 
+// Texto alternativo de uma mídia já migrada, pelo caminho no Storage (para imagens dentro do texto).
+const altDaMidia = (caminho) => [...cacheMidias.values()].find((m) => m?.storage_path === caminho)?.texto_alternativo ?? null;
+
 // ------------------------------------------------------------------ registros
 async function localizar(tabela, wpId) {
   const { data } = await sb.from(tabela).select('id, slug').eq('municipio_id', MID).eq('legado->>wp_id', String(wpId)).maybeSingle();
@@ -210,7 +214,7 @@ async function migrarPost(post, c) {
   const urls = arquivosDoPost(post);
   const midias = [];
   for (const u of urls) { const m = await migrarArquivo(u, titulo, post.date); if (m) midias.push({ url: u, ...m }); }
-  const html = reescreverLinks(limparHtml(post.content?.rendered));
+  const html = preencherAlt(reescreverLinks(limparHtml(post.content?.rendered)), altDaMidia, titulo);
   const texto = textoPlano(html);
   const legado = { wp_id: post.id, url: post.link, wp_categorias: post.categories };
   const tabela = c.tipo === 'documento' ? 'documentos' : 'publicacoes';
@@ -333,7 +337,7 @@ async function migrarPaginas() {
       const anexos = (mediaPorPost.get(pg.id) ?? []).filter((x) => !x.mime_type?.startsWith('image/')).map((x) => urlOriginal(x.source_url));
       const midias = [];
       for (const u of new Set([...citados, ...anexos])) { const md = await migrarArquivo(u, m.titulo, pg.date); if (md) midias.push({ url: u, ...md }); }
-      let html = reescreverLinks(limparHtml(pg.content?.rendered));
+      let html = preencherAlt(reescreverLinks(limparHtml(pg.content?.rendered)), altDaMidia, m.titulo);
       const soltos = midias.filter((md) => !html.includes(md.storage_path));
       if (soltos.length) {
         const publica = (md) => sb.storage.from('midias').getPublicUrl(md.storage_path).data.publicUrl;

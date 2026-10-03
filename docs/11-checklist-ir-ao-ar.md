@@ -19,7 +19,8 @@
 - [ ] **Backup extra** (D-05): GitHub Action `pg_dump` diário → Cloudflare R2, 30 dias de retenção, **com um teste de restauração feito**.
 - [ ] **Monitoramento de disponibilidade** (UptimeRobot ou Better Stack) com alerta para a equipe.
 - [ ] **Verificação de links quebrados** (RF18) e **exportação completa** (RF19) funcionando.
-- [ ] **Cache na borda + limpeza ao publicar**, para o portal ficar rápido sem mostrar conteúdo velho.
+- [ ] **Cache na borda (D-30) na produção:** migration 0011 aplicada; `npx wrangler secret put CACHE_SEGREDO` no Worker `portal-municipal`; no Vault da produção, `portal_cache_url` (endereço do Worker de produção) e `portal_cache_segredo` (o mesmo valor). Testar: publicar uma notícia e ver a página atualizada em até ~1 min.
+- [ ] **Isolamento do cache entre prefeituras (obrigatório antes do 2º município):** com dois domínios apontando para o Worker, abrir `/noticias` em cada um e conferir que cada um mostra a sua prefeitura (o cache separa pelo domínio via `ctx.props`, D-30). Na homologação só há um domínio, então isso ainda não foi testado.
 - [ ] Rodar os **Security e Performance Advisors** do Supabase na produção e revisar.
 - [ ] Usuário dedicado da SECKE para a migração na produção (aparece como autor na auditoria).
 

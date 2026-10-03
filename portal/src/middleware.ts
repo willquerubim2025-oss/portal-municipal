@@ -27,8 +27,7 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
   // tirar a barra, confere os redirecionamentos, para levar ao destino num salto só.
   if (url.pathname.length > 1 && url.pathname.endsWith('/')) {
     const antiga = await redirecionar(contexto.municipio.id, url);
-    if (antiga) return antiga;
-    return ctx.redirect(url.pathname.replace(/\/+$/, '') + url.search, 301);
+    return naBorda(antiga ?? ctx.redirect(url.pathname.replace(/\/+$/, '') + url.search, 301), contexto.municipio.id, ctx.request);
   }
 
   ctx.locals.contexto = contexto;
@@ -49,8 +48,23 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
   if (!headers.has('Cache-Control')) {
     headers.set('Cache-Control', resposta.status === 200 ? 'public, max-age=60' : 'no-store');
   }
-  return new Response(resposta.body, { status: resposta.status, statusText: resposta.statusText, headers });
+  return naBorda(new Response(resposta.body, { status: resposta.status, statusText: resposta.statusText, headers }), contexto.municipio.id, ctx.request);
 });
+
+// Cache na borda (D-30). Só para a Cloudflare (o navegador segue o Cache-Control acima): 10 min,
+// com a etiqueta do município para a limpeza ao publicar (migration 0011). Os 10 min são a rede de
+// segurança se uma limpeza falhar e o atraso máximo do que tem data marcada (publicado_em, expira_em).
+// A busca não é guardada: cada termo seria uma cópia, quase sempre usada uma vez só.
+const GUARDAVEIS: Record<number, number> = { 200: 600, 301: 600, 404: 120, 410: 600 };
+
+function naBorda(resposta: Response, municipioId: string, request: Request): Response {
+  const segundos = GUARDAVEIS[resposta.status];
+  if (!segundos || !['GET', 'HEAD'].includes(request.method) || new URL(request.url).pathname === '/busca') return resposta;
+  const r = new Response(resposta.body, resposta);
+  r.headers.set('Cloudflare-CDN-Cache-Control', `public, max-age=${segundos}, stale-while-revalidate=60`);
+  r.headers.set('Cache-Tag', `m-${municipioId}`);
+  return r;
+}
 
 async function redirecionar(municipioId: string, url: URL): Promise<Response | null> {
   const caminho = decodeURIComponent(url.pathname).toLowerCase();
