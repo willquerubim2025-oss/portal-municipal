@@ -8,11 +8,12 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "e2e": "node e2e/noticias.mjs && node e2e/conteudo.mjs && node e2e/estrutura.mjs && node e2e/administracao.mjs",
+    "e2e": "node e2e/rodar.mjs",
     "build:homologacao": "tsc --noEmit && vite build --mode homologacao",
     "build:producao": "tsc --noEmit && vite build --mode producao",
     "deploy:homologacao": "npm run build:homologacao && wrangler deploy --env homologacao",
-    "deploy:producao": "npm run build:producao && wrangler deploy"
+    "deploy:producao": "npm run build:producao && wrangler deploy",
+    "e2e:limpar": "node e2e/limpar-homologacao.mjs --aplicar"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",

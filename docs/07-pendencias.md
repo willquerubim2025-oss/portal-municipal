@@ -12,10 +12,8 @@
 - [ ] **E-mail do sistema (SMTP próprio) nos dois projetos Supabase:** sem isso, convites e "esqueci minha senha" não chegam por e-mail a quem não é da equipe (hoje o convite devolve um link para repassar). Opções: Cloudflare Email Service, Resend, Amazon SES ou o e-mail da SECKE. Configurar em Authentication → Emails → SMTP, com remetente do domínio da SECKE e SPF/DKIM.
 - [ ] **Auth na produção:** cadastrar em Authentication → URL Configuration o endereço do painel publicado (Site URL e Redirect URLs `https://<painel>/redefinir-senha`). Sem isso, o link de convite volta para o endereço padrão.
 - [ ] Exportação completa por município (RF19): Edge Function + tela no painel (tabela `exportacoes` já existe).
-- [ ] Homologação: apagar usuários de teste criados pelo `e2e/administracao.mjs` (`novo.e2e.*@exemplo.gov.br`, e o `debug.*`) junto com os itens "E2E".
 - [ ] Painel: pré-visualização de rascunho no portal (hoje o portal só mostra o publicado); biblioteca de mídias para reaproveitar imagens; publicar o painel (Cloudflare Workers static assets ou Pages); gerenciar categorias pelo painel (hoje só as do provisionamento).
 - [ ] Acessibilidade do painel: auditoria automática com axe (`@axe-core/playwright`) em todas as telas, dentro do `npm run e2e`.
-- [ ] Homologação: apagar os itens de teste com "E2E" no título e o conteúdo **fictício de exemplo** (`legado.exemplo = true`: notícias, documentos, serviços, eventos, perguntas e o alerta). As exclusões em lote foram recusadas pelas permissões desta sessão (03/10/2026); dá para apagar pelo painel. Não afeta a produção.
 - [ ] Edge Functions: verificação de links (RF18), exportação (RF19), export diário por município.
 - [ ] GitHub Action: `pg_dump` diário → R2, com retenção de 30 dias + teste de restauração.
 - [ ] Monitoramento de disponibilidade (UptimeRobot ou Better Stack).
@@ -52,6 +50,7 @@ Tudo o que precisa ser levantado com a prefeitura está organizado em **[docs/re
 - 02/10/2026: análise de capacidade multi-prefeitura (doc 04).
 - 02/10/2026: documentação, CLAUDE.md e registro de decisões.
 - 02/10/2026: revisão do schema como base genérica (doc 08). Corrigidos isolamento entre municípios (D-11), brechas da D-09 em arquivos e Storage, `atualizado_por`, auditoria de `municipios`, limite 120 fixo e `(select auth.uid())`. Testes: 23 → 34.
+- 03/10/2026: homologação limpa: 83 itens de teste ("E2E") e de exemplo apagados (mantidos os 5 órgãos de exemplo); notícias fictícias apagadas pelo usuário. `npm run e2e` agora limpa o que os testes criam ao final (`painel/e2e/rodar.mjs`).
 - 03/10/2026: login da homologação configurado pelo usuário (Site URL = painel publicado; Redirect URLs: painel publicado e localhost:5190 `/redefinir-senha`).
 - 03/10/2026: homologação publicada na Cloudflare (D-27): portal https://portal-municipal-homologacao.portal-municipal.workers.dev e painel https://painel-municipal-homologacao.portal-municipal.workers.dev.
 - 03/10/2026: código no GitHub, repositório privado `willquerubim2025-oss/portal-municipal` (D-25), sem `.env`, chaves nem o arquivo local de senhas.
