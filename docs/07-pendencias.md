@@ -32,6 +32,7 @@
 - [ ] Jeriquara: escolher o domínio canônico (com ou sem `www`) e obter acesso ao Search Console / DNS (junto da pergunta sobre o Registro.br).
 
 ## Pendências técnicas do banco
+- [ ] **Avaliar (futuro) a integração GitHub do Supabase** (o painel mostra "No repository connected"; é opcional). Ela aplicaria migrations do `main` automaticamente na produção e criaria branches por pull request. **Não ligar agora:** exige migrations no padrão da CLI (`<timestamp>_nome.sql`; as nossas são `0001_...`) e tiraria o controle do fluxo homologação → produção (D-14). Reavaliar ao adotar a Supabase CLI e pull requests com revisão.
 - [ ] Desempenho (Performance Advisor, 02/10/2026; nada urgente com o volume atual): ~56 FKs sem índice de cobertura (principalmente as compostas e `criado_por`/`atualizado_por`) e ~26 casos de várias policies permissivas para o mesmo papel e ação. Criar índices nas FKs mais usadas e consolidar policies numa migration quando o portal e o painel estiverem consultando de verdade.
 - [ ] Segurança (aviso aceito, ver doc 03 > Permissões): mover `is_plataforma()`/`tem_papel()` para um schema não exposto na Data API.
 - [ ] Carregar `pntp_criterios` com a matriz PNTP vigente e **conferir os nomes das 18 seções padrão da Central** (`provisionar_municipio`) com as dimensões dessa matriz.
