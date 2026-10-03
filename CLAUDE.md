@@ -21,6 +21,7 @@ Produto da SECKE Sistemas: site institucional para prefeituras, com um único si
 | Rotinas | Edge Functions + `pg_cron`: links quebrados, exportação, migração. Backup extra via `pg_dump` em GitHub Action para o Cloudflare R2, com retenção de 30 dias. |
 
 ## Regras do código
+- **Repositório:** https://github.com/willquerubim2025-oss/portal-municipal (privado, `main`). Commitar e enviar ao concluir cada etapa. Nunca versionar `.env`, chaves ou anotações com senha (D-25).
 - **Multi-prefeitura:** toda tabela de conteúdo tem `municipio_id`; o isolamento é feito por RLS. Nenhum dado de uma prefeitura no código; identidade visual fica em `municipios.tema` e `municipios.config`.
 - **Migrations em `supabase/migrations/`, numeradas.** Nunca editar uma migration já aplicada em produção; criar uma nova.
 - **Testes de permissão:** depois de mexer em schema ou RLS, rodar `node supabase/tests/rls.test.mjs`, que precisa terminar com 0 falhas. Toda regra nova de permissão ganha um teste.

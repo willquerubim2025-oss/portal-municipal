@@ -153,3 +153,10 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - O antigo doc 10 (mapa da migração) foi incorporado ao `reuniao/02`. A seção de perguntas do doc 07 passou a apontar para a pasta.
 - Destaque contratual levado ao guia: os 60 dias de implantação contam da entrega dos acessos e materiais pelo Município (TR 6.9.2); a reunião deve terminar com datas de entrega registradas.
 - Regra daqui em diante: pergunta nova para a prefeitura entra no arquivo do assunto em `docs/reuniao/`.
+
+**D-25 · 03/10/2026 · Código no GitHub, repositório privado `portal-municipal`**
+- Repositório: https://github.com/willquerubim2025-oss/portal-municipal (**privado**, branch `main`). Um repositório só para o produto (supabase, portal, painel, migracao, docs), com nome genérico (D-10).
+- Nunca versionar: `.env` (só `.env.example`), `node_modules`, builds, relatórios da migração, prints dos testes e **arquivos de anotação com senhas** (`senhas*.txt`). Há um arquivo `senhas de teste.txt` local do usuário, mantido fora do git.
+- Fim de linha LF para todos os arquivos (`.gitattributes`), para não gerar diferenças falsas no Windows.
+- Motivo: até aqui o projeto existia só numa pasta local (risco de perda) e o GitHub é pré-requisito do backup `pg_dump` → R2 por GitHub Action (D-05) e da publicação automática.
+- A avaliar: transferir o repositório para uma organização da SECKE no GitHub quando houver mais pessoas na equipe.

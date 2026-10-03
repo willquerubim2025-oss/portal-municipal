@@ -3,8 +3,7 @@
 *Atualizar este arquivo sempre que algo for resolvido (mover para "Concluído", com data) ou surgir.*
 
 ## Próximos passos
-- [ ] **URGENTE: controle de versão (03/10/2026).** O projeto não está em git: portal, painel, migrations e ferramenta de migração existem só nesta pasta. Criar repositório **privado** no GitHub (conta da SECKE), iniciar o git sem `.env`, chaves ou `node_modules`, e enviar. Também é pré-requisito do backup `pg_dump` → R2 por GitHub Action (D-05) e da publicação automática.
-- [ ] Ordem sugerida antes da reunião: 1) git + GitHub; 2) limite de upload 200 MB + migração completa na homologação; 3) publicar a homologação na Cloudflare (`npx wrangler login` pelo usuário) para mostrar à prefeitura.
+- [ ] Ordem sugerida antes da reunião: 1) ~~git + GitHub~~ (feito, D-25); 2) limite de upload 200 MB + migração completa na homologação; 3) publicar a homologação na Cloudflare (`npx wrangler login` pelo usuário) para mostrar à prefeitura.
 - [ ] Homologação: definir o domínio de homologação do portal e criar no Auth **da branch** os usuários de teste (o Auth da branch é separado: o usuário da SECKE da produção não existe lá).
 - [ ] **Conta Cloudflare (03/10/2026):** o usuário tem conta grátis. Usar para a homologação. **Antes de Jeriquara ir ao ar, ativar o Workers Paid (US$ 5/mês por conta, cobre todos os municípios).** No Free: 100 mil requisições/dia somadas de todos os municípios e **10 ms de CPU por requisição**; passar disso dá erro ao visitante, não lentidão. Paid: 10 mi requisições + 30 mi ms de CPU por mês, até 30 s por requisição. Domínios das prefeituras via **Cloudflare for SaaS** (custom hostnames): 100 grátis, depois US$ 0,10/mês cada; a prefeitura só cria um CNAME, sem transferir o DNS. Avaliar se a conta deve ficar no e-mail da SECKE (produto da empresa).
 - [ ] Tema ampliado (D-17), junto com o painel: home por blocos (`config.home.blocos`), variações de cabeçalho e de cartões, fontes auto-hospedadas; validação de contraste das cores no painel; documentar o formato em `docs/03`.
@@ -52,6 +51,7 @@ Tudo o que precisa ser levantado com a prefeitura está organizado em **[docs/re
 - 02/10/2026: análise de capacidade multi-prefeitura (doc 04).
 - 02/10/2026: documentação, CLAUDE.md e registro de decisões.
 - 02/10/2026: revisão do schema como base genérica (doc 08). Corrigidos isolamento entre municípios (D-11), brechas da D-09 em arquivos e Storage, `atualizado_por`, auditoria de `municipios`, limite 120 fixo e `(select auth.uid())`. Testes: 23 → 34.
+- 03/10/2026: código no GitHub, repositório privado `willquerubim2025-oss/portal-municipal` (D-25), sem `.env`, chaves nem o arquivo local de senhas.
 - 03/10/2026: material da reunião com a prefeitura reorganizado em `docs/reuniao/` (D-24).
 - 03/10/2026: ferramenta de migração (D-23) em `migracao/` + mapa proposto de Jeriquara (`docs/reuniao/02-migracao-do-site-atual.md`). Amostra de 50 notícias + 50 documentos na homologação: 820 arquivos (1,1 GB), 0 erros, repetição sem duplicar, redirecionamentos conferidos no portal.
 - 03/10/2026: painel (fase 4, D-21): usuários (convite pela Edge Function `convidar-usuario`, papel, desativar/reativar), chamados (abertura, conversa, nota interna da SECKE, situação, consumo do saldo, relatório mensal), auditoria (quem, o quê, quando e o que mudou). Edge Function publicada na homologação e na produção. e2e `administracao.mjs` 25/25, inclusive o convidado abrindo o link, criando a senha e entrando com o papel certo. Bateria completa do painel: 98/98.
