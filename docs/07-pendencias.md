@@ -19,7 +19,7 @@
 - [ ] Edge Functions: verificação de links (RF18), exportação (RF19), export diário por município.
 - [ ] GitHub Action: `pg_dump` diário → R2, com retenção de 30 dias + teste de restauração.
 - [ ] Monitoramento de disponibilidade (UptimeRobot ou Better Stack).
-- [ ] **Aumentar o limite de upload do Storage** nos dois projetos Supabase (Storage → Settings → "Upload file size limit", ex.: 200 MB). Na amostra, 6 PDFs escaneados/assinados passaram de 50 MB e não migraram.
+- [ ] **Arquivos acima de 50 MB (decisão do usuário pendente, 03/10/2026).** O limite de 50 MB vem do **spend cap** (teto de gastos) do Supabase; só sobe (até 500 GB) desligando o teto, o que passa a cobrar o excedente da franquia do Pro (100 GB de armazenamento, 250 GB de tráfego/mês). Opções: **A)** desligar o teto e criar alerta de gasto (Billing → Usage alerts); **B, recomendada)** manter o teto e tratar os ~25 PDFs grandes à parte (lista para a prefeitura comprimir e reenviar pelo painel; o relatório da migração já lista os que falharam por tamanho). Amostra: 6 em 1.016 PDFs (~0,6%). "Image transformation" ligado não gera custo com o teto ativo (o portal ainda não usa).
 - [ ] **Validar com a prefeitura o mapa da migração** (`docs/reuniao/02-migracao-do-site-atual.md`): boletins, temas das notícias, o que descartar (coluna Destino), vigência das leis.
 - [ ] Migração completa na homologação (`--todos`, algumas horas, ~8 GB), depois `limpar-orfas.mjs`; páginas (129, com duplicadas) numa etapa própria, após a validação da coluna Destino.
 - [ ] Revisar aos poucos os textos alternativos automáticos das imagens migradas (`midias.legado.alt_automatico = true`; 552 só na amostra). Ideia: filtro no painel.
