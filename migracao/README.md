@@ -10,6 +10,7 @@ cp .env.example .env            # URL, chave publicável e usuário da migraçã
 node simular.mjs ../inventario-bruto.json mapas/jeriquara.json        # não grava nada; gera relatorios/simulacao-*.md
 node migrar.mjs --mapa mapas/jeriquara.json --inventario ../inventario-bruto.json --noticias 50 --documentos 50   # amostra
 node migrar.mjs --mapa mapas/jeriquara.json --inventario ../inventario-bruto.json --todos                          # tudo
+node migrar.mjs --mapa mapas/jeriquara.json --inventario ../inventario-bruto.json --paginas                        # páginas (D-29), depois dos posts
 node limpar-orfas.mjs --mapa mapas/jeriquara.json               # simula; --aplicar apaga mídias migradas que nada usa
 ```
 Sempre na **homologação** primeiro (D-14). O usuário da migração aparece como autor na auditoria.
@@ -34,3 +35,6 @@ Copiar `mapas/jeriquara.json` e ajustar: `municipio_slug`, `site_antigo`, `fuso`
 - **Rodada completa (D-28):** fotos de galeria anexadas ao post e não citadas no texto precisam ir para a galeria (`publicacao_midias`); PDFs anexados a notícias, para uma lista "Arquivos" no texto. Sem isso ficam órfãos.
 - **Paginação:** consultas que podem passar de 1.000 linhas precisam de `range()`. Sem isso, a limpeza de órfãs tratou anexos de licitações além do milésimo como "sem uso". **Sempre rodar `limpar-orfas.mjs` primeiro sem `--aplicar` e conferir o número.**
 - Arquivos que o WordPress lista mas o servidor não tem (404) vão para `relatorios/arquivos-ausentes-*.csv` com o documento de cada um, para a prefeitura procurar em backup.
+
+## Páginas (D-29)
+A seção `paginas` do mapa decide tudo: `migrar` (página do WP → caminho novo; pais antes dos filhos), `pais` (páginas novas que agrupam), `redirecionar` (endereço antigo → destino, interno ou sistema externo), `mesmo_endereco` (já existe no portal com o mesmo caminho) e `padrao` (para onde vai o que sobrar; o relatório lista em `paginas_para_padrao`). Em geral só uma fração das páginas do WordPress tem texto próprio: as demais são duplicadas, páginas vazias de menu ou atalhos para sistemas. `dados_institucionais` preenche o rodapé só onde está vazio ou com dado de exemplo.

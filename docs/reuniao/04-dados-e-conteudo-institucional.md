@@ -7,13 +7,14 @@
 ## 4.1 Dados da prefeitura (rodapé de todas as páginas)
 | Informação | Onde aparece | Resposta |
 |---|---|---|
-| Endereço completo da sede | Rodapé; Google (dados da organização) | |
-| Telefone principal | Rodapé; botão de ligar no celular | |
-| E-mail institucional | Rodapé | |
-| Horário de atendimento | Rodapé | |
-| CNPJ | Rodapé | |
+| Endereço completo da sede | Rodapé; Google (dados da organização) | Hoje: Rua Jonas Alves Costa, 559 – Centro – CEP 14.450-011. Confirma? |
+| Telefone principal | Rodapé; botão de ligar no celular | Hoje: (16) 99141-5521 (é celular/WhatsApp; há telefone fixo?) |
+| E-mail institucional | Rodapé | Hoje: prefeitura@jeriquara.sp.gov.br. Confirma? |
+| Horário de atendimento | Rodapé | Hoje: segunda a sexta, das 8h às 11h e das 13h às 16h. Confirma? |
+| CNPJ | Rodapé | Hoje: 45.353.315/0001-50. Confirma? |
 | Nome curto (ex.: "Jeriquara") | Cabeçalho | |
 | Frase de apresentação (slogan) | Página inicial; Google; prévia no WhatsApp | |
+- **Já preenchido** com os dados da página Fale Conosco do site atual (D-29): basta confirmar ou corrigir.
 - **Onde será usado:** painel → Estrutura → Identidade visual e dados.
 - **O que muda:** nada no sistema; é cadastro.
 - **Bloqueia?** Não, mas o portal não vai ao ar sem esses dados.

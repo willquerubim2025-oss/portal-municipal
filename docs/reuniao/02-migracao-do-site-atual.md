@@ -48,14 +48,22 @@ Nos documentos, as **licitações** ficam com a modalidade registrada (Pregão P
 - **Resposta:** ____________________________________________
 
 ## 2.4 Páginas do site atual
-- **Pergunta:** das **129 páginas** do site atual, quais devem continuar? Há duplicadas (3 páginas "Ouvidoria", 2 "Transparência", 2 "Licitações"…). Algumas serão substituídas por partes novas do portal (Central de Transparência, Carta de Serviços, Estrutura organizacional, Legislação).
-- **Onde será usado:** na etapa de migração das páginas, que é separada da de notícias e documentos.
-- **O que muda conforme a resposta:**
-  - página mantida → migrada e redirecionada;
-  - página substituída por parte nova → o endereço antigo redireciona para a parte nova;
-  - página descartada → "removido" (410).
-- **Bloqueia?** Não para notícias e documentos; sim para as páginas.
-- **Resposta (ou prazo):** ____________________________________________
+- **Situação:** as páginas **já foram migradas** na homologação, com uma proposta da SECKE (D-29), para a prefeitura conferir. Das 129 páginas, só 12 têm texto próprio; as demais são duplicadas, páginas vazias de menu ou links para sistemas. Todos os 129 endereços antigos levam a algum lugar.
+- **Como ficou (para mostrar na reunião):**
+  | Página nova | Veio de |
+  |---|---|
+  | A Prefeitura → Gabinete da Prefeita, Gabinete da Vice-Prefeita | páginas dos gabinetes (havia duas iguais da Prefeita) |
+  | Departamentos → Saúde, Educação, Assistência Social, Agricultura e Meio Ambiente, Cultura/Esporte/Lazer (com a PNAB), Defesa Civil | páginas dos departamentos (cada uma tinha uma cópia "-2") |
+  | O Município → História de Jeriquara, História (outra versão) | duas páginas de história com textos diferentes |
+  | Fale Conosco | página "Contato" |
+- **Perguntas:**
+  1. **História:** há duas versões com textos diferentes. Qual é a oficial? A outra sai e o endereço dela passa a levar à oficial.
+  2. **Departamentos:** os textos devem continuar como páginas ou passar para a **Estrutura organizacional** (responsável, contato, horário e competências de cada setor, item 4.3)? Se passarem, as páginas viram redirecionamento para lá.
+  3. **Os textos migrados estão atualizados?** (nomes, telefones, responsáveis)
+  4. **Webmail:** qual o endereço do webmail da prefeitura? Hoje o link antigo leva à página inicial.
+- **O que muda conforme a resposta:** só o mapa da migração (`migracao/mapas/jeriquara.json`, seção `paginas`), que é rodado de novo. Textos também podem ser corrigidos direto pelo painel → Páginas.
+- **Bloqueia?** Não.
+- **Resposta:** ____________________________________________
 
 ## 2.5 Vigência das leis e decretos antigos
 - **Pergunta:** a prefeitura consegue indicar quais leis e decretos estão **revogados** ou **alterados**?

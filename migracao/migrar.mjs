@@ -278,6 +278,106 @@ async function migrarPost(post, c) {
   }
 }
 
+// ------------------------------------------------------------------ páginas (D-29)
+// Etapa própria (--paginas): o mapa diz quais páginas do WordPress migram e para qual caminho,
+// quais páginas novas as agrupam (pais) e para onde vai cada endereço antigo sem conteúdo ou duplicado.
+const semBarra = (c) => (c.length > 1 ? c.replace(/\/+$/, '') : c);
+
+async function gravarPagina(caminho, linha, wpId) {
+  // O pai é a página do caminho acima (a/b → a); precisa existir antes (pais e ordem do mapa).
+  const acima = caminho.includes('/') ? caminho.slice(0, caminho.lastIndexOf('/')) : null;
+  let parent_id = null;
+  if (acima) {
+    const { data } = await sb.from('paginas').select('id').eq('municipio_id', MID).eq('caminho', acima).maybeSingle();
+    if (!data) throw new Error(`página ${caminho}: a página-pai ${acima} não existe`);
+    parent_id = data.id;
+  }
+  const atual = wpId
+    ? await localizar('paginas', wpId)
+    : (await sb.from('paginas').select('id').eq('municipio_id', MID).eq('caminho', caminho).maybeSingle()).data;
+  const valores = { municipio_id: MID, caminho, parent_id, ...linha };
+  const r = atual
+    ? await sb.from('paginas').update(valores).eq('id', atual.id).select('id').single()
+    : await sb.from('paginas').insert(valores).select('id').single();
+  if (r.error) throw new Error(`página ${caminho}: ${r.error.message}`);
+  return r.data.id;
+}
+
+async function redirecionar(origem, destino) {
+  if (!origem || semBarra(origem) === semBarra(destino)) return;
+  const { error } = await sb.from('redirecionamentos').upsert({ municipio_id: MID, origem, destino, codigo: 301 }, { onConflict: 'municipio_id,origem' });
+  if (error) relatorio.erros.push({ origem, erro: `redirecionamento: ${error.message}` });
+  else relatorio.redirecionamentos++;
+}
+
+async function migrarPaginas() {
+  const cfg = mapa.paginas;
+  if (!cfg) throw new Error('O mapa não tem a seção "paginas".');
+  const porId = new Map(inv.pages.map((p) => [p.id, p]));
+  for (const m of cfg.migrar) {
+    const c0 = porId.has(m.wp) ? caminhoAntigo(porId.get(m.wp).link) : null;
+    if (c0) novoCaminho.set(c0, `/${m.caminho}`);
+  }
+  for (const [o, d] of Object.entries(cfg.redirecionar ?? {})) if (!/^https?:/.test(d)) novoCaminho.set(o, d);
+
+  for (const [i, p] of (cfg.pais ?? []).entries()) {
+    await gravarPagina(p.caminho, { titulo: p.titulo, resumo: p.resumo ?? null, ordem: i, status: 'publicado', publicado_em: new Date().toISOString() });
+  }
+  for (const [i, m] of cfg.migrar.entries()) {
+    const pg = porId.get(m.wp);
+    if (!pg) { relatorio.erros.push({ wp: m.wp, erro: 'página não está no inventário' }); continue; }
+    try {
+      // Arquivos citados no texto + anexos que não são imagem (fotos soltas anexadas à página não têm lugar numa página).
+      const citados = new Set();
+      for (const x of (pg.content?.rendered ?? '').matchAll(/(?:href|src)=["']([^"']+)["']/gi)) if (ehUpload(x[1])) citados.add(urlOriginal(decodificar(x[1])));
+      const anexos = (mediaPorPost.get(pg.id) ?? []).filter((x) => !x.mime_type?.startsWith('image/')).map((x) => urlOriginal(x.source_url));
+      const midias = [];
+      for (const u of new Set([...citados, ...anexos])) { const md = await migrarArquivo(u, m.titulo, pg.date); if (md) midias.push({ url: u, ...md }); }
+      let html = reescreverLinks(limparHtml(pg.content?.rendered));
+      const soltos = midias.filter((md) => !html.includes(md.storage_path));
+      if (soltos.length) {
+        const publica = (md) => sb.storage.from('midias').getPublicUrl(md.storage_path).data.publicUrl;
+        const rotulo = (md) => textoPlano(mediaPorUrl.get(urlOriginal(md.url))?.title?.rendered) || nomeArquivo(urlOriginal(md.url)).original;
+        html += `\n<h2>Arquivos</h2>\n<ul>${soltos.map((md) => `<li><a href="${publica(md)}">${rotulo(md).replace(/</g, '&lt;')}</a></li>`).join('')}</ul>`;
+      }
+      await gravarPagina(m.caminho, {
+        titulo: m.titulo ?? textoPlano(pg.title.rendered), corpo_html: html || null, ordem: i,
+        status: 'publicado', publicado_em: dataComFuso(pg.date), legado: { wp_id: pg.id, url: pg.link },
+      }, pg.id);
+      await redirecionar(caminhoAntigo(pg.link), `/${m.caminho}`);
+      relatorio.paginas = (relatorio.paginas ?? 0) + 1;
+    } catch (e) { relatorio.erros.push({ wp: m.wp, titulo: m.titulo, erro: String(e.message ?? e) }); }
+  }
+
+  // Endereços antigos: regra do mapa; senão, mesmo endereço no portal novo (nada a fazer); senão, o padrão.
+  const migradas = new Set(cfg.migrar.map((m) => porId.get(m.wp)).filter(Boolean).map((p) => caminhoAntigo(p.link)));
+  const mesmo = new Set(cfg.mesmo_endereco ?? []);
+  for (const pg of inv.pages) {
+    const origem = caminhoAntigo(pg.link);
+    if (!origem || migradas.has(origem) || mesmo.has(origem)) continue;
+    const destino = cfg.redirecionar?.[origem] ?? cfg.padrao ?? '/';
+    if (!cfg.redirecionar?.[origem]) relatorio.paginas_para_padrao = [...(relatorio.paginas_para_padrao ?? []), origem];
+    await redirecionar(origem, destino);
+  }
+  // Regras do mapa para endereços que não são páginas do inventário (ex.: links antigos de menu).
+  for (const [o, d] of Object.entries(cfg.redirecionar ?? {})) if (!inv.pages.some((pg) => caminhoAntigo(pg.link) === o)) await redirecionar(o, d);
+}
+
+// Dados institucionais do mapa (endereço, telefone…) em municipios.config. Só preenche o que está vazio
+// ou marcado como exemplo, para não sobrescrever o que a prefeitura já corrigiu pelo painel.
+async function preencherDadosInstitucionais() {
+  const dados = { ...mapa.dados_institucionais }; delete dados._comentario;
+  const { data } = await sb.from('municipios').select('config').eq('id', MID).single();
+  const config = { ...(data?.config ?? {}) };
+  const exemplo = (v) => !v || /exemplo|0000-0000/i.test(String(v));
+  const mudou = Object.keys(dados).filter((k) => exemplo(config[k]));
+  for (const k of mudou) config[k] = dados[k];
+  if (!mudou.length) return log('Dados institucionais: nada a preencher.');
+  const { error } = await sb.from('municipios').update({ config }).eq('id', MID);
+  if (error) relatorio.erros.push({ erro: `dados institucionais: ${error.message}` });
+  else log(`Dados institucionais preenchidos: ${mudou.join(', ')}`);
+}
+
 // ------------------------------------------------------------------ execução
 await entrar();
 await garantirCategorias();
@@ -288,7 +388,17 @@ for (const { p, c } of classificados) {
   const c0 = caminhoAntigo(p.link);
   if (c0) novoCaminho.set(c0, `/${c.tipo === 'documento' ? 'documentos' : 'noticias'}/${slugificar(decodeURIComponent(p.slug))}`);
 }
-const escolhidos = args.todos ? classificados : [
+if (args.paginas) {
+  // Arquivos já migrados (para reescrever links de upload nas páginas sem baixar de novo).
+  for (let de = 0; ; de += 1000) {
+    const { data } = await sb.from('midias').select('id, storage_path, mime_type, texto_alternativo, legado').eq('municipio_id', MID).not('legado', 'is', null).range(de, de + 999);
+    for (const md of data ?? []) if (md.legado?.url) cacheMidias.set(md.legado.url, md);
+    if (!data || data.length < 1000) break;
+  }
+  await migrarPaginas();
+  if (mapa.dados_institucionais) await preencherDadosInstitucionais();
+}
+const escolhidos = args.paginas ? [] : args.todos ? classificados : [
   ...classificados.filter((x) => x.c.tipo === 'noticia' && !x.c.arquivo).slice(0, Number(args.noticias ?? 0)),
   ...classificados.filter((x) => x.c.tipo === 'documento').slice(0, Number(args.documentos ?? 0)),
 ];
@@ -322,5 +432,5 @@ if (unicos.length) {
   console.log('*  Ver docs/11-checklist-ir-ao-ar.md. Depois de resolver, rode a migração de novo.');
   console.log('*'.repeat(78));
 }
-log(`Fim: ${relatorio.noticias} notícias, ${relatorio.documentos} documentos, ${relatorio.arquivos_enviados} arquivos enviados (${relatorio.arquivos_reaproveitados} reaproveitados, ${relatorio.arquivos_falha.length} falhas), ${relatorio.redirecionamentos} redirecionamentos, ${relatorio.erros.length} erros. Relatório: ${arq}`);
+log(`Fim: ${relatorio.paginas ?? 0} páginas, ${relatorio.noticias} notícias, ${relatorio.documentos} documentos, ${relatorio.arquivos_enviados} arquivos enviados (${relatorio.arquivos_reaproveitados} reaproveitados, ${relatorio.arquivos_falha.length} falhas), ${relatorio.redirecionamentos} redirecionamentos, ${relatorio.erros.length} erros. Relatório: ${arq}`);
 await sb.auth.signOut();

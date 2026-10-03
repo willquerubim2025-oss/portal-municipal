@@ -235,5 +235,221 @@
       "padrao": "OBRA|PAVIMENTA|INFRAESTRUTURA",
       "categoria": "obras"
     }
-  ]
+  ],
+  "paginas": {
+    "_comentario": "Páginas do WordPress (D-29). migrar: as que têm conteúdo (uma de cada duplicada). pais: páginas novas que agrupam as migradas. redirecionar: destino de cada endereço antigo sem conteúdo ou duplicado. Endereço antigo sem regra vai para padrao. mesmo_endereco: já existem no portal novo com o mesmo caminho (não redirecionam). /webmail/ vai para padrao até a prefeitura informar o endereço do webmail.",
+    "pais": [
+      {
+        "caminho": "a-prefeitura",
+        "titulo": "A Prefeitura",
+        "resumo": "Gabinete da Prefeita e da Vice-Prefeita."
+      },
+      {
+        "caminho": "departamentos",
+        "titulo": "Departamentos",
+        "resumo": "Departamentos da Prefeitura e o que cada um faz."
+      }
+    ],
+    "migrar": [
+      {
+        "wp": 19390,
+        "caminho": "a-prefeitura/gabinete-da-prefeita",
+        "titulo": "Gabinete da Prefeita"
+      },
+      {
+        "wp": 18990,
+        "caminho": "a-prefeitura/gabinete-da-vice-prefeita",
+        "titulo": "Gabinete da Vice-Prefeita"
+      },
+      {
+        "wp": 18972,
+        "caminho": "o-municipio/historia",
+        "titulo": "História de Jeriquara"
+      },
+      {
+        "wp": 19389,
+        "caminho": "o-municipio/historia-versao-2",
+        "titulo": "História (outra versão, a confirmar)"
+      },
+      {
+        "wp": 19394,
+        "caminho": "departamentos/saude",
+        "titulo": "Departamento de Saúde"
+      },
+      {
+        "wp": 19393,
+        "caminho": "departamentos/educacao",
+        "titulo": "Departamento de Educação"
+      },
+      {
+        "wp": 19396,
+        "caminho": "departamentos/assistencia-social",
+        "titulo": "Departamento de Assistência Social"
+      },
+      {
+        "wp": 19397,
+        "caminho": "departamentos/agricultura-e-meio-ambiente",
+        "titulo": "Departamento de Agricultura e Meio Ambiente"
+      },
+      {
+        "wp": 20757,
+        "caminho": "departamentos/cultura-esporte-e-lazer",
+        "titulo": "Departamento de Cultura, Esporte e Lazer"
+      },
+      {
+        "wp": 20894,
+        "caminho": "departamentos/cultura-esporte-e-lazer/pnab",
+        "titulo": "PNAB: Política Nacional Aldir Blanc"
+      },
+      {
+        "wp": 19094,
+        "caminho": "departamentos/defesa-civil",
+        "titulo": "Defesa Civil Municipal"
+      },
+      {
+        "wp": 219,
+        "caminho": "fale-conosco",
+        "titulo": "Fale Conosco"
+      }
+    ],
+    "redirecionar": {
+      "/gabinete-da-prefeita/": "/a-prefeitura/gabinete-da-prefeita",
+      "/gabinete-da-vice-prefeita/": "/a-prefeitura/gabinete-da-vice-prefeita",
+      "/a-cidade/gabinete-da-vice-prefeita/": "/a-prefeitura/gabinete-da-vice-prefeita",
+      "/historia-2/": "/o-municipio/historia",
+      "/nossa-cidad/nossa-historia/": "/o-municipio/historia",
+      "/nossa-cidad/": "/o-municipio",
+      "/nossa-cidad/hino-da-cidade/": "/o-municipio",
+      "/nossa-cidad/simbolos/": "/o-municipio",
+      "/a-cidade/": "/o-municipio",
+      "/dados-do-municipio/": "/o-municipio",
+      "/cultura-e-tradicao/": "/o-municipio",
+      "/turismo/": "/o-municipio",
+      "/pontos-de-interesse/": "/o-municipio",
+      "/jeriquara/": "/o-municipio",
+      "/saude/": "/departamentos/saude",
+      "/saude-2/": "/departamentos/saude",
+      "/educacao/": "/departamentos/educacao",
+      "/educacao-2/": "/departamentos/educacao",
+      "/assistencia-social/": "/departamentos/assistencia-social",
+      "/assistencia-social-2/": "/departamentos/assistencia-social",
+      "/agricultura-e-meio-ambiente/": "/departamentos/agricultura-e-meio-ambiente",
+      "/agricultura-e-meio-ambiente-2/": "/departamentos/agricultura-e-meio-ambiente",
+      "/cultura-esporte-e-lazer/": "/departamentos/cultura-esporte-e-lazer",
+      "/cultura-esporte-e-lazer-2/": "/departamentos/cultura-esporte-e-lazer",
+      "/defesa-civil-municipal/": "/departamentos/defesa-civil",
+      "/defesa-civil-2/": "/departamentos/defesa-civil",
+      "/a-prefeitura/": "/a-prefeitura",
+      "/a-prefeitura-2/": "/a-prefeitura",
+      "/departamentos/": "/departamentos",
+      "/departamentos-2/": "/departamentos",
+      "/a-prefeitura/departamentos/": "/departamentos",
+      "/contact/": "/fale-conosco",
+      "/ouvidoria-2/": "/ouvidoria",
+      "/ouvidoria-3/": "/ouvidoria",
+      "/acesso-a-informacao-e-sic/": "/acesso-a-informacao",
+      "/transparencia/acesso-a-informacao/": "/acesso-a-informacao",
+      "/a-prefeitura/jeriquara-online/": "/servicos",
+      "/prefeitura-online/": "/servicos",
+      "/servicos-2/": "/servicos",
+      "/sia-sistema-de-arrecadacao/": "/servicos",
+      "/holerite-online/": "/servicos",
+      "/sis-web/": "https://sppmjeriquara.dcfiorilli.com.br:897/sis/",
+      "/sis-web-2/": "https://sppmjeriquara.dcfiorilli.com.br:897/sis/",
+      "/sis-web/sis-web/": "https://sppmjeriquara.dcfiorilli.com.br:897/sis/",
+      "/scpi-9-0/": "https://scpijeriquara.dcfiorilli.com.br:879/scpi9/",
+      "/servicos/scpi-9-0/": "https://scpijeriquara.dcfiorilli.com.br:879/scpi9/",
+      "/flow-docs/": "https://jeriquara.flowdocs.com.br:2053/",
+      "/servicos/flowdocs/": "https://jeriquara.flowdocs.com.br:2053/",
+      "/nfs-e/": "https://www.nfse.gov.br/EmissorNacional",
+      "/nfs-e-2/": "https://www.nfse.gov.br/EmissorNacional",
+      "/nota-fiscal-de-servicos-nfs-e/": "https://www.nfse.gov.br/EmissorNacional",
+      "/licitacoes/": "/documentos?categoria=licitacoes",
+      "/licitacoes-2/": "/documentos?categoria=licitacoes",
+      "/licitacoes-e-contratos/": "/documentos?categoria=licitacoes",
+      "/transparencia/licitacoes-e-dispensas/": "/documentos?categoria=licitacoes",
+      "/pregoes/": "/documentos?categoria=licitacoes",
+      "/dispensas/": "/documentos?categoria=licitacoes",
+      "/inexigibilidades/": "/documentos?categoria=licitacoes",
+      "/concorrencias/": "/documentos?categoria=licitacoes",
+      "/leiloes/": "/documentos?categoria=licitacoes",
+      "/chamada-publica/": "/documentos?categoria=chamamentos-publicos",
+      "/contratos/": "/documentos?categoria=contratos",
+      "/licitacoes/pca/": "/documentos?categoria=planejamento",
+      "/plano-anual-de-contratacoes/": "/documentos?categoria=planejamento",
+      "/ldo/": "/documentos?categoria=planejamento",
+      "/loa/": "/documentos?categoria=planejamento",
+      "/ppa/": "/documentos?categoria=planejamento",
+      "/licitacoes/decreto/": "/documentos?categoria=decretos",
+      "/decretos/": "/documentos?categoria=decretos",
+      "/portarias/": "/documentos?categoria=portarias",
+      "/portarias-2/": "/documentos?categoria=portarias",
+      "/manual-de-compras/": "/documentos?categoria=outros-documentos",
+      "/valor-venal-rural/": "/documentos?categoria=outros-documentos",
+      "/a-cidade/valor-venal-rural-ano-2026/": "/documentos?categoria=outros-documentos",
+      "/planta-generica-municipal/": "/documentos?categoria=outros-documentos",
+      "/leis-municipais/": "/legislacao",
+      "/transparencia/legislacao-municipal/": "/legislacao",
+      "/codigo-tributario/": "/legislacao",
+      "/alteracoes-do-codigo-tributario/": "/legislacao",
+      "/transparencia/emenda-do-codigo-tributario-municipal/": "/legislacao",
+      "/transparencia/emenda-do-codigo-tributario-municipal/emenda/": "/legislacao",
+      "/concursos/": "/documentos?categoria=processos-seletivos",
+      "/processos-seletivos/": "/documentos?categoria=processos-seletivos",
+      "/transparencia/concursos-e-processos-seletivos/": "/documentos?categoria=processos-seletivos",
+      "/pareceres-do-tribunal-de-contas/": "/documentos?categoria=prestacao-de-contas",
+      "/terceiro-setor/": "/documentos?categoria=convenios",
+      "/transparencia/terceiro-setor/": "/documentos?categoria=convenios",
+      "/planos-e-politicas-publicas/": "/documentos?categoria=planos-municipais",
+      "/conselhos-municipais/": "/documentos?categoria=conselhos-municipais",
+      "/transparencia-2/": "/transparencia",
+      "/portal-da-transparencia-2/": "/transparencia",
+      "/transparencia/portal-da-transparencia/": "/transparencia",
+      "/transparencia/contas-publicas/": "/transparencia",
+      "/receitas-e-despesas/": "/transparencia",
+      "/relatorios-fiscais/": "/transparencia",
+      "/orcamento-e-planejamento/": "/transparencia",
+      "/controle-e-fiscalizacao/": "/transparencia",
+      "/controle-interno/": "/transparencia",
+      "/pessoal/": "/transparencia",
+      "/remuneracao/": "/transparencia",
+      "/cargos-e-funcoes/": "/transparencia",
+      "/servidores/": "/transparencia",
+      "/servidor/": "/transparencia",
+      "/obras-publicas/": "/transparencia",
+      "/tributos-e-financas/": "/transparencia",
+      "/audiencias-publicas/": "/transparencia",
+      "/transparencia/audiencias-publicas/": "/transparencia",
+      "/consultas-publicas/": "/transparencia",
+      "/conferencias-e-participacao-popular/": "/transparencia",
+      "/participacao-social/": "/transparencia",
+      "/diario-oficial-2/": "/transparencia",
+      "/transparencia/diario-oficial-do-municipio/": "/transparencia",
+      "/covid-19/": "/noticias?categoria=covid-19",
+      "/municipio-verde-azul/": "/noticias?categoria=agricultura-e-meio-ambiente",
+      "/politica-de-cookies-br/": "/privacidade",
+      "/minhas-reservas/": "/eventos",
+      "/categorias/": "/eventos",
+      "/locais/": "/eventos",
+      "/home/": "/"
+    },
+    "padrao": "/",
+    "mesmo_endereco": [
+      "/",
+      "/fale-conosco/",
+      "/legislacao/",
+      "/servicos/",
+      "/transparencia/",
+      "/ouvidoria/",
+      "/a-prefeitura/gabinete-da-prefeita/"
+    ]
+  },
+  "dados_institucionais": {
+    "_comentario": "Da página Fale Conosco do site atual (confirmar na reunião, item 4.1).",
+    "cnpj": "45.353.315/0001-50",
+    "endereco": "Rua Jonas Alves Costa, 559 – Centro, Jeriquara/SP – CEP 14.450-011",
+    "telefone": "(16) 99141-5521",
+    "email": "prefeitura@jeriquara.sp.gov.br",
+    "horario": "Segunda a sexta, das 8h às 11h e das 13h às 16h"
+  }
 }

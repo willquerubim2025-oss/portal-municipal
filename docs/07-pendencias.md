@@ -19,7 +19,8 @@
 - [ ] Monitoramento de disponibilidade (UptimeRobot ou Better Stack).
 - [ ] **Arquivos acima de 50 MB: decidido manter o teto de gastos (D-26); resolver antes da migração final, ver o topo de `docs/11-checklist-ir-ao-ar.md`.** Histórico: O limite de 50 MB vem do **spend cap** (teto de gastos) do Supabase; só sobe (até 500 GB) desligando o teto, o que passa a cobrar o excedente da franquia do Pro (100 GB de armazenamento, 250 GB de tráfego/mês). Opções: **A)** desligar o teto e criar alerta de gasto (Billing → Usage alerts); **B, recomendada)** manter o teto e tratar os ~25 PDFs grandes à parte (lista para a prefeitura comprimir e reenviar pelo painel; o relatório da migração já lista os que falharam por tamanho). Amostra: 6 em 1.016 PDFs (~0,6%). "Image transformation" ligado não gera custo com o teto ativo (o portal ainda não usa).
 - [ ] **Validar com a prefeitura o mapa da migração** (`docs/reuniao/02-migracao-do-site-atual.md`): boletins, temas das notícias, o que descartar (coluna Destino), vigência das leis.
-- [ ] Migração: **páginas** (129, com duplicadas) numa etapa própria, após a validação da coluna Destino (reunião 2.4). Notícias e documentos já migrados (D-28).
+- [ ] Migração: páginas migradas na homologação (D-29); ajustar o mapa conforme a reunião (2.4: História oficial, departamentos, webmail) e rodar `--paginas` de novo.
+- [ ] Imagens dentro do texto vindas do WordPress estão com descrição vazia (`alt=""`, ex.: foto da Prefeita), o que as esconde de leitores de tela. Preencher na migração com o texto alternativo da mídia (`Imagem: título`, marcado para revisão), como já é feito na imagem de destaque, e rodar de novo.
 - [ ] Revisar aos poucos os textos alternativos automáticos das imagens migradas (`midias.legado.alt_automatico = true`; 552 só na amostra). Ideia: filtro no painel.
 - [ ] Usuário dedicado da SECKE para a migração na produção (aparece na auditoria).
 - [ ] Salvar uma cópia do PDF de requisitos em `docs/`.

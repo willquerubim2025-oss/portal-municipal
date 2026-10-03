@@ -37,7 +37,7 @@ Use como checklist durante a reunião. **B** = bloqueia o trabalho; **I** = impo
 - [ ] **B** Os 208 "Boletins" de 2020 a 2022 são todos da Covid? (vão para o arquivo)
 - [ ] **B** O que **não** migrar (coluna "Destino" da planilha de inventário).
 - [ ] **I** Os 10 temas das notícias atendem?
-- [ ] **I** As 129 páginas do site atual (há duplicadas): quais manter.
+- [ ] **I** Páginas já migradas (D-29): qual das **duas Histórias** é a oficial; departamentos ficam como páginas ou vão para a Estrutura organizacional; textos atualizados?; endereço do **webmail**.
 - [ ] **D** Situação de vigência das leis e decretos antigos (vigente, revogado...).
 - [ ] **I** **445 arquivos que já não existem no site atual** (2018–2022): há backup? Levar a lista `arquivos-ausentes-no-site-atual-jeriquara.csv`.
 - [ ] **I** 12 PDFs acima de 50 MB: pedir versão comprimida (lista `arquivos-grandes-jeriquara.csv`).
@@ -49,7 +49,7 @@ Use como checklist durante a reunião. **B** = bloqueia o trabalho; **I** = impo
 - [ ] **I** Quem responde pelo PNTP na prefeitura e qual foi a última avaliação.
 
 ### 4. Dados e conteúdo institucional
-- [ ] **I** Endereço, telefone, e-mail, horário de atendimento e CNPJ da prefeitura.
+- [ ] **I** **Confirmar** endereço, telefone, e-mail, horário e CNPJ (já preenchidos com os dados da página Fale Conosco do site atual).
 - [ ] **I** Redes sociais oficiais (links).
 - [ ] **I** Estrutura organizacional: secretarias e departamentos, responsáveis, contatos, horários e competências.
 - [ ] **I** Textos das páginas obrigatórias: Acesso à Informação, e-SIC, Ouvidoria, Privacidade (com o **encarregado de dados da LGPD**), Acessibilidade, O Município.

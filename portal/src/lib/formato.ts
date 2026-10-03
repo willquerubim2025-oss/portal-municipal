@@ -35,9 +35,17 @@ export function tamanhoArquivo(bytes: number | null | undefined): string {
   return `${v.toLocaleString('pt-BR', { maximumFractionDigits: i ? 1 : 0 })} ${unidades[i]}`;
 }
 
-/** Texto puro a partir de HTML, para meta description. */
+const ENTIDADES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', ndash: '–', mdash: '—', hellip: '…' };
+
+const caractere = (n: number, original: string) => (n > 0 && n <= 0x10ffff ? String.fromCodePoint(n) : original);
+
+/** Texto puro a partir de HTML, para meta description. Decodifica as entidades (&#8211;, &amp;…):
+ *  o Astro escapa o atributo de novo, e sem isso o Google mostraria "&amp;#8211;". */
 export function resumir(texto: string | null | undefined, max = 160): string {
-  const limpo = (texto ?? '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+  const limpo = (texto ?? '').replace(/<[^>]+>/g, ' ')
+    .replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (e, c: string) =>
+      c[0] === '#' ? caractere(c[1].toLowerCase() === 'x' ? parseInt(c.slice(2), 16) : parseInt(c.slice(1), 10), e) : ENTIDADES[c.toLowerCase()] ?? e)
+    .replace(/\s+/g, ' ').trim();
   if (limpo.length <= max) return limpo;
   return limpo.slice(0, max - 1).replace(/\s+\S*$/, '') + '…';
 }
