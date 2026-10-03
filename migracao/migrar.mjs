@@ -285,5 +285,21 @@ relatorio.fim = new Date().toISOString();
 fs.mkdirSync('relatorios', { recursive: true });
 const arq = path.join('relatorios', `migracao-${mapa.municipio_slug}-${relatorio.fim.replace(/[:.]/g, '-')}.json`);
 fs.writeFileSync(arq, JSON.stringify(relatorio, null, 2));
+// Arquivos acima do limite de upload: lista para a prefeitura comprimir e reenviar (D-26).
+// Rodar a migração de novo, depois de resolver o limite, envia os que faltaram e os anexa ao documento.
+const grandes = relatorio.arquivos_falha.filter((f) => /maximum allowed size|too large|413/i.test(f.erro));
+const unicos = [...new Map(grandes.map((f) => [f.url, f])).values()];
+if (unicos.length) {
+  const csv = ['arquivo;endereco_no_site_antigo', ...unicos.map((f) => `${f.url.split('/').pop()};${f.url}`)].join(String.fromCharCode(10));
+  const arqCsv = path.join('relatorios', `arquivos-grandes-${mapa.municipio_slug}.csv`);
+  // BOM (U+FEFF) para o Excel abrir com acentos corretos.
+  fs.writeFileSync(arqCsv, String.fromCharCode(0xfeff) + csv);
+  console.log('');
+  console.log('*'.repeat(78));
+  console.log(`*  ATENÇÃO: ${unicos.length} arquivo(s) acima do limite de upload (50 MB com o teto de gastos ligado)`);
+  console.log(`*  ficaram de fora. Lista para a prefeitura comprimir: ${arqCsv}`);
+  console.log('*  Ver docs/11-checklist-ir-ao-ar.md. Depois de resolver, rode a migração de novo.');
+  console.log('*'.repeat(78));
+}
 log(`Fim: ${relatorio.noticias} notícias, ${relatorio.documentos} documentos, ${relatorio.arquivos_enviados} arquivos enviados (${relatorio.arquivos_reaproveitados} reaproveitados, ${relatorio.arquivos_falha.length} falhas), ${relatorio.redirecionamentos} redirecionamentos, ${relatorio.erros.length} erros. Relatório: ${arq}`);
 await sb.auth.signOut();

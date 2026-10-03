@@ -8,6 +8,7 @@ Produto da SECKE Sistemas: site institucional para prefeituras, com um único si
 **Não estamos construindo o site de Jeriquara, e sim uma base para sites de prefeituras em geral.** Banco, lógica, painel e portal devem atender a maior parte dos municípios sem mudar código. O que é específico de cada prefeitura vira dado ou configuração. Jeriquara valida a base, mas não a define. Na dúvida, preferir a solução genérica.
 
 ## Antes de trabalhar, leia
+- [docs/11-checklist-ir-ao-ar.md](docs/11-checklist-ir-ao-ar.md): **conferir sempre que o assunto for publicação, troca de domínio ou migração final.** Tem itens adiados de propósito (ex.: arquivos acima de 50 MB, D-26).
 - [docs/00-indice.md](docs/00-indice.md): mapa da documentação.
 - [docs/06-decisoes.md](docs/06-decisoes.md): o que já foi decidido e por quê. **Não reabrir sem motivo novo.**
 - [docs/07-pendencias.md](docs/07-pendencias.md): o que está em aberto e os próximos passos.

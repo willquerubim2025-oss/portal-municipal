@@ -160,3 +160,9 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Fim de linha LF para todos os arquivos (`.gitattributes`), para não gerar diferenças falsas no Windows.
 - Motivo: até aqui o projeto existia só numa pasta local (risco de perda) e o GitHub é pré-requisito do backup `pg_dump` → R2 por GitHub Action (D-05) e da publicação automática.
 - A avaliar: transferir o repositório para uma organização da SECKE no GitHub quando houver mais pessoas na equipe.
+
+**D-26 · 03/10/2026 · Manter o teto de gastos do Supabase; arquivos acima de 50 MB tratados à parte (adiado, com lembrete)**
+- Decisão do usuário (opção B): o *spend cap* continua **ligado**, então o upload fica limitado a 50 MB. Sem risco de cobrança acima do plano Pro no início.
+- **Não interfere na migração:** arquivo acima do limite é pulado e anotado; o resto do post migra. Rodar a migração de novo depois de resolver o limite envia só os que faltaram e os anexa ao documento (a ferramenta é repetível).
+- A migração gera `migracao/relatorios/arquivos-grandes-<municipio>.csv` e mostra um aviso ao final de cada rodada.
+- **Lembrete:** item no topo de `docs/11-checklist-ir-ao-ar.md` ("Não esquecer"). Resolver antes da migração final: a prefeitura comprime e reenvia os arquivos da lista **ou** desligar o teto com alerta de gasto.
