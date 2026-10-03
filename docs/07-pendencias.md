@@ -19,7 +19,7 @@
 - [ ] Monitoramento de disponibilidade (UptimeRobot ou Better Stack).
 - [ ] **Arquivos acima de 50 MB: decidido manter o teto de gastos (D-26); resolver antes da migração final, ver o topo de `docs/11-checklist-ir-ao-ar.md`.** Histórico: O limite de 50 MB vem do **spend cap** (teto de gastos) do Supabase; só sobe (até 500 GB) desligando o teto, o que passa a cobrar o excedente da franquia do Pro (100 GB de armazenamento, 250 GB de tráfego/mês). Opções: **A)** desligar o teto e criar alerta de gasto (Billing → Usage alerts); **B, recomendada)** manter o teto e tratar os ~25 PDFs grandes à parte (lista para a prefeitura comprimir e reenviar pelo painel; o relatório da migração já lista os que falharam por tamanho). Amostra: 6 em 1.016 PDFs (~0,6%). "Image transformation" ligado não gera custo com o teto ativo (o portal ainda não usa).
 - [ ] **Validar com a prefeitura o mapa da migração** (`docs/reuniao/02-migracao-do-site-atual.md`): boletins, temas das notícias, o que descartar (coluna Destino), vigência das leis.
-- [ ] Migração completa: 1ª rodada feita (D-28); **2ª rodada em andamento** para montar as galerias; depois conferir órfãs (`limpar-orfas.mjs`, esperado ~0) e testar no portal. Páginas (129, com duplicadas) numa etapa própria, após a validação da coluna Destino.
+- [ ] Migração: **páginas** (129, com duplicadas) numa etapa própria, após a validação da coluna Destino (reunião 2.4). Notícias e documentos já migrados (D-28).
 - [ ] Revisar aos poucos os textos alternativos automáticos das imagens migradas (`midias.legado.alt_automatico = true`; 552 só na amostra). Ideia: filtro no painel.
 - [ ] Usuário dedicado da SECKE para a migração na produção (aparece na auditoria).
 - [ ] Salvar uma cópia do PDF de requisitos em `docs/`.
@@ -50,6 +50,7 @@ Tudo o que precisa ser levantado com a prefeitura está organizado em **[docs/re
 - 02/10/2026: análise de capacidade multi-prefeitura (doc 04).
 - 02/10/2026: documentação, CLAUDE.md e registro de decisões.
 - 02/10/2026: revisão do schema como base genérica (doc 08). Corrigidos isolamento entre municípios (D-11), brechas da D-09 em arquivos e Storage, `atualizado_por`, auditoria de `municipios`, limite 120 fixo e `(select auth.uid())`. Testes: 23 → 34.
+- 03/10/2026: **migração completa de notícias e documentos de Jeriquara na homologação** (D-28): 683 notícias, 956 documentos, 6.860 arquivos (7,2 GB), 7.347 redirecionamentos, galerias montadas, 0 órfãs, 0 erros. Pendentes: 445 arquivos que não existem no site atual e 12 acima de 50 MB (listas em `migracao/relatorios/`, itens 2.7 e 2.8 da reunião).
 - 03/10/2026: homologação limpa: 83 itens de teste ("E2E") e de exemplo apagados (mantidos os 5 órgãos de exemplo); notícias fictícias apagadas pelo usuário. `npm run e2e` agora limpa o que os testes criam ao final (`painel/e2e/rodar.mjs`).
 - 03/10/2026: login da homologação configurado pelo usuário (Site URL = painel publicado; Redirect URLs: painel publicado e localhost:5190 `/redefinir-senha`).
 - 03/10/2026: homologação publicada na Cloudflare (D-27): portal https://portal-municipal-homologacao.portal-municipal.workers.dev e painel https://painel-municipal-homologacao.portal-municipal.workers.dev.
