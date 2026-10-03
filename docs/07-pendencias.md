@@ -4,7 +4,6 @@
 
 ## Próximos passos
 - [ ] Ordem sugerida antes da reunião: 1) ~~git + GitHub~~ (D-25); 2) migração completa na homologação (em andamento, 03/10/2026); 3) ~~publicar a homologação na Cloudflare~~ (D-27).
-- [ ] **Login da homologação (Supabase da branch → Authentication → URL Configuration):** incluir `https://painel-municipal-homologacao.portal-municipal.workers.dev/redefinir-senha` nas Redirect URLs e usar o painel publicado como Site URL. Sem isso, convite e "esqueci minha senha" enviados pelo painel publicado voltam para o endereço padrão.
 - [ ] Homologação: definir o domínio de homologação do portal e criar no Auth **da branch** os usuários de teste (o Auth da branch é separado: o usuário da SECKE da produção não existe lá).
 - [ ] **Conta Cloudflare (03/10/2026):** o usuário tem conta grátis. Usar para a homologação. **Antes de Jeriquara ir ao ar, ativar o Workers Paid (US$ 5/mês por conta, cobre todos os municípios).** No Free: 100 mil requisições/dia somadas de todos os municípios e **10 ms de CPU por requisição**; passar disso dá erro ao visitante, não lentidão. Paid: 10 mi requisições + 30 mi ms de CPU por mês, até 30 s por requisição. Domínios das prefeituras via **Cloudflare for SaaS** (custom hostnames): 100 grátis, depois US$ 0,10/mês cada; a prefeitura só cria um CNAME, sem transferir o DNS. Avaliar se a conta deve ficar no e-mail da SECKE (produto da empresa).
 - [ ] Tema ampliado (D-17), junto com o painel: home por blocos (`config.home.blocos`), variações de cabeçalho e de cartões, fontes auto-hospedadas; validação de contraste das cores no painel; documentar o formato em `docs/03`.
@@ -53,6 +52,7 @@ Tudo o que precisa ser levantado com a prefeitura está organizado em **[docs/re
 - 02/10/2026: análise de capacidade multi-prefeitura (doc 04).
 - 02/10/2026: documentação, CLAUDE.md e registro de decisões.
 - 02/10/2026: revisão do schema como base genérica (doc 08). Corrigidos isolamento entre municípios (D-11), brechas da D-09 em arquivos e Storage, `atualizado_por`, auditoria de `municipios`, limite 120 fixo e `(select auth.uid())`. Testes: 23 → 34.
+- 03/10/2026: login da homologação configurado pelo usuário (Site URL = painel publicado; Redirect URLs: painel publicado e localhost:5190 `/redefinir-senha`).
 - 03/10/2026: homologação publicada na Cloudflare (D-27): portal https://portal-municipal-homologacao.portal-municipal.workers.dev e painel https://painel-municipal-homologacao.portal-municipal.workers.dev.
 - 03/10/2026: código no GitHub, repositório privado `willquerubim2025-oss/portal-municipal` (D-25), sem `.env`, chaves nem o arquivo local de senhas.
 - 03/10/2026: material da reunião com a prefeitura reorganizado em `docs/reuniao/` (D-24).
