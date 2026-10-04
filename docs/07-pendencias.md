@@ -2,6 +2,20 @@
 
 *Atualizar este arquivo sempre que algo for resolvido (mover para "Concluído", com data) ou surgir.*
 
+## Situação geral (estimativa de 04/10/2026)
+Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reunião) e da ida ao ar.
+
+| Frente | Pronto | O que falta |
+|---|---|---|
+| Base (banco, RLS, multi-prefeitura) | ~95% | índices de desempenho, mover `is_plataforma`/`tem_papel` para `interno` |
+| Portal público (RF01–07) | ~90% | identidade visual de Jeriquara, otimização de imagens, tema ampliado (D-17) |
+| Transparência (RF08–11) | ~55% | links dos sistemas Fiorilli e de cada seção (prefeitura), matriz PNTP, tela PNTP |
+| Painel (RF12–19) | ~90% | biblioteca de mídias, pré-visualização de rascunho |
+| Suporte (RF20–22) | ~85% | regra de contagem da "solicitação editorial" (prefeitura) |
+| Migração (RM01–05) | ~80% | validação da prefeitura, arquivos ausentes/grandes, rodada final na produção |
+| Operação (cache, backup, links, exportação, acessibilidade) | ~80% | SMTP, monitoramento, Workers Paid, teste manual de acessibilidade, cópia dos arquivos |
+| Ida ao ar (domínio, produção, treinamento, aceite) | ~10% | quase tudo depende da reunião |
+
 ## Próximos passos
 - [ ] Ordem sugerida antes da reunião: 1) ~~git + GitHub~~ (D-25); 2) migração completa na homologação (em andamento, 03/10/2026); 3) ~~publicar a homologação na Cloudflare~~ (D-27).
 - [ ] Homologação: definir o domínio de homologação do portal e criar no Auth **da branch** os usuários de teste (o Auth da branch é separado: o usuário da SECKE da produção não existe lá).
