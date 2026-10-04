@@ -9,7 +9,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 |---|---|---|
 | Base (banco, RLS, multi-prefeitura) | ~95% | índices de desempenho, mover `is_plataforma`/`tem_papel` para `interno` |
 | Portal público (RF01–07) | ~90% | identidade visual de Jeriquara, otimização de imagens, tema ampliado (D-17) |
-| Transparência (RF08–11) | ~55% | links dos sistemas Fiorilli e de cada seção (prefeitura), matriz PNTP, tela PNTP |
+| Transparência (RF08–11) | ~70% | links dos sistemas Fiorilli e de cada seção (prefeitura); preencher o PNTP com a prefeitura |
 | Painel (RF12–19) | ~90% | biblioteca de mídias, pré-visualização de rascunho |
 | Suporte (RF20–22) | ~85% | regra de contagem da "solicitação editorial" (prefeitura) |
 | Migração (RM01–05) | ~80% | validação da prefeitura, arquivos ausentes/grandes, rodada final na produção |
@@ -22,7 +22,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 - [ ] **Conta Cloudflare (03/10/2026):** o usuário tem conta grátis. Usar para a homologação. **Antes de Jeriquara ir ao ar, ativar o Workers Paid (US$ 5/mês por conta, cobre todos os municípios).** No Free: 100 mil requisições/dia somadas de todos os municípios e **10 ms de CPU por requisição**; passar disso dá erro ao visitante, não lentidão. Paid: 10 mi requisições + 30 mi ms de CPU por mês, até 30 s por requisição. Domínios das prefeituras via **Cloudflare for SaaS** (custom hostnames): 100 grátis, depois US$ 0,10/mês cada; a prefeitura só cria um CNAME, sem transferir o DNS. Avaliar se a conta deve ficar no e-mail da SECKE (produto da empresa).
 - [ ] Tema ampliado (D-17), junto com o painel: home por blocos (`config.home.blocos`), variações de cabeçalho e de cartões, fontes auto-hospedadas; validação de contraste das cores no painel; documentar o formato em `docs/03`.
 - [ ] Portal (fase 2): publicar o Worker na Cloudflare (conta, `wrangler deploy`, variáveis) e apontar um domínio de homologação; cache na borda + purge ao publicar; otimização de imagens (Supabase Image Transformations ou Cloudflare Images, `srcset`); revisar a sessão KV que o adaptador liga por padrão (o portal não usa sessão); `astro check` (instalar `@astrojs/check`); medir Core Web Vitals (`web-perf`); validar dados estruturados no Rich Results Test; teste com leitor de tela (NVDA).
-- [ ] Painel: tela de acompanhamento PNTP (depende de carregar `pntp_criterios`); importação em lote de redirecionamentos (CSV), junto com o script de migração.
+- [ ] Painel: importação em lote de redirecionamentos (CSV).
 - [ ] **E-mail do sistema (SMTP próprio) nos dois projetos Supabase:** sem isso, convites e "esqueci minha senha" não chegam por e-mail a quem não é da equipe (hoje o convite devolve um link para repassar). Opções: Cloudflare Email Service, Resend, Amazon SES ou o e-mail da SECKE. Configurar em Authentication → Emails → SMTP, com remetente do domínio da SECKE e SPF/DKIM.
 - [ ] **Auth na produção:** cadastrar em Authentication → URL Configuration o endereço do painel publicado (Site URL e Redirect URLs `https://<painel>/redefinir-senha`). Sem isso, o link de convite volta para o endereço padrão.
 - [ ] Painel: pré-visualização de rascunho no portal (hoje o portal só mostra o publicado); biblioteca de mídias para reaproveitar imagens; publicar o painel (Cloudflare Workers static assets ou Pages); gerenciar categorias pelo painel (hoje só as do provisionamento).
@@ -47,7 +47,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 - [ ] **Avaliar (futuro) a integração GitHub do Supabase** (o painel mostra "No repository connected"; é opcional). Ela aplicaria migrations do `main` automaticamente na produção e criaria branches por pull request. **Não ligar agora:** exige migrations no padrão da CLI (`<timestamp>_nome.sql`; as nossas são `0001_...`) e tiraria o controle do fluxo homologação → produção (D-14). Reavaliar ao adotar a Supabase CLI e pull requests com revisão.
 - [ ] Desempenho (Performance Advisor, 02/10/2026; nada urgente com o volume atual): ~56 FKs sem índice de cobertura (principalmente as compostas e `criado_por`/`atualizado_por`) e ~26 casos de várias policies permissivas para o mesmo papel e ação. Criar índices nas FKs mais usadas e consolidar policies numa migration quando o portal e o painel estiverem consultando de verdade.
 - [ ] Segurança (aviso aceito, ver doc 03 > Permissões): mover `is_plataforma()`/`tem_papel()` para um schema não exposto na Data API.
-- [ ] Carregar `pntp_criterios` com a matriz PNTP vigente e **conferir os nomes das 18 seções padrão da Central** (`provisionar_municipio`) com as dimensões dessa matriz.
+- [ ] Conferir os nomes das 18 seções padrão da Central (`provisionar_municipio`) com as dimensões da matriz PNTP 2026 (D-35) e ligar cada critério ao item da Central que o atende (`pntp_atendimento.transparencia_item_id`, hoje não usado pela tela).
 - [ ] Revisar os textos-guia das 6 páginas padrão do provisionamento (hoje é uma frase cada) e decidir se a SECKE oferece um modelo completo (ex.: política de privacidade).
 - [ ] Prioridade baixa do doc 08: Diário Oficial próprio, câmaras como cliente (`municipios.tipo`), `config.fuso_horario`, ampliar `sistemas_externos.categoria`.
 - [ ] Criação de usuários pelo admin do município: Edge Function com service_role (convite por e-mail) + linha em `membros`.
@@ -56,6 +56,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 Tudo o que precisa ser levantado com a prefeitura está organizado em **[docs/reuniao/](reuniao/00-LEIA-PRIMEIRO.md)**: guia e pauta (00), acessos e domínio (01), migração (02), transparência e sistemas (03), dados e conteúdo institucional (04), identidade visual (05), usuários, suporte e contrato (06). **Ao incluir uma nova pergunta para a prefeitura, colocar lá**, no arquivo do assunto.
 
 ## Concluído
+- 04/10/2026: **PNTP 2026** (D-35): matriz oficial (181 critérios, 96 de prefeitura) na produção e na homologação, tela de acompanhamento no painel, critérios 13.1, 13.4, 13.5 e 2.9 atendidos pelo portal; auditoria de acessibilidade 69 páginas, 0 problemas.
 - 04/10/2026: **backup da homologação no R2** funcionando: restauração conferida com todo o conteúdo migrado (683 notícias, 956 documentos, 6.905 mídias, 7.497 redirecionamentos, 20.294 registros de auditoria, 8 usuários). Produção e homologação verdes.
 - 04/10/2026: **backup extra da produção no R2** (D-34): R2 ativado pelo usuário, bucket `portal-municipal-backups` (enam) com expiração de 30 dias, token só de objetos nesse bucket, segredos no GitHub; execução manual verde com restauração conferida. Um token do R2 cujo segredo apareceu num print foi substituído por outro e apagado pelo usuário.
 - 04/10/2026: **auditoria automática de acessibilidade** (D-33): 67 páginas do portal e do painel, 0 problemas. 0014 aplicada pelo usuário; nova verificação de links: 217 problemas, 217 registros (sem duplicar).

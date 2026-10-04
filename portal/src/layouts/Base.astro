@@ -151,10 +151,12 @@ const caminhoAtual = Astro.url.pathname;
             Acessibilidade
           </a>
         </li>
-        <li class="tamanho-texto" role="group" aria-label="Tamanho do texto">
-          <button type="button" data-fonte="-1" aria-label="Diminuir o tamanho do texto">A-</button>
-          <button type="button" data-fonte="0" aria-label="Tamanho normal do texto">A</button>
-          <button type="button" data-fonte="1" aria-label="Aumentar o tamanho do texto">A+</button>
+        <li>
+          <span class="tamanho-texto" role="group" aria-label="Tamanho do texto">
+            <button type="button" data-fonte="-1" aria-label="Diminuir o tamanho do texto">A-</button>
+            <button type="button" data-fonte="0" aria-label="Tamanho normal do texto">A</button>
+            <button type="button" data-fonte="1" aria-label="Aumentar o tamanho do texto">A+</button>
+          </span>
         </li>
         <li><button type="button" id="botao-contraste" aria-pressed="false">Alto contraste</button></li>
       </ul>

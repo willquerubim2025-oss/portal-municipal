@@ -186,8 +186,8 @@ function Linha({ c, a, situacao, aberto, portal, alternar, salvar }: {
           {Object.entries(SITUACOES).map(([v, r]) => <option key={v} value={v}>{r}</option>)}
         </select>
       </div>
-      {c.aspectos.length > 0 && (
-        <p className="meta">O tribunal também avalia: {c.aspectos.filter((x) => ASPECTO[x]).map((x) => ASPECTO[x]).join(', ') || 'disponibilidade'}.</p>
+      {c.aspectos.some((x) => ASPECTO[x]) && (
+        <p className="meta">O tribunal também avalia: {c.aspectos.filter((x) => ASPECTO[x]).map((x) => ASPECTO[x]).join(', ')}.</p>
       )}
       {a?.evidencia_url && !aberto && (
         <p className="meta">Evidência: <a href={a.evidencia_url} target="_blank" rel="noopener noreferrer">{a.evidencia_url}<span className="sr-only"> (abre em nova aba)</span></a></p>

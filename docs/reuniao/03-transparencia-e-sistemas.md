@@ -56,7 +56,9 @@
 
 ## 3.4 PNTP: responsável e última avaliação
 - **Pergunta:** quem cuida do PNTP na prefeitura e qual foi a nota ou o resultado da última avaliação, com a lista do que faltou?
-- **Onde será usado:** para priorizar a Central e conferir, critério a critério, onde cada exigência está atendida (o sistema tem uma tabela para esse acompanhamento).
+- **Onde será usado:** no painel → **PNTP**, que já tem os **96 critérios da matriz oficial de 2026** que valem para a prefeitura (12 essenciais). Para cada um, registra-se o link com a evidência e a situação. O portal já oferece sozinho a evidência de 48 deles (busca, estrutura, legislação, documentos, e-SIC, ouvidoria, Carta de Serviços, acessibilidade, mapa do site, botão do Radar). O que falta depende de links dos sistemas e de documentos da prefeitura.
+- **Para mostrar na reunião:** a tela do PNTP na homologação, filtrada por "Essencial" (receitas, despesas, RGF, RREO, PPA, LDO, LOA): é a lista do que a prefeitura precisa garantir primeiro.
+- **O que precisamos também:** o **relatório da última avaliação** (o tribunal envia ou está no Radar da Transparência), para começar o acompanhamento pelo que já foi apontado.
 - **Contexto contratual:** o Termo de Referência pede o **mapeamento** dos critérios, **sem garantia de nota**. Vale alinhar essa expectativa na reunião.
 - **Bloqueia?** Não.
 - **Resposta:** ____________________________________________

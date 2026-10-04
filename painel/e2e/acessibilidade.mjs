@@ -88,7 +88,7 @@ await page.getByRole('heading', { level: 1, name: /Olá/ }).waitFor({ timeout: 2
 
 const TELAS = ['/', '/noticias', '/noticias/nova', '/documentos', '/documentos/novo', '/paginas', '/paginas/novo', '/servicos',
   '/servicos/novo', '/eventos', '/eventos/novo', '/perguntas', '/perguntas/novo', '/destaques', '/destaques/novo', '/orgaos',
-  '/orgaos/novo', '/menus', '/transparencia', '/identidade', '/categorias', '/redirecionamentos', '/usuarios', '/chamados',
+  '/orgaos/novo', '/menus', '/transparencia', '/pntp', '/identidade', '/categorias', '/redirecionamentos', '/usuarios', '/chamados',
   '/chamados/novo', '/auditoria', '/links', '/exportar'];
 for (const t of TELAS) {
   await page.goto(`${PAINEL}${t}`);
