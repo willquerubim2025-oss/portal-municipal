@@ -42,11 +42,13 @@ Retenção de 30 dias: regra de ciclo de vida do bucket no R2 (apaga sozinho).
 
 ## Restaurar
 1. Baixar o arquivo do dia no painel do R2 (ou `aws s3 cp s3://portal-municipal-backups/producao/AAAA-MM-DD/backup.tar.gpg . --endpoint-url https://<conta>.r2.cloudflarestorage.com`).
-2. Abrir: `gpg -d backup.tar.gpg | tar -xf -` (pede a `BACKUP_SENHA`). Saem `banco.dump`, `auth-storage.dump` e `contagens.txt`.
+2. Abrir: `gpg -d backup.tar.gpg | tar -xf -` (pede a `BACKUP_SENHA`). Saem `banco.dump`, `auth-storage.dump`, `auth-storage-estrutura.sql` (estrutura das tabelas de login e Storage, para restaurar fora do Supabase) e `contagens.txt`.
 3. **Num projeto Supabase novo** (o caminho normal, se o projeto foi perdido): o dump já tem tabelas, funções, gatilhos e políticas, então não é preciso rodar as migrations. Antes, ligar as extensões que o banco usa (SQL Editor: `create extension if not exists unaccent schema extensions; create extension if not exists pg_trgm schema extensions; create extension if not exists pg_net; create extension if not exists pg_cron;`) e então restaurar:
    ```bash
-   pg_restore -d "<URI do Session pooler do projeto novo>" --no-owner --no-privileges --clean --if-exists banco.dump
-   pg_restore -d "<URI>" --data-only auth-storage.dump
+   # Primeiro os usuários do login e o índice do Storage (perfis e membros dependem deles):
+   pg_restore -d "<URI do Session pooler do projeto novo>" --data-only --disable-triggers auth-storage.dump
+   # Depois o conteúdo:
+   pg_restore -d "<URI>" --no-owner --no-privileges --clean --if-exists banco.dump
    ```
    Depois, refazer o que não está no banco: Edge Functions, segredos do Vault (D-30), `interno.configuracao` (D-31), Auth URLs e arquivos do Storage.
 4. **Só uma tabela ou um registro** (ex.: notícia apagada por engano): restaurar num Postgres local e copiar o que falta, ou usar o backup do próprio Supabase (mais simples para os últimos 7 dias).

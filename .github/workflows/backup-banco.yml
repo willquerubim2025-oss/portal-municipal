@@ -82,8 +82,10 @@ jobs:
           # Conteúdo do portal (schemas do projeto) e, só os dados, usuários do login e o índice do Storage.
           pg_dump "$DB_URL" -Fc --no-owner --no-privileges -n public -n interno -f saida/banco.dump
           pg_dump "$DB_URL" -Fc --data-only -t auth.users -t auth.identities -t storage.buckets -t storage.objects -f saida/auth-storage.dump
+          # Estrutura dessas tabelas (para recriá-las num Postgres comum, no teste e numa emergência).
+          pg_dump "$DB_URL" --schema-only --no-owner --no-privileges -t auth.users -t auth.identities -t storage.buckets -t storage.objects -f saida/auth-storage-estrutura.sql
           # Contagens na origem, para conferir a restauração.
-          psql "$DB_URL" -At -F ';' -c "select 'municipios', count(*) from public.municipios union all select 'publicacoes', count(*) from public.publicacoes union all select 'documentos', count(*) from public.documentos union all select 'paginas', count(*) from public.paginas union all select 'midias', count(*) from public.midias union all select 'redirecionamentos', count(*) from public.redirecionamentos union all select 'auditoria', count(*) from public.auditoria" > saida/contagens.txt
+          psql "$DB_URL" -At -F ';' -c "select 'municipios', count(*) from public.municipios union all select 'publicacoes', count(*) from public.publicacoes union all select 'documentos', count(*) from public.documentos union all select 'paginas', count(*) from public.paginas union all select 'midias', count(*) from public.midias union all select 'redirecionamentos', count(*) from public.redirecionamentos union all select 'auditoria', count(*) from public.auditoria union all select 'membros', count(*) from public.membros union all select 'perfis', count(*) from public.perfis" > saida/contagens.txt
           cat saida/contagens.txt
           ls -la saida
 
@@ -114,11 +116,13 @@ jobs:
             create function auth.uid() returns uuid language sql stable as $$ select null::uuid $$;
             create function auth.role() returns text language sql stable as $$ select null::text $$;
             create function auth.jwt() returns jsonb language sql stable as $$ select null::jsonb $$;
-            create table auth.users (id uuid primary key, email text);
-            create table storage.buckets (id text primary key, name text, public boolean);
-            create table storage.objects (id uuid primary key default gen_random_uuid(), bucket_id text, name text, owner uuid, metadata jsonb);
             create function storage.foldername(name text) returns text[] language sql immutable as $$ select (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1] $$;
           SQL
+          # Usuários do login e índice do Storage primeiro: perfis, membros e equipe dependem deles.
+          # (Na estrutura, gatilhos e tipos internos do Supabase falham; as tabelas são criadas.)
+          psql "$T" -q -f saida/auth-storage-estrutura.sql > /dev/null 2> estrutura.log || true
+          pg_restore -d "$T" --data-only --disable-triggers saida/auth-storage.dump 2> auth.log || true
+          echo "Usuários restaurados: $(psql "$T" -At -c 'select count(*) from auth.users')"
           # Erros esperados: objetos que dependem de pg_cron, pg_net e Vault (só existem no Supabase).
           pg_restore -d "$T" --no-owner --no-privileges saida/banco.dump 2> restauracao.log || true
           echo "Erros da restauração (esperados só os de extensões do Supabase):"; grep -c "error" restauracao.log || true
