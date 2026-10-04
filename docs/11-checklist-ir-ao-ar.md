@@ -16,7 +16,7 @@
 - [ ] **E-mail do sistema (SMTP próprio)** nos dois projetos Supabase (*Authentication → Emails → SMTP*), com remetente do domínio da SECKE, SPF e DKIM. Sem isso, convite e "esqueci minha senha" não chegam por e-mail.
 - [ ] **Painel publicado** e o endereço dele cadastrado no login da produção (*Authentication → URL Configuration*: Site URL e Redirect URL `https://<painel>/redefinir-senha`).
 - [ ] **Portal publicado** no Worker `portal-municipal` (build **sem** `CLOUDFLARE_ENV`; confira na saída do deploy que `SUPABASE_URL` é `qgywucdnaeheqndcxtho`, a produção) e **painel** com `npm run deploy:producao` (D-27).
-- [ ] **Backup extra** (D-05): GitHub Action `pg_dump` diário → Cloudflare R2, 30 dias de retenção, **com um teste de restauração feito**.
+- [ ] **Backup extra** (D-05, D-34): workflow `backup-banco.yml` configurado (`docs/12-backup-e-restauracao.md`), última execução verde **com o teste de restauração passando**, e a `BACKUP_SENHA` guardada fora do GitHub.
 - [ ] **Monitoramento de disponibilidade** (UptimeRobot ou Better Stack) com alerta para a equipe.
 - [ ] **Verificação de links (RF18) e exportação (RF19) na produção** (D-31, D-32): migrations 0012 e 0013; Edge Functions `verificar-links` e `exportar` publicadas com `verify_jwt = false`; `interno.configuracao` com `supabase_url` = `https://qgywucdnaeheqndcxtho.supabase.co` e `ambiente` = `producao`. Testar: pedir uma verificação e uma exportação pelo painel.
 - [ ] **Cache na borda (D-30) na produção:** migration 0011 aplicada; `npx wrangler secret put CACHE_SEGREDO` no Worker `portal-municipal`; no Vault da produção, `portal_cache_url` (endereço do Worker de produção) e `portal_cache_segredo` (o mesmo valor). Testar: publicar uma notícia e ver a página atualizada em até ~1 min.

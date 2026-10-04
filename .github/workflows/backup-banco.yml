@@ -1,0 +1,125 @@
+# Backup extra do banco (D-05, D-34): todo dia, pg_dump → criptografia → Cloudflare R2,
+# com teste de restauração num Postgres 17 temporário. Retenção de 30 dias pela regra de
+# ciclo de vida do bucket. O Supabase Pro já faz backup diário próprio; este é a cópia
+# fora do Supabase (outro fornecedor), para o caso de perder a conta ou o projeto.
+#
+# Segredos do repositório (Settings → Secrets and variables → Actions):
+#   SUPABASE_DB_URL_PRODUCAO     conexão do Session pooler (porta 5432) da produção, com a senha
+#   SUPABASE_DB_URL_HOMOLOGACAO  idem, da branch de homologação (opcional)
+#   R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY   token de API do R2 com escrita só no bucket
+#   BACKUP_SENHA                 senha da criptografia (guardar também fora do GitHub!)
+# Variável (não secreta): R2_ACCOUNT_ID, R2_BUCKET
+#
+# Restaurar um backup: ver docs/12-backup-e-restauracao.md.
+name: Backup do banco
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # 3h de Brasília
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        ambiente: [producao, homologacao]
+    services:
+      # Banco descartável para o teste de restauração.
+      teste:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: teste
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      # Um segredo por ambiente; vazio = ambiente não configurado (pula). Nunca cai no do outro.
+      DB_URL: ${{ matrix.ambiente == 'producao' && secrets.SUPABASE_DB_URL_PRODUCAO || '' }}${{ matrix.ambiente == 'homologacao' && secrets.SUPABASE_DB_URL_HOMOLOGACAO || '' }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      R2_ENDPOINT: https://${{ vars.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+      R2_BUCKET: ${{ vars.R2_BUCKET }}
+      BACKUP_SENHA: ${{ secrets.BACKUP_SENHA }}
+    steps:
+      - name: Ambiente configurado?
+        id: cfg
+        run: |
+          if [ -z "$DB_URL" ]; then echo "Sem conexão para ${{ matrix.ambiente }}: pulando."; echo "pular=1" >> "$GITHUB_OUTPUT"; exit 0; fi
+          for v in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY BACKUP_SENHA R2_BUCKET; do
+            if [ -z "${!v}" ]; then echo "::error::Falta o segredo/variável $v"; exit 1; fi
+          done
+
+      - name: Instalar o cliente do Postgres 17
+        if: steps.cfg.outputs.pular != '1'
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSo /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client-17
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+
+      - name: Dump
+        if: steps.cfg.outputs.pular != '1'
+        run: |
+          set -euo pipefail
+          mkdir -p saida
+          # Conteúdo do portal (schemas do projeto) e, só os dados, usuários do login e o índice do Storage.
+          pg_dump "$DB_URL" -Fc --no-owner --no-privileges -n public -n interno -f saida/banco.dump
+          pg_dump "$DB_URL" -Fc --data-only -t auth.users -t auth.identities -t storage.buckets -t storage.objects -f saida/auth-storage.dump
+          # Contagens na origem, para conferir a restauração.
+          psql "$DB_URL" -At -F ';' -c "select 'municipios', count(*) from public.municipios union all select 'publicacoes', count(*) from public.publicacoes union all select 'documentos', count(*) from public.documentos union all select 'paginas', count(*) from public.paginas union all select 'midias', count(*) from public.midias union all select 'redirecionamentos', count(*) from public.redirecionamentos union all select 'auditoria', count(*) from public.auditoria" > saida/contagens.txt
+          cat saida/contagens.txt
+          ls -la saida
+
+      # Envia antes de testar: o backup fica guardado mesmo se o teste falhar (a falha avisa por e-mail).
+      - name: Criptografar e enviar ao R2
+        if: steps.cfg.outputs.pular != '1'
+        run: |
+          set -euo pipefail
+          data=$(date -u +%Y-%m-%d)
+          tar -C saida -cf - . | gpg --batch --yes --symmetric --cipher-algo AES256 --passphrase "$BACKUP_SENHA" -o backup.tar.gpg
+          ls -la backup.tar.gpg
+          aws s3 cp backup.tar.gpg "s3://$R2_BUCKET/${{ matrix.ambiente }}/$data/backup.tar.gpg" --endpoint-url "$R2_ENDPOINT" --only-show-errors
+          echo "Enviado: ${{ matrix.ambiente }}/$data/backup.tar.gpg"
+
+      - name: Teste de restauração
+        if: steps.cfg.outputs.pular != '1'
+        env:
+          PGPASSWORD: teste
+        run: |
+          set -uo pipefail
+          T="postgresql://postgres@localhost:5432/postgres"
+          # O que o Supabase já tem e um Postgres comum não: papéis, auth.uid(), schema extensions.
+          psql "$T" -q -v ON_ERROR_STOP=1 <<'SQL'
+            create role anon nologin; create role authenticated nologin; create role service_role nologin bypassrls;
+            create role supabase_admin nologin; create role supabase_auth_admin nologin; create role supabase_storage_admin nologin;
+            create schema extensions; create schema auth; create schema storage;
+            create extension unaccent schema extensions; create extension pg_trgm schema extensions;
+            create function auth.uid() returns uuid language sql stable as $$ select null::uuid $$;
+            create function auth.role() returns text language sql stable as $$ select null::text $$;
+            create function auth.jwt() returns jsonb language sql stable as $$ select null::jsonb $$;
+            create table auth.users (id uuid primary key, email text);
+            create table storage.buckets (id text primary key, name text, public boolean);
+            create table storage.objects (id uuid primary key default gen_random_uuid(), bucket_id text, name text, owner uuid, metadata jsonb);
+            create function storage.foldername(name text) returns text[] language sql immutable as $$ select (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1] $$;
+          SQL
+          # Erros esperados: objetos que dependem de pg_cron, pg_net e Vault (só existem no Supabase).
+          pg_restore -d "$T" --no-owner --no-privileges saida/banco.dump 2> restauracao.log || true
+          echo "Erros da restauração (esperados só os de extensões do Supabase):"; grep -c "error" restauracao.log || true
+          grep "error" restauracao.log | grep -v -E "pg_cron|pg_net|cron\.|net\.|vault|supabase_vault|extension" | head -20 | tee erros-inesperados.txt
+          # Confere as contagens.
+          falhou=0
+          while IFS=';' read -r tabela origem; do
+            restaurado=$(psql "$T" -At -c "select count(*) from public.$tabela")
+            echo "$tabela: origem $origem, restaurado $restaurado"
+            [ "$origem" = "$restaurado" ] || falhou=1
+          done < saida/contagens.txt
+          if [ "$falhou" = 1 ]; then echo "::error::A restauração não bateu com a origem"; exit 1; fi
+          echo "Restauração conferida."
