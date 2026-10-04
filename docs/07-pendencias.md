@@ -14,6 +14,7 @@
 - [ ] Painel: pré-visualização de rascunho no portal (hoje o portal só mostra o publicado); biblioteca de mídias para reaproveitar imagens; publicar o painel (Cloudflare Workers static assets ou Pages); gerenciar categorias pelo painel (hoje só as do provisionamento).
 - [ ] Acessibilidade, parte manual (D-33): teste com leitor de tela (NVDA + Chrome/Firefox) e navegação só por teclado no portal e no painel; a parte automática está pronta (`npm run acessibilidade`, 0 problemas).
 - [ ] Cópia integral dos arquivos de um município (fim de contrato, RF19): script que baixa tudo do Storage para a pasta do município e compacta (D-32).
+- [ ] **Confirmar que o token antigo do R2 ("R2 Account Token", cujo segredo apareceu num print) foi apagado** em R2 → Manage API tokens; só deve existir o `backup-github`.
 - [ ] **Backup da homologação (D-34), falta o usuário:** recadastrar `SUPABASE_DB_URL_HOMOLOGACAO` com a URI do Session pooler da branch (hoje tem só a senha; o workflow acusa). A produção já está funcionando.
 - [ ] Cópia periódica dos arquivos do Storage para o R2 (o backup extra só cobre o banco).
 - [ ] Monitoramento de disponibilidade (UptimeRobot ou Better Stack).
@@ -43,7 +44,7 @@
 Tudo o que precisa ser levantado com a prefeitura está organizado em **[docs/reuniao/](reuniao/00-LEIA-PRIMEIRO.md)**: guia e pauta (00), acessos e domínio (01), migração (02), transparência e sistemas (03), dados e conteúdo institucional (04), identidade visual (05), usuários, suporte e contrato (06). **Ao incluir uma nova pergunta para a prefeitura, colocar lá**, no arquivo do assunto.
 
 ## Concluído
-- 04/10/2026: **backup extra da produção no R2** (D-34): R2 ativado pelo usuário, bucket `portal-municipal-backups` (enam) com expiração de 30 dias, token só de objetos nesse bucket, segredos no GitHub; execução manual verde com restauração conferida. Um token do R2 cujo segredo apareceu num print foi descartado e substituído.
+- 04/10/2026: **backup extra da produção no R2** (D-34): R2 ativado pelo usuário, bucket `portal-municipal-backups` (enam) com expiração de 30 dias, token só de objetos nesse bucket, segredos no GitHub; execução manual verde com restauração conferida. Um token do R2 cujo segredo apareceu num print foi substituído por outro.
 - 04/10/2026: **auditoria automática de acessibilidade** (D-33): 67 páginas do portal e do painel, 0 problemas. 0014 aplicada pelo usuário; nova verificação de links: 217 problemas, 217 registros (sem duplicar).
 - 04/10/2026: **verificação de links (RF18) e exportação completa (RF19)** na homologação (D-31, D-32): 0012 e 0013 aplicadas pelo usuário no SQL Editor; Edge Functions `verificar-links` e `exportar`; telas no painel; ambas testadas de ponta a ponta com os dados de Jeriquara.
 - 03/10/2026: **cache na borda por município com limpeza ao publicar** (D-30): `portal/src/worker.ts`, cabeçalhos no middleware, migration 0011 na homologação, 71 testes de permissão. Vault da homologação cadastrado pelo usuário; teste ponta a ponta: gravação às 20:57:15, limpeza às 20:58:00 (200), página nova às 20:58:05. Falta a produção.
