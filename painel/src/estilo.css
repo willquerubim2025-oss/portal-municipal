@@ -197,3 +197,6 @@ code { background: var(--fundo); padding: 0 .3rem; border-radius: 4px; font-size
 .lista-auditoria p { margin: .1rem 0; }
 .lista-auditoria details { margin-top: .4rem; }
 .tabela-compacta th, .tabela-compacta td { padding: .3rem .5rem; font-size: .9rem; }
+
+/* Endereços longos (links quebrados) não esticam a tabela. */
+.quebra-tudo { overflow-wrap: anywhere; word-break: break-word; }

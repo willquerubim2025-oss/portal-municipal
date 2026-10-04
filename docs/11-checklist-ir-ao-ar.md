@@ -18,7 +18,7 @@
 - [ ] **Portal publicado** no Worker `portal-municipal` (build **sem** `CLOUDFLARE_ENV`; confira na saída do deploy que `SUPABASE_URL` é `qgywucdnaeheqndcxtho`, a produção) e **painel** com `npm run deploy:producao` (D-27).
 - [ ] **Backup extra** (D-05): GitHub Action `pg_dump` diário → Cloudflare R2, 30 dias de retenção, **com um teste de restauração feito**.
 - [ ] **Monitoramento de disponibilidade** (UptimeRobot ou Better Stack) com alerta para a equipe.
-- [ ] **Verificação de links quebrados** (RF18) e **exportação completa** (RF19) funcionando.
+- [ ] **Verificação de links (RF18) e exportação (RF19) na produção** (D-31, D-32): migrations 0012 e 0013; Edge Functions `verificar-links` e `exportar` publicadas com `verify_jwt = false`; `interno.configuracao` com `supabase_url` = `https://qgywucdnaeheqndcxtho.supabase.co` e `ambiente` = `producao`. Testar: pedir uma verificação e uma exportação pelo painel.
 - [ ] **Cache na borda (D-30) na produção:** migration 0011 aplicada; `npx wrangler secret put CACHE_SEGREDO` no Worker `portal-municipal`; no Vault da produção, `portal_cache_url` (endereço do Worker de produção) e `portal_cache_segredo` (o mesmo valor). Testar: publicar uma notícia e ver a página atualizada em até ~1 min.
 - [ ] **Isolamento do cache entre prefeituras (obrigatório antes do 2º município):** com dois domínios apontando para o Worker, abrir `/noticias` em cada um e conferir que cada um mostra a sua prefeitura (o cache separa pelo domínio via `ctx.props`, D-30). Na homologação só há um domínio, então isso ainda não foi testado.
 - [ ] Rodar os **Security e Performance Advisors** do Supabase na produção e revisar.

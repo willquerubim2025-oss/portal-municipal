@@ -199,3 +199,15 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **Schema `interno`:** primeiro uso de um schema não exposto pela Data API; a fila e as funções ficam fora do alcance de anon e authenticated. É o caminho também para `is_plataforma()`/`tem_papel()` (pendência).
 - **Testado na homologação:** 2ª visita em diante = HIT; limpeza com segredo funciona (próxima visita = MISS); sem segredo = 401. A cada deploy o cache começa vazio (a versão do Worker faz parte da chave).
 - **Alternativas descartadas:** Cache API (`caches.default`) não funciona em `workers.dev` e só limpa por data center; Cache Rules da zona exigem zona própria e não cobrem os domínios das prefeituras.
+
+**D-31 · 03/10/2026 · Verificação de links quebrados (RF18)**
+- **Como funciona:** toda semana (domingo, 3h de Brasília) cada município ativo ganha uma verificação pendente; o publicador também pode pedir pelo painel (Administração → Links quebrados). A Edge Function `verificar-links` confere em lotes (8 em paralelo, 10 s por link, HEAD e, se recusado, GET de 1 byte), para em ~110 s e continua na chamada seguinte. Problemas aparecem no painel com o link para editar o item.
+- **O que entra:** links e imagens do conteúdo **publicado** (notícias, documentos e anexos externos, páginas, serviços, agenda, perguntas, órgãos, banners vigentes, menus, transparência, sistemas). Links para arquivos do próprio Storage são conferidos **no banco** (`storage.objects`), sem requisição: são milhares.
+- **O que é problema:** 404/410 ("não encontrado"), erro 5xx, sem resposta, DNS ou certificado inválido ("indisponível"). 401/403/429 são bloqueio a robôs e **não** contam.
+- **Disparo sem segredo:** o `pg_cron` chama a função a cada minuto **só se há trabalho na fila**. A função não recebe parâmetros e só processa o que está na fila; por isso usa `verify_jwt = false` sem segredo: chamá-la de fora só adianta o que já foi pedido. Endereço do projeto e ambiente ficam em `interno.configuracao` (não é segredo).
+- **Fila em `public`, fechada:** a Edge Function só alcança o schema `public` pela API, então `verificacao_fila` e as funções `verificacao_*` ficam em `public`, mas só com GRANT para `service_role`.
+
+**D-32 · 03/10/2026 · Exportação completa por município (RF19)**
+- O admin pede no painel (Administração → Exportar dados); a Edge Function `exportar` gera um ZIP com **todas as tabelas do município em JSON e CSV** (`;` e BOM, abre no Excel), `arquivos.csv` com o endereço público de cada arquivo, `arquivos-enderecos.txt` (para `wget -i`) e um LEIA-ME. Fica no bucket privado `exportacoes` (pasta = município); download por link assinado de 5 min; guarda as 3 últimas.
+- **Os arquivos (PDFs, imagens) não vão no ZIP:** em Jeriquara são 7 GB, inviável numa Edge Function. Ficam públicos no endereço listado; a cópia integral, quando pedida (ex.: fim de contrato), é feita pela SECKE com um script (pendência).
+- **Fica de fora:** notas internas da SECKE nos chamados, a coluna técnica `busca` e dados de outros municípios. Usuários: só nome, e-mail e cargo de quem é membro do município.

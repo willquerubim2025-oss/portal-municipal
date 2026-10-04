@@ -27,6 +27,8 @@
 | 0008_permissoes | GRANTs explícitos por papel (anon só lê o que o portal mostra; authenticated conforme as policies); revoga o resto, inclusive TRUNCATE | D-13 |
 | 0009_permissoes_service_role | GRANTs do `service_role` (Edge Functions, migração, backup) | D-13 |
 | 0010_municipio_campos_admin | Trigger `checar_campos_municipio`: fora da SECKE, o UPDATE em `municipios` só altera `tema` e `config` | D-20 |
+| 0012_verificacao_links | `interno.configuracao`; `verificacoes_links` ganha status, quem pediu e batimento (uma em andamento por município); `verificacao_fila` (só service_role); funções `verificacao_iniciar/proximos/registrar/concluir` (só service_role); `interno.agendar_verificacoes()` (domingo 6h UTC) e `interno.disparar_rotinas()` (a cada minuto) | RF18, D-31 |
+| 0013_exportacao | Bucket privado `exportacoes` (admin do município lê a própria pasta; ninguém grava pela API); uma exportação em andamento por município; `disparar_rotinas()` passa a chamar a exportação | RF19, D-32 |
 | 0011_cache_portal | Schema `interno` (não exposto); fila `interno.cache_pendente`; gatilhos em 22 tabelas; `interno.limpar_cache_portal()` agendada no `pg_cron` a cada minuto (envia a limpeza via `pg_net`) | D-30 |
 | 0007_modulos_genericos | `orgaos`, `perguntas_frequentes`, `documento_relacoes` + `documentos.situacao`, `destaques`, `publicacao_midias`, `eventos`, `publicacoes.expira_em`, `orgao_id` em serviços/documentos/publicações, `buscar()` ampliada, `provisionar_municipio()` e `criar_municipio()` | D-10, D-12 (doc 08) |
 
@@ -76,7 +78,8 @@ Perguntas frequentes, eventos e destaques seguem o mesmo fluxo editorial de publ
 
 ### Schema `interno` (não exposto pela Data API)
 - **cache_pendente:** um registro por município com conteúdo alterado desde a última limpeza do cache do portal (D-30). Preenchida por `interno.marcar_cache_pendente()` (gatilho AFTER em 22 tabelas; em `redirecionamentos`, só quando muda origem, destino ou código). Esvaziada a cada minuto por `interno.limpar_cache_portal()`, que lê no Vault `portal_cache_url` e `portal_cache_segredo`; sem eles, não faz nada.
-- Sem GRANT para anon/authenticated (nem `usage` no schema). Tabelas e funções novas que não devam ser chamadas pela API vão para cá.
+- **configuracao:** valores por projeto, não sigilosos: `supabase_url` (para o pg_cron chamar as Edge Functions) e `ambiente` (`producao` ou `homologacao`, qual domínio do portal usar). Preencher em cada projeto.
+- Sem GRANT para anon/authenticated (nem `usage` no schema). Tabelas e funções novas que não devam ser chamadas pela API vão para cá. Exceção: o que a Edge Function precisa ler pela API fica em `public` com GRANT só para `service_role` (ex.: `verificacao_fila`).
 
 ## Papéis e permissões (RLS)
 | Quem | Pode |
@@ -140,7 +143,7 @@ O projeto foi criado com *Automatically expose new tables* **desligado** e *auto
 
 ## Testes
 `node supabase/tests/rls.test.mjs` (requer `npm i`, já tem `@electric-sql/pglite` no package.json).
-O teste simula `auth.uid()` e o `storage` do Supabase, aplica todas as migrations e o seed, e verifica **71 regras**: publicação por papel, isolamento entre municípios (RLS e FKs compostas), busca, auditoria, chamados e saldo, nota interna, pastas do Storage, proteção de conteúdo publicado (arquivos e substituição no Storage), provisionamento (idempotência, só a SECKE cria município), os módulos da 0007 e as permissões explícitas da 0008, os campos do município (0010) e a fila do cache (0011). Nesse Postgres local não há `pg_cron`, `pg_net` nem Vault: a 0011 só agenda a rotina onde eles existem. O teste **não** concede nada no schema `public`: usa só os GRANTs das migrations, como no projeto real.
+O teste simula `auth.uid()` e o `storage` do Supabase, aplica todas as migrations e o seed, e verifica **91 regras**: publicação por papel, isolamento entre municípios (RLS e FKs compostas), busca, auditoria, chamados e saldo, nota interna, pastas do Storage, proteção de conteúdo publicado (arquivos e substituição no Storage), provisionamento (idempotência, só a SECKE cria município), os módulos da 0007 e as permissões explícitas da 0008, os campos do município (0010), a fila do cache (0011), a verificação de links (0012, inclusive a extração de links) e a exportação (0013). Nesse Postgres local não há `pg_cron`, `pg_net` nem Vault: a 0011 só agenda a rotina onde eles existem. O teste **não** concede nada no schema `public`: usa só os GRANTs das migrations, como no projeto real.
 
 ## Pendências do banco
 Ver [07-pendencias](07-pendencias.md): export diário por município, Edge Functions de links e exportação, carga dos critérios PNTP, conferência das seções da Central com a matriz PNTP vigente.

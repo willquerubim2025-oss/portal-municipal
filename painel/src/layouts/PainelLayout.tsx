@@ -26,7 +26,9 @@ const GRUPOS: { titulo: string; itens: ItemMenu[] }[] = [
   { titulo: 'Administração', itens: [
     { rotulo: 'Usuários', para: '/usuarios', pronto: true, papel: 'admin' },
     { rotulo: 'Chamados', para: '/chamados', pronto: true },
+    { rotulo: 'Links quebrados', para: '/links', pronto: true, papel: 'publicador' },
     { rotulo: 'Auditoria', para: '/auditoria', pronto: true, papel: 'admin' },
+    { rotulo: 'Exportar dados', para: '/exportar', pronto: true, papel: 'admin' },
   ]},
 ];
 

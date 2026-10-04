@@ -20,6 +20,8 @@ import { Categorias, Redirecionamentos } from './pages/estrutura/Cadastros';
 import { Usuarios } from './pages/admin/Usuarios';
 import { DetalheChamado, ListaChamados, NovoChamado } from './pages/admin/Chamados';
 import { Auditoria } from './pages/admin/Auditoria';
+import { Links } from './pages/admin/Links';
+import { Exportacao } from './pages/admin/Exportacao';
 
 // Módulos de conteúdo com lista + edição (/x, /x/novo, /x/:id).
 const MODULOS = [
@@ -56,6 +58,7 @@ export function App() {
               <Route path="chamados/:id" element={<DetalheChamado />} />
               <Route element={<ExigirAcesso papelMinimo="publicador" />}>
                 <Route path="categorias" element={<Categorias />} />
+                <Route path="links" element={<Links />} />
               </Route>
               <Route element={<ExigirAcesso papelMinimo="admin" />}>
                 <Route path="orgaos" element={<ListaOrgaos />} />
@@ -67,6 +70,7 @@ export function App() {
                 <Route path="redirecionamentos" element={<Redirecionamentos />} />
                 <Route path="usuarios" element={<Usuarios />} />
                 <Route path="auditoria" element={<Auditoria />} />
+                <Route path="exportar" element={<Exportacao />} />
               </Route>
             </Route>
           </Route>

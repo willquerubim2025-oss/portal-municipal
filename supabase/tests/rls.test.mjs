@@ -268,5 +268,66 @@ espera('usuário NÃO lê a fila do cache', /permission denied/.test(r.erro ?? '
 r = await como('anon', `select interno.limpar_cache_portal()`)
 espera('anon NÃO dispara a limpeza do cache', /permission denied/.test(r.erro ?? ''))
 
+console.log('\nVerificação de links (0012, RF18, D-31)')
+await db.exec(`delete from verificacoes_links`)
+r = await como('editor', `insert into verificacoes_links (municipio_id) values ('${J}')`)
+espera('editor NÃO pede verificação de links', !!r.erro)
+r = await como('anon', `insert into verificacoes_links (municipio_id) values ('${J}')`)
+espera('anon NÃO pede verificação de links', !!r.erro)
+r = await como('outro', `insert into verificacoes_links (municipio_id) values ('${J}')`)
+espera('admin de outro município NÃO pede verificação aqui', !!r.erro)
+r = await como('admin', `insert into verificacoes_links (municipio_id) values ('${J}') returning id`)
+espera('admin pede verificação do próprio município', r.rows?.length === 1)
+r = await como('admin', `insert into verificacoes_links (municipio_id) values ('${J}')`)
+espera('só uma verificação em andamento por município', !!r.erro)
+r = await como('admin', `select * from verificacao_fila`)
+espera('usuário NÃO lê a fila de links', /permission denied/.test(r.erro ?? ''))
+r = await como('admin', `select * from verificacao_iniciar()`)
+espera('usuário NÃO inicia a verificação (só a Edge Function)', /permission denied/.test(r.erro ?? ''))
+await db.exec(`
+  insert into interno.configuracao values ('supabase_url', 'https://x.supabase.co'), ('ambiente', 'producao');
+  insert into storage.objects (bucket_id, name) values ('midias', '${J}/existe.pdf');
+  insert into paginas (municipio_id, titulo, caminho, status, publicado_em, corpo_html) values ('${J}', 'Links', 'teste-links', 'publicado', now(),
+    '<a href="/noticias">interno</a> <a href="https://exemplo.org/x">externo</a> <a href="#topo">âncora</a> <a href="mailto:a@b">e-mail</a>
+     <a href="https://x.supabase.co/storage/v1/object/public/midias/${J}/existe.pdf">ok</a>
+     <a href="https://x.supabase.co/storage/v1/object/public/midias/${J}/sumiu.pdf">sumiu</a>');
+  insert into paginas (municipio_id, titulo, caminho, status, corpo_html) values ('${J}', 'Rascunho', 'rascunho-links', 'rascunho', '<a href="https://rascunho.org">r</a>');
+`)
+const ver = (await db.query(`select * from verificacao_iniciar()`)).rows[0]
+const fila = (await db.query(`select url, verificado, status_http from verificacao_fila where verificacao_id = '${ver.verificacao_id}' and origem_tabela = 'paginas' order by url`)).rows
+espera('extrai links do publicado (interno vira absoluto; âncora, e-mail e rascunho ficam de fora)',
+  JSON.stringify(fila.map((f) => f.url).filter((u) => !u.includes('storage'))) === JSON.stringify(['https://exemplo.org/x', 'https://jeriquara.sp.gov.br/noticias']))
+espera('arquivo do Storage conferido no banco (existe = 200, sumiu = 404)',
+  fila.find((f) => f.url.endsWith('existe.pdf'))?.status_http === 200 && fila.find((f) => f.url.endsWith('sumiu.pdf'))?.status_http === 404)
+const lote = (await db.query(`select url from verificacao_proximos('${ver.verificacao_id}', 500)`)).rows.map((x) => x.url)
+espera('próximo lote traz só os não conferidos, sem repetir', lote.length > 0 && !lote.some((u) => u.includes('storage')) && new Set(lote).size === lote.length)
+await db.query(`select verificacao_registrar($1, $2)`, [ver.verificacao_id, JSON.stringify(lote.map((u) => ({ url: u, status_http: u.includes('exemplo.org/x') ? 404 : 200 })))])
+const n = (await db.query(`select verificacao_concluir('${ver.verificacao_id}') n`)).rows[0].n
+const probs = (await db.query(`select url from verificacao_problemas p join verificacoes_links v on v.id = p.verificacao_id where v.id = '${ver.verificacao_id}' and p.origem_tabela = 'paginas' order by url`)).rows.map((x) => x.url)
+espera('problemas: link externo 404 e arquivo sumido (com o endereço como está no texto)',
+  probs.length === 2 && probs.includes('https://exemplo.org/x') && probs.some((u) => u.endsWith('sumiu.pdf')) && n >= 2)
+r = await como('editor', `select count(*) n from verificacao_problemas`)
+espera('editor NÃO vê o relatório de links (é do publicador)', r.rows?.[0]?.n === 0 || !!r.erro)
+r = await como('admin', `select count(*) n from verificacao_problemas`)
+espera('admin vê o relatório de links', Number(r.rows?.[0]?.n) >= 2)
+
+console.log('\nExportação (0013, RF19, D-32)')
+await db.exec(`delete from exportacoes`)
+r = await como('editor', `insert into exportacoes (municipio_id) values ('${J}')`)
+espera('editor NÃO pede exportação', !!r.erro)
+r = await como('outro', `insert into exportacoes (municipio_id) values ('${J}')`)
+espera('admin de outro município NÃO pede exportação aqui', !!r.erro)
+r = await como('admin', `insert into exportacoes (municipio_id) values ('${J}') returning id`)
+espera('admin pede exportação do próprio município', r.rows?.length === 1)
+r = await como('admin', `insert into exportacoes (municipio_id) values ('${J}')`)
+espera('só uma exportação em andamento por município', !!r.erro)
+await db.exec(`insert into storage.objects (bucket_id, name) values ('exportacoes', '${J}/exportacao.zip'), ('exportacoes', '00000000-0000-4000-8000-000000000002/exportacao.zip')`)
+r = await como('admin', `select name from storage.objects where bucket_id = 'exportacoes'`)
+espera('admin baixa só a exportação do próprio município', r.rows?.length === 1 && r.rows[0].name.startsWith(J))
+r = await como('editor', `select name from storage.objects where bucket_id = 'exportacoes'`)
+espera('editor NÃO baixa exportação', r.rows?.length === 0)
+r = await como('admin', `insert into storage.objects (bucket_id, name) values ('exportacoes', '${J}/falsa.zip')`)
+espera('ninguém grava no bucket de exportação pela API', !!r.erro)
+
 console.log(`\n${ok} ok, ${falhas} falhas`)
 process.exit(falhas ? 1 : 0)
