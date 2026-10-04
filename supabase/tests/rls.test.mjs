@@ -306,6 +306,9 @@ const n = (await db.query(`select verificacao_concluir('${ver.verificacao_id}') 
 const probs = (await db.query(`select url from verificacao_problemas p join verificacoes_links v on v.id = p.verificacao_id where v.id = '${ver.verificacao_id}' and p.origem_tabela = 'paginas' order by url`)).rows.map((x) => x.url)
 espera('problemas: link externo 404 e arquivo sumido (com o endereço como está no texto)',
   probs.length === 2 && probs.includes('https://exemplo.org/x') && probs.some((u) => u.endsWith('sumiu.pdf')) && n >= 2)
+const n2 = (await db.query(`select verificacao_concluir('${ver.verificacao_id}') n`)).rows[0].n
+const totalProbs = Number((await db.query(`select count(*) n from verificacao_problemas where verificacao_id = '${ver.verificacao_id}'`)).rows[0].n)
+espera('concluir de novo não duplica os problemas (0014)', n2 === n && totalProbs === n)
 r = await como('editor', `select count(*) n from verificacao_problemas`)
 espera('editor NÃO vê o relatório de links (é do publicador)', r.rows?.[0]?.n === 0 || !!r.erro)
 r = await como('admin', `select count(*) n from verificacao_problemas`)
