@@ -55,6 +55,15 @@ jobs:
           for v in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY BACKUP_SENHA R2_BUCKET; do
             if [ -z "${!v}" ]; then echo "::error::Falta o segredo/variável $v"; exit 1; fi
           done
+          # Erro comum: colar só a senha. Sem o formato de URI, o pg_dump tenta um banco local.
+          case "$DB_URL" in
+            postgresql://*pooler.supabase.com:5432/*|postgres://*pooler.supabase.com:5432/*) ;;
+            *) echo "::error::O segredo da conexão de ${{ matrix.ambiente }} não é a URI do Session pooler (postgresql://postgres.<projeto>:<senha>@aws-...pooler.supabase.com:5432/postgres). Ver docs/12-backup-e-restauracao.md."; exit 1 ;;
+          esac
+          # Chaves do R2: Access Key ID tem 32 caracteres e o Secret, 64.
+          if [ ${#AWS_ACCESS_KEY_ID} -ne 32 ] || [ ${#AWS_SECRET_ACCESS_KEY} -ne 64 ]; then
+            echo "::error::As chaves do R2 não têm o tamanho esperado (32 e 64 caracteres). Gere um token em R2 → Manage API tokens."; exit 1
+          fi
 
       - name: Instalar o cliente do Postgres 17
         if: steps.cfg.outputs.pular != '1'
