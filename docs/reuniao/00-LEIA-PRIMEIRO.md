@@ -1,17 +1,19 @@
 # Reunião inicial com a Prefeitura de Jeriquara: guia
 
 **Para quem:** William (SECKE), para conduzir a reunião. Os arquivos 01 a 06 podem ser impressos ou entregues à prefeitura.
-**Atualizado em:** 03/10/2026.
+**Atualizado em:** 04/10/2026.
 
 ## Objetivo da reunião
 Sair com **tudo o que a SECKE precisa para continuar o desenvolvimento**: acessos, materiais, dados da prefeitura e decisões. E com **datas de entrega registradas** para o que não for resolvido na hora.
 
 > **Por que as datas importam:** pelo Termo de Referência (item 6.9.2), os **60 dias de implantação começam a contar da entrega dos acessos e materiais pelo Município**, e atrasos do Município deslocam o prazo. Registre em ata o que foi entregue, o que ficou pendente e a data prometida.
 
-## O que já está pronto (para mostrar, se for útil)
-- **Portal público** funcionando em teste (homologação), com as notícias e documentos mais recentes do site atual já migrados, os endereços antigos redirecionando e acessibilidade (atalhos, alto contraste).
-- **Painel administrativo** completo: notícias, documentos e licitações, páginas, serviços, agenda, perguntas frequentes, banners e alertas, estrutura organizacional, menus, transparência, identidade visual, usuários, chamados e auditoria.
-- **Ferramenta de migração** do WordPress, testada com 100 publicações.
+## O que já está pronto (para mostrar)
+Roteiro de 15 minutos em [07-roteiro-demonstracao.md](07-roteiro-demonstracao.md).
+- **Portal público** em teste (homologação) com **todo o conteúdo do site atual migrado**: 683 notícias, 956 documentos (830 licitações), as páginas institucionais e 7 mil arquivos; todos os endereços antigos redirecionam.
+- **Acessibilidade (eMAG):** atalhos, alto contraste, tamanho do texto, mapa do site; verificação automática de 69 páginas sem nenhum problema.
+- **Painel administrativo** completo: conteúdo, estrutura organizacional, menus, transparência, **acompanhamento do PNTP 2026** (96 critérios da matriz oficial), usuários, chamados, auditoria, **links quebrados** e **exportação dos dados**.
+- **Operação:** backup diário fora do servidor principal, com teste de restauração automático; site rápido com cache.
 
 ## Pauta, na ordem sugerida
 | # | Assunto | Arquivo | Tempo | Bloqueia o trabalho? |
@@ -22,6 +24,8 @@ Sair com **tudo o que a SECKE precisa para continuar o desenvolvimento**: acesso
 | 4 | Dados e conteúdo institucional | [04-dados-e-conteudo-institucional.md](04-dados-e-conteudo-institucional.md) | 15 min | Em parte: dá para começar e completar depois |
 | 5 | Identidade visual | [05-identidade-visual.md](05-identidade-visual.md) | 10 min | Não: o visual entra a qualquer momento (D-22) |
 | 6 | Usuários, suporte e contrato | [06-usuarios-suporte-e-contrato.md](06-usuarios-suporte-e-contrato.md) | 15 min | Em parte: usuários para o treinamento |
+
+**Para levar:** o [roteiro de demonstração](07-roteiro-demonstracao.md) (só para você) e o [guia de teste da homologação](08-guia-teste-homologacao.md) (impresso, para quem vai avaliar).
 
 ## Resumo de tudo o que precisa ser levantado
 Use como checklist durante a reunião. **B** = bloqueia o trabalho; **I** = importante, pode vir em seguida; **D** = pode ficar para depois.
