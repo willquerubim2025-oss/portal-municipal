@@ -60,6 +60,8 @@ const GUARDAVEIS: Record<number, number> = { 200: 600, 301: 600, 404: 120, 410: 
 function naBorda(resposta: Response, municipioId: string, request: Request): Response {
   const segundos = GUARDAVEIS[resposta.status];
   if (!segundos || !['GET', 'HEAD'].includes(request.method) || new URL(request.url).pathname === '/busca') return resposta;
+  // Rota que já define o próprio cache na borda (ex.: imagens, 30 dias) fica como está.
+  if (resposta.headers.has('Cloudflare-CDN-Cache-Control')) return resposta;
   const r = new Response(resposta.body, resposta);
   r.headers.set('Cloudflare-CDN-Cache-Control', `public, max-age=${segundos}, stale-while-revalidate=60`);
   r.headers.set('Cache-Tag', `m-${municipioId}`);

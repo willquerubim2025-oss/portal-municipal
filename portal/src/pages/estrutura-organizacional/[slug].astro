@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import { orgao, orgaos } from '../../lib/consultas';
 import { moduloAtivo } from '../../lib/municipio';
 import { urlMidia } from '../../lib/supabase';
+import { urlImagem, srcsetImagem } from '../../lib/imagens';
 import { htmlSeguro } from '../../lib/html';
 import { resumir } from '../../lib/formato';
 
@@ -37,7 +38,7 @@ const ld = {
     </header>
     {o.responsavel_nome && (
       <section class="evento" aria-label="Responsável">
-        {foto && <img src={foto} alt={o.foto?.texto_alternativo ?? `Foto de ${o.responsavel_nome}`} width="120" height="150" style="border-radius:8px;object-fit:cover" />}
+        {foto && <img src={urlImagem(o.foto.storage_path, 320)} alt={o.foto?.texto_alternativo ?? `Foto de ${o.responsavel_nome}`} width="120" height="150" style="border-radius:8px;object-fit:cover" />}
         <div>
           <h2 style="margin-top:0">{o.responsavel_nome}</h2>
           {o.responsavel_cargo && <p>{o.responsavel_cargo}</p>}

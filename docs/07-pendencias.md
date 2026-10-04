@@ -8,7 +8,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 | Frente | Pronto | O que falta |
 |---|---|---|
 | Base (banco, RLS, multi-prefeitura) | ~95% | índices de desempenho, mover `is_plataforma`/`tem_papel` para `interno` |
-| Portal público (RF01–07) | ~90% | identidade visual de Jeriquara, otimização de imagens, tema ampliado (D-17) |
+| Portal público (RF01–07) | ~93% | identidade visual de Jeriquara, tema ampliado (D-17) |
 | Transparência (RF08–11) | ~70% | links dos sistemas Fiorilli e de cada seção (prefeitura); preencher o PNTP com a prefeitura |
 | Painel (RF12–19) | ~90% | biblioteca de mídias, pré-visualização de rascunho |
 | Suporte (RF20–22) | ~85% | regra de contagem da "solicitação editorial" (prefeitura) |
@@ -56,6 +56,8 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 Tudo o que precisa ser levantado com a prefeitura está organizado em **[docs/reuniao/](reuniao/00-LEIA-PRIMEIRO.md)**: guia e pauta (00), acessos e domínio (01), migração (02), transparência e sistemas (03), dados e conteúdo institucional (04), identidade visual (05), usuários, suporte e contrato (06). **Ao incluir uma nova pergunta para a prefeitura, colocar lá**, no arquivo do assunto.
 
 ## Concluído
+- 04/10/2026: **imagens otimizadas** (D-36): página inicial de 4,9 MB para 249 KB de imagens, lista de notícias de 6,9 MB para 410 KB. Acompanhar o uso da cota de transformações (Cloudflare → Images) quando houver mais prefeituras.
+- 04/10/2026: **kit da reunião**: roteiro de demonstração (`docs/reuniao/07`) e guia de teste da homologação para a prefeitura (`docs/reuniao/08`).
 - 04/10/2026: **PNTP 2026** (D-35): matriz oficial (181 critérios, 96 de prefeitura) na produção e na homologação, tela de acompanhamento no painel, critérios 13.1, 13.4, 13.5 e 2.9 atendidos pelo portal; auditoria de acessibilidade 69 páginas, 0 problemas.
 - 04/10/2026: **backup da homologação no R2** funcionando: restauração conferida com todo o conteúdo migrado (683 notícias, 956 documentos, 6.905 mídias, 7.497 redirecionamentos, 20.294 registros de auditoria, 8 usuários). Produção e homologação verdes.
 - 04/10/2026: **backup extra da produção no R2** (D-34): R2 ativado pelo usuário, bucket `portal-municipal-backups` (enam) com expiração de 30 dias, token só de objetos nesse bucket, segredos no GitHub; execução manual verde com restauração conferida. Um token do R2 cujo segredo apareceu num print foi substituído por outro e apagado pelo usuário.

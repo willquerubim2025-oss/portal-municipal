@@ -1,4 +1,5 @@
 import { FilterXSS, getDefaultWhiteList } from 'xss';
+import { otimizarImagensDoTexto } from './imagens';
 
 // HTML do editor (corpo de notícias, páginas, serviços, documentos) é sanitizado
 // na renderização: nenhum <script>, on*="...", javascript: etc. chega ao visitante,
@@ -26,5 +27,6 @@ const filtro = new FilterXSS({
 });
 
 export function htmlSeguro(html: string | null | undefined): string {
-  return html ? filtro.process(html) : '';
+  // Depois de sanitizar: imagens do Storage no tamanho da coluna de texto (D-36).
+  return html ? otimizarImagensDoTexto(filtro.process(html)) : '';
 }

@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import { evento } from '../../lib/consultas';
 import { moduloAtivo } from '../../lib/municipio';
 import { urlMidia } from '../../lib/supabase';
+import { urlImagem, srcsetImagem } from '../../lib/imagens';
 import { htmlSeguro } from '../../lib/html';
 import { dataExtenso, hora, resumir } from '../../lib/formato';
 
@@ -41,7 +42,7 @@ const ld = {
       {e.orgao && <><dt>Organização</dt><dd><a href={`/estrutura-organizacional/${e.orgao.slug}`}>{e.orgao.nome}</a></dd></>}
     </dl>
     {e.url_externa && <p><a class="botao" href={e.url_externa} target="_blank" rel="noopener">Inscrição / mais informações<span class="sr-only"> (abre em nova aba)</span></a></p>}
-    {img && <figure class="figura-destaque"><img src={img} alt={e.imagem.texto_alternativo ?? ''} width="1200" height="675" /></figure>}
+    {img && <figure class="figura-destaque"><img src={urlImagem(e.imagem.storage_path, 1200)} srcset={srcsetImagem(e.imagem.storage_path, [640, 800, 1200, 1600])} sizes="(max-width: 1200px) 100vw, 1200px" alt={e.imagem.texto_alternativo ?? ''} width="1200" height="675" /></figure>}
     {e.descricao_html && <div class="conteudo" set:html={htmlSeguro(e.descricao_html)} />}
   </article>
 </Base>

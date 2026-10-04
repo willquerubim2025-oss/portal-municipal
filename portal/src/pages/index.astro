@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import CartaoNoticia from '../components/CartaoNoticia.astro';
 import { destaques, eventos, menu, noticias } from '../lib/consultas';
 import { moduloAtivo } from '../lib/municipio';
-import { urlMidia } from '../lib/supabase';
+import { urlImagem, srcsetImagem } from '../lib/imagens';
 import { diaMes, hora } from '../lib/formato';
 
 const { municipio: m, dominioPrincipal } = Astro.locals.contexto;
@@ -38,7 +38,7 @@ const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: m.n
       <section aria-label="Destaques" class="home-destaques">
         {banners.slice(0, 2).map((b) => (
           <a class="banner" href={b.url ?? '#'} target={b.nova_aba ? '_blank' : undefined} rel={b.nova_aba ? 'noopener' : undefined}>
-            <img src={urlMidia(b.imagem.storage_path)} alt={b.imagem.texto_alternativo ?? b.titulo} width="1200" height="514" />
+            <img src={urlImagem(b.imagem.storage_path, 1200)} srcset={srcsetImagem(b.imagem.storage_path, [640, 800, 1200, 1600])} sizes="(max-width: 1200px) 100vw, 1200px" alt={b.imagem.texto_alternativo ?? b.titulo} width="1200" height="514" />
             <span>{b.titulo}</span>
           </a>
         ))}

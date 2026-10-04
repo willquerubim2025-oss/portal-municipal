@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import { noticia } from '../../lib/consultas';
 import { urlMidia } from '../../lib/supabase';
+import { urlImagem, srcsetImagem } from '../../lib/imagens';
 import { dataExtenso, resumir } from '../../lib/formato';
 import { htmlSeguro } from '../../lib/html';
 
@@ -39,7 +40,7 @@ const ld = {
     </header>
     {img && (
       <figure class="figura-destaque">
-        <img src={img} alt={n.imagem.texto_alternativo ?? ''} width="1200" height="675" fetchpriority="high" />
+        <img src={urlImagem(n.imagem.storage_path, 1200)} srcset={srcsetImagem(n.imagem.storage_path, [640, 800, 1200, 1600])} sizes="(max-width: 1200px) 100vw, 1200px" alt={n.imagem.texto_alternativo ?? ''} width="1200" height="675" fetchpriority="high" />
       </figure>
     )}
     <div class="conteudo" set:html={htmlSeguro(n.corpo_html)} />
@@ -50,7 +51,7 @@ const ld = {
           {galeria.map((g: any) => (
             <li>
               <figure>
-                <a href={urlMidia(g.midia.storage_path)}><img src={urlMidia(g.midia.storage_path)} alt={g.midia.texto_alternativo ?? ''} loading="lazy" width="400" height="300" /></a>
+                <a href={urlMidia(g.midia.storage_path)}><img src={urlImagem(g.midia.storage_path, 480)} srcset={srcsetImagem(g.midia.storage_path, [320, 480, 800])} sizes="(max-width: 600px) 50vw, 400px" alt={g.midia.texto_alternativo ?? ''} loading="lazy" decoding="async" width="400" height="300" /></a>
                 {g.legenda && <figcaption>{g.legenda}</figcaption>}
               </figure>
             </li>

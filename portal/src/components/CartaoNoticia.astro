@@ -1,13 +1,13 @@
 ---
-import { urlMidia } from '../lib/supabase';
+import { urlImagem, srcsetImagem } from '../lib/imagens';
 import { data } from '../lib/formato';
 interface Props { noticia: any; nivel?: 2 | 3 }
 const { noticia: n, nivel = 3 } = Astro.props;
-const img = urlMidia(n.imagem?.storage_path);
+const caminho: string | undefined = n.imagem?.storage_path;
 const Titulo = `h${nivel}` as 'h2' | 'h3';
 ---
 <article class="cartao">
-  {img && <img src={img} alt={n.imagem?.texto_alternativo ?? ''} loading="lazy" decoding="async" width="400" height="225" />}
+  {caminho && <img src={urlImagem(caminho, 480)} srcset={srcsetImagem(caminho, [320, 480, 800])} sizes="(max-width: 600px) 100vw, 400px" alt={n.imagem?.texto_alternativo ?? ''} loading="lazy" decoding="async" width="400" height="225" />}
   <div class="cartao-corpo">
     <p class="cartao-meta">
       {n.tipo === 'aviso' && <span class="selo">Aviso</span>}

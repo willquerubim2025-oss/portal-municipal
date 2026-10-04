@@ -15,6 +15,8 @@
     "Portal": { "type": "worker", "cache": { "enabled": true } }
   },
   "observability": { "enabled": true },
+  // Redimensionamento de imagens (D-36): /imagem/<largura>/<caminho>.
+  "images": { "binding": "IMAGES" },
   "vars": {
     "SUPABASE_URL": "https://qgywucdnaeheqndcxtho.supabase.co",
     "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_5hNTishJduD5ApO7MTuUqQ_lqbfTMOF"
@@ -22,6 +24,7 @@
   "env": {
     "homologacao": {
       "name": "portal-municipal-homologacao",
+      "images": { "binding": "IMAGES" },
       "vars": {
         "SUPABASE_URL": "https://kvilgamsyneenjtlllcf.supabase.co",
         "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_Be47d2VktOMB_5vhUi8Y7A_oQU9yTsv"
