@@ -12,8 +12,7 @@
 - [ ] **E-mail do sistema (SMTP próprio) nos dois projetos Supabase:** sem isso, convites e "esqueci minha senha" não chegam por e-mail a quem não é da equipe (hoje o convite devolve um link para repassar). Opções: Cloudflare Email Service, Resend, Amazon SES ou o e-mail da SECKE. Configurar em Authentication → Emails → SMTP, com remetente do domínio da SECKE e SPF/DKIM.
 - [ ] **Auth na produção:** cadastrar em Authentication → URL Configuration o endereço do painel publicado (Site URL e Redirect URLs `https://<painel>/redefinir-senha`). Sem isso, o link de convite volta para o endereço padrão.
 - [ ] Painel: pré-visualização de rascunho no portal (hoje o portal só mostra o publicado); biblioteca de mídias para reaproveitar imagens; publicar o painel (Cloudflare Workers static assets ou Pages); gerenciar categorias pelo painel (hoje só as do provisionamento).
-- [ ] Acessibilidade do painel: auditoria automática com axe (`@axe-core/playwright`) em todas as telas, dentro do `npm run e2e`.
-- [ ] **Links (RF18), falta o usuário:** aplicar a 0014 na homologação colando `aplicar-0014-homologacao.sql` no SQL Editor (a aplicação pela sessão é recusada pela permissão). Sem ela, uma verificação pode gravar os problemas em dobro (aconteceu no 1º teste: 434 registros para 217).
+- [ ] Acessibilidade, parte manual (D-33): teste com leitor de tela (NVDA + Chrome/Firefox) e navegação só por teclado no portal e no painel; a parte automática está pronta (`npm run acessibilidade`, 0 problemas).
 - [ ] Cópia integral dos arquivos de um município (fim de contrato, RF19): script que baixa tudo do Storage para a pasta do município e compacta (D-32).
 - [ ] GitHub Action: `pg_dump` diário → R2, com retenção de 30 dias + teste de restauração.
 - [ ] Monitoramento de disponibilidade (UptimeRobot ou Better Stack).
@@ -43,6 +42,7 @@
 Tudo o que precisa ser levantado com a prefeitura está organizado em **[docs/reuniao/](reuniao/00-LEIA-PRIMEIRO.md)**: guia e pauta (00), acessos e domínio (01), migração (02), transparência e sistemas (03), dados e conteúdo institucional (04), identidade visual (05), usuários, suporte e contrato (06). **Ao incluir uma nova pergunta para a prefeitura, colocar lá**, no arquivo do assunto.
 
 ## Concluído
+- 04/10/2026: **auditoria automática de acessibilidade** (D-33): 67 páginas do portal e do painel, 0 problemas. 0014 aplicada pelo usuário; nova verificação de links: 217 problemas, 217 registros (sem duplicar).
 - 04/10/2026: **verificação de links (RF18) e exportação completa (RF19)** na homologação (D-31, D-32): 0012 e 0013 aplicadas pelo usuário no SQL Editor; Edge Functions `verificar-links` e `exportar`; telas no painel; ambas testadas de ponta a ponta com os dados de Jeriquara.
 - 03/10/2026: **cache na borda por município com limpeza ao publicar** (D-30): `portal/src/worker.ts`, cabeçalhos no middleware, migration 0011 na homologação, 71 testes de permissão. Vault da homologação cadastrado pelo usuário; teste ponta a ponta: gravação às 20:57:15, limpeza às 20:58:00 (200), página nova às 20:58:05. Falta a produção.
 - 03/10/2026: descrição (alt) das imagens dentro do texto: 371 textos migrados corrigidos (`migracao/corrigir-alt.mjs`); a migração já preenche nas próximas prefeituras (`migracao/alt.mjs`).

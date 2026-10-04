@@ -27,6 +27,7 @@
 ## Por prefeitura: dados e conteúdo
 - [ ] Respostas da reunião registradas (`docs/reuniao/`), com pendências e datas.
 - [ ] Identidade visual e dados do rodapé preenchidos (painel → Identidade visual e dados).
+- [ ] **Depois da identidade visual:** rodar `npm run acessibilidade` (pasta `painel`) apontando `PORTAL_URL` para o portal da prefeitura: as cores do tema podem quebrar o contraste (D-33). Tem de terminar com 0 problemas.
 - [ ] Páginas obrigatórias **publicadas** com o texto oficial: Acesso à Informação, e-SIC, Ouvidoria, Privacidade (com o encarregado da LGPD), Acessibilidade.
 - [ ] Central de Transparência com os links de cada seção.
 - [ ] Estrutura organizacional cadastrada.
