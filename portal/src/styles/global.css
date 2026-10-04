@@ -69,6 +69,11 @@ main:focus { outline: none; }
 .atalhos span { display: inline-block; min-width: 1.4em; text-align: center; margin-left: .2em; border: 1px solid var(--cor-borda); border-radius: 3px; font-size: .75rem; }
 .ferramentas button { font: inherit; background: none; border: 0; padding: 0; cursor: pointer; color: var(--cor-texto); }
 .ferramentas button:hover { text-decoration: underline; }
+.link-acessibilidade { display: inline-flex; align-items: center; gap: .3rem; }
+.simbolo-acessibilidade { flex: none; }
+.tamanho-texto { display: inline-flex; gap: .15rem; }
+.tamanho-texto button { min-width: 2rem; min-height: 1.75rem; border: 1px solid var(--cor-borda); border-radius: 3px; padding: 0 .3rem; }
+.rodape-base-linha { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem 1.5rem; }
 
 /* Cabeçalho */
 .cabecalho { background: var(--cor-primaria); color: #fff; }
@@ -113,6 +118,10 @@ main:focus { outline: none; }
 /* Migalhas (breadcrumb) */
 .migalhas ol { list-style: none; display: flex; flex-wrap: wrap; gap: .25rem; padding: 1rem 0 0; margin: 0; font-size: .9rem; color: var(--cor-texto-suave); }
 .migalhas li + li::before { content: "›"; margin-right: .25rem; }
+
+/* Mapa do site */
+.mapa-site { padding-left: 1.25rem; line-height: 1.9; }
+.mapa-site ul { padding-left: 1.25rem; }
 
 /* Blocos de conteúdo */
 .cabecalho-pagina { padding: 1rem 0 .5rem; }

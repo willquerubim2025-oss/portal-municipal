@@ -200,3 +200,22 @@ code { background: var(--fundo); padding: 0 .3rem; border-radius: 4px; font-size
 
 /* Endereços longos (links quebrados) não esticam a tabela. */
 .quebra-tudo { overflow-wrap: anywhere; word-break: break-word; }
+
+/* PNTP (D-35) */
+.resumo-pntp { list-style: none; display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; padding: 0; margin: .5rem 0; }
+.resumo-pntp strong { font-size: 1.25rem; }
+.lista-pntp { list-style: none; padding: 0; margin: 0; }
+.dimensao-pntp { font-size: 1.1rem; margin: 1.5rem 0 .5rem; padding-bottom: .25rem; border-bottom: 1px solid var(--borda); }
+.criterio-pntp { border-left: 4px solid #8a96a3; padding: .5rem .75rem; margin-bottom: .5rem; background: #fff; }
+.criterio-pntp.situacao-atende { border-left-color: #1e7a3c; }
+.criterio-pntp.situacao-parcial { border-left-color: #b25e00; }
+.criterio-pntp.situacao-nao_atende { border-left-color: #a12020; }
+.criterio-pntp.situacao-nao_se_aplica { border-left-color: #cfd6de; }
+.criterio-pntp-topo { display: flex; gap: 1rem; justify-content: space-between; align-items: flex-start; }
+.criterio-pntp-topo p { margin: 0; }
+.criterio-pntp-topo select { flex: none; }
+.criterio-pntp-form { display: grid; gap: .5rem; margin-top: .5rem; max-width: 48rem; }
+.etiqueta-essencial { background: #fbe4e2; color: #8a1c1c; }
+.etiqueta-obrigatoria { background: #e8f1fb; color: #0b3a66; }
+.etiqueta-recomendada { background: #e6ebf1; color: #33404f; }
+@media (max-width: 700px) { .criterio-pntp-topo { flex-direction: column; } }

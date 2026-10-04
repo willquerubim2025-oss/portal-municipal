@@ -208,6 +208,17 @@ export async function pagina(municipioId: string, caminho: string) {
   return p;
 }
 
+/** Todas as páginas publicadas, em árvore (para o mapa do site). */
+export interface NoPagina { titulo: string; caminho: string; filhas: NoPagina[] }
+export async function arvorePaginas(municipioId: string): Promise<NoPagina[]> {
+  const linhas = erro(await supabase().from('paginas').select('id, parent_id, titulo, caminho')
+    .eq('municipio_id', municipioId).order('ordem').order('titulo').limit(2000)) as any[];
+  const nos = new Map(linhas.map((l) => [l.id, { titulo: l.titulo, caminho: l.caminho, filhas: [] as NoPagina[], pai: l.parent_id }]));
+  const raiz: NoPagina[] = [];
+  for (const n of nos.values()) (n.pai && nos.get(n.pai) ? nos.get(n.pai)!.filhas : raiz).push(n);
+  return raiz;
+}
+
 // ---------------------------------------------------------------- busca e sitemap
 export async function buscar(municipioId: string, termo: string, pagina = 1) {
   return erro(await supabase().rpc('buscar', {

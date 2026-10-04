@@ -43,7 +43,7 @@ const browser = await chromium.launch();
 // ------------------------------------------------------------------ portal
 const PAGINAS_PORTAL = ['/', '/noticias', '/documentos', '/legislacao', '/servicos', '/eventos', '/perguntas-frequentes',
   '/estrutura-organizacional', '/transparencia', '/busca?q=saude', '/o-municipio', '/o-municipio/historia', '/departamentos',
-  '/fale-conosco', '/acessibilidade', '/pagina-que-nao-existe'];
+  '/fale-conosco', '/acessibilidade', '/mapa-do-site', '/pagina-que-nao-existe'];
 
 for (const [rotulo, contexto] of [
   ['computador', { viewport: { width: 1366, height: 900 } }],

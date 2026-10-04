@@ -1,0 +1,66 @@
+---
+// Mapa do site para pessoas (eMAG e PNTP 13.5). O /sitemap.xml é o dos buscadores.
+import Base from '../layouts/Base.astro';
+import { arvorePaginas, categorias, hrefCategoria, menu, type NoPagina } from '../lib/consultas';
+import { moduloAtivo } from '../lib/municipio';
+
+const { municipio: m } = Astro.locals.contexto;
+const [paginas, catNoticias, catDocumentos, principal] = await Promise.all([
+  arvorePaginas(m.id),
+  categorias(m.id, 'publicacao'),
+  categorias(m.id, 'documento'),
+  menu(m.id, 'principal'),
+]);
+
+const secoes = [
+  { rotulo: 'Página inicial', href: '/' },
+  { rotulo: 'Notícias', href: '/noticias', filhos: catNoticias.map((c) => ({ rotulo: c.nome, href: hrefCategoria('publicacao', c.slug) })) },
+  { rotulo: 'Documentos', href: '/documentos', filhos: catDocumentos.map((c) => ({ rotulo: c.nome, href: hrefCategoria('documento', c.slug) })) },
+  moduloAtivo(m, 'legislacao') && { rotulo: 'Legislação', href: '/legislacao' },
+  { rotulo: 'Transparência', href: '/transparencia' },
+  moduloAtivo(m, 'carta_servicos') && { rotulo: 'Carta de Serviços', href: '/servicos' },
+  moduloAtivo(m, 'agenda') && { rotulo: 'Agenda', href: '/eventos' },
+  moduloAtivo(m, 'estrutura_organizacional') && { rotulo: 'Estrutura organizacional', href: '/estrutura-organizacional' },
+  moduloAtivo(m, 'perguntas_frequentes') && { rotulo: 'Perguntas frequentes', href: '/perguntas-frequentes' },
+  { rotulo: 'Busca', href: '/busca' },
+].filter(Boolean) as { rotulo: string; href: string; filhos?: { rotulo: string; href: string }[] }[];
+
+// Links externos do menu (sistemas, e-SIC de terceiros...): também entram no mapa.
+const externos = principal.flatMap((i) => [i, ...i.filhos]).filter((i) => i.href && /^https?:/.test(i.href));
+---
+<Base titulo="Mapa do site" descricao={`Todas as seções e páginas do portal de ${m.nome}.`} migalhas={[{ nome: 'Mapa do site' }]}>
+  <article class="container">
+    <header class="cabecalho-pagina"><h1>Mapa do site</h1></header>
+
+    <section aria-labelledby="t-secoes">
+      <h2 id="t-secoes">Seções</h2>
+      <ul class="mapa-site">
+        {secoes.map((s) => (
+          <li>
+            <a href={s.href}>{s.rotulo}</a>
+            {s.filhos && s.filhos.length > 0 && <ul>{s.filhos.map((f) => <li><a href={f.href}>{f.rotulo}</a></li>)}</ul>}
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    {paginas.length > 0 && (
+      <section aria-labelledby="t-paginas">
+        <h2 id="t-paginas">Páginas</h2>
+        <Fragment set:html={(function lista(nos: NoPagina[]): string {
+          const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+          return `<ul class="mapa-site">${nos.map((n) => `<li><a href="/${esc(n.caminho)}">${esc(n.titulo)}</a>${n.filhas.length ? lista(n.filhas) : ''}</li>`).join('')}</ul>`;
+        })(paginas)} />
+      </section>
+    )}
+
+    {externos.length > 0 && (
+      <section aria-labelledby="t-externos">
+        <h2 id="t-externos">Sistemas e sites externos</h2>
+        <ul class="mapa-site">
+          {externos.map((e) => <li><a href={e.href!} rel="noopener" target="_blank">{e.rotulo}<span class="sr-only"> (abre em nova aba)</span></a></li>)}
+        </ul>
+      </section>
+    )}
+  </article>
+</Base>

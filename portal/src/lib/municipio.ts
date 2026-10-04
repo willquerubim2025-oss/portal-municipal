@@ -21,6 +21,7 @@ export interface Config {
   modulos?: Partial<Record<Modulo, boolean>>;
   legislacao_categorias?: string[];    // slugs das categorias de documento listadas em /legislacao
   seo?: { google_site_verification?: string; imagem_compartilhamento_path?: string };
+  radar_transparencia?: boolean;      // botão do Radar da Transparência no rodapé (PNTP 2.9); padrão: mostra
 }
 
 export type Modulo =
