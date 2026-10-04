@@ -228,3 +228,6 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **Conexão pelo Session pooler** (porta 5432): a conexão direta do Supabase é só IPv6, e o GitHub Actions usa IPv4.
 - **Fora do escopo por enquanto:** os arquivos (PDFs, imagens, 7 GB em Jeriquara) não entram no dump; ficam no Storage do Supabase. Pendência: cópia periódica do Storage para o R2.
 - **Cuidado corrigido na revisão:** a 1ª versão escolhia a conexão com `producao && A || B`, que, com o segredo da produção vazio, faria o backup da homologação com o nome de produção. Agora cada ambiente só usa o próprio segredo.
+- **Corrigido no 1º teste real:** o teste não restaurava os usuários do login, então `perfis` e `equipe_plataforma` ficavam vazias sem o teste perceber; e o doc mandava restaurar o conteúdo antes dos usuários (os perfis seriam recusados). Agora o backup guarda também a estrutura de `auth.users`/`auth.identities`/`storage.*`, o teste restaura os usuários primeiro e confere `perfis` e `membros`.
+- **Validação de entrada:** o workflow confere antes de começar se a conexão é a URI do Session pooler e se as chaves do R2 têm 32 e 64 caracteres (o 1º cadastro tinha só a senha no lugar da URI).
+- **Produção funcionando em 04/10/2026:** `producao/2026-10-04/backup.tar.gpg` no R2, restauração conferida (usuários, perfis, páginas, auditoria iguais à origem).
