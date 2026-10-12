@@ -337,3 +337,10 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - direção: cards maiores, com foto de 84 px, filete da cor primária e cargo em caixa alta;
   - supervisão e divisões: grade de cards pequenos, com foto de 56 px.
 - **Homologação:** para a apresentação, a equipe é **fictícia**. São nomes inventados, e as fotos vêm do randomuser.me, retratos de banco de imagens para protótipo. As fotos do "Em foco" vêm do Unsplash. Tudo isso tem de sair antes de qualquer publicação real.
+
+**D-45 · 12/10/2026 · Sem amarelo: acento salmão e "areia" no lugar do amarelo; "Em foco" em faixas horizontais (a pedido do usuário)**
+- **Cores:** o amarelo foi considerado alarmante.
+  - O acento (`tema.cor_acento`), usado nos botões de ação, na régua das seções, no indicador do carrossel e no traço sob os títulos, passou a ser salmão claro `#f2c2a9`. O texto petróleo sobre ele tem contraste 6,9.
+  - A primeira cor viva passou de amarelo para "areia": forte `#8a5a3c` (branco sobre ela: 5,8) e claro `#f7efe6`.
+  - O chip "Em breve" segue o tema, sem cor fixa. O anel de foco do teclado continua amarelo, porque é recurso de acessibilidade e só aparece na navegação por teclado.
+- **Em foco:** cada card ocupa a largura toda, com foto de um lado e painel colorido do outro, e os lados alternam. Os cards ficam empilhados e têm a mesma altura mínima. No celular, a foto vai para cima.

@@ -208,7 +208,7 @@ a.v-servico:hover .v-servico-icone, a.v-servico:focus-visible .v-servico-icone {
 .v-servico-ir svg { width: 1em; height: 1em; transition: transform .2s; }
 a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .v-servico-breve { box-shadow: none; background: rgb(255 255 255 / .7); }
-.v-chip { position: absolute; top: 1rem; right: 1rem; font-family: var(--v-fonte-titulos); font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: .25rem .6rem; border-radius: 999px; background: #fff4d1; color: #6b4a00; border: 1px solid #f0d78a; }
+.v-chip { position: absolute; top: 1rem; right: 1rem; font-family: var(--v-fonte-titulos); font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: .25rem .6rem; border-radius: 999px; background: var(--v-tom-0); color: var(--v-cor-0); border: 1px solid color-mix(in srgb, var(--v-cor-0) 30%, transparent); }
 .v-cor-0 { --forte: var(--v-cor-0); --claro: var(--v-tom-0); }
 .v-cor-1 { --forte: var(--v-cor-1, var(--v-cor-0)); --claro: var(--v-tom-1, var(--v-tom-0)); }
 .v-cor-2 { --forte: var(--v-cor-2, var(--v-cor-0)); --claro: var(--v-tom-2, var(--v-tom-0)); }
@@ -251,12 +251,12 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 
 /* Em foco (D-44): cards grandes, alternando foto em cima e embaixo e com alturas diferentes. */
 .v-fundo-foco { background: linear-gradient(180deg, #fff 0, var(--v-faixa-neutra) 100%); }
-.v-foco { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 7fr 5fr; gap: 1.5rem; align-items: start; }
-.v-foco-item { display: flex; flex-direction: column; border-radius: 22px; overflow: hidden; background: var(--forte, var(--cor-primaria)); color: #fff; box-shadow: var(--v-sombra); }
-.v-foco-invertido { flex-direction: column-reverse; margin-top: 3.5rem; }
-.v-foco-foto { width: 100%; height: clamp(220px, 24vw, 340px); object-fit: cover; }
-.v-foco-invertido .v-foco-foto { height: clamp(180px, 18vw, 250px); }
-.v-foco-painel { position: relative; display: grid; gap: .8rem; justify-items: start; padding: clamp(1.25rem, 2.5vw, 2rem); }
+.v-foco { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.5rem; }
+.v-foco-item { display: grid; grid-template-columns: 5fr 7fr; min-height: 320px; border-radius: 22px; overflow: hidden; background: var(--forte, var(--cor-primaria)); color: #fff; box-shadow: var(--v-sombra); }
+.v-foco-invertido { grid-template-columns: 7fr 5fr; }
+.v-foco-invertido .v-foco-foto { order: 2; }
+.v-foco-foto { width: 100%; height: 100%; min-height: 240px; object-fit: cover; }
+.v-foco-painel { position: relative; overflow: hidden; display: grid; gap: .8rem; justify-items: start; align-content: center; padding: clamp(1.5rem, 3vw, 2.5rem); }
 .v-foco-painel::before { content: ""; position: absolute; right: -40px; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: rgb(255 255 255 / .08); pointer-events: none; }
 .v-foco-chamada { margin: 0; font-family: var(--v-fonte-titulos); font-size: .75rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: rgb(255 255 255 / .9); }
 .v-foco-painel h3 { margin: 0; color: #fff; font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem); font-weight: 700; line-height: 1.15; }
@@ -265,7 +265,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .v-foco-links a { display: inline-block; padding: .4rem .85rem; border-radius: 999px; border: 1px solid rgb(255 255 255 / .6); color: #fff; text-decoration: none; font-size: .85rem; font-weight: 500; }
 .v-foco-links a:hover, .v-foco-links a:focus-visible { background: #fff; color: var(--forte); }
 .v-foco-item .v-botao-acento svg { width: 1.1em; height: 1.1em; }
-@media (max-width: 860px) { .v-foco { grid-template-columns: 1fr; } .v-foco-invertido { margin-top: 0; } }
+@media (max-width: 860px) { .v-foco-item, .v-foco-invertido { grid-template-columns: 1fr; } .v-foco-invertido .v-foco-foto { order: 0; } .v-foco-foto { height: 220px; min-height: 0; } }
 :root.contraste.vitrine .v-foco-item { background: #000; border: 1px solid #fff; }
 :root.contraste.vitrine .v-foco-painel h3, :root.contraste.vitrine .v-foco-links a { color: #ff0; border-color: #ff0; }
 
