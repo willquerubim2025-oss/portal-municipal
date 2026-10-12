@@ -21,7 +21,15 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
   - publicar o portal de homologação na Cloudflare com o código novo, para ver no navegador. Até lá, testar com `DOMINIO_DEV=educacao.paulinia.teste` no `.env` do `portal/`;
   - menu principal da SMEDU cadastrado na homologação em 12/10/2026 (D-40). **Confirmar com a SMEDU** os rótulos e a ordem, e se Agenda e Transparência ficam no menu. As páginas "Matrícula Escolar" e "Fale com o supervisor" ainda não têm conteúdo real (prazos, documentos, lista de escolas);
   - brasão colorido em uso desde 12/10/2026 (`<id>/carga/brasao-colorido.png`, tema.brasao_path). O arquivo recebido tem só 252 px, e serve no cabeçalho, mas **pedir à Prefeitura o brasão oficial em alta resolução (PNG transparente ou SVG)** para o compartilhamento em redes e a impressão. A função `carga-midias-temporaria` foi reativada só para esse envio e já voltou a responder 410;
-  - rodapé da SMEDU sem endereço, telefone e horário (coluna esquerda vazia): aguardando os dados oficiais;
+  - **carga de dados públicos da SMEDU em 12/10/2026 (homologação):**
+    - 59 unidades escolares em `unidades`, com `legado.confirmar = true`;
+    - contato no rodapé (`config`);
+    - página Matrícula Escolar (serviço);
+    - página `educacao-em-numeros`, com o card apontando para ela;
+    - card "Secretaria de Educação" apontando para /estrutura-organizacional.
+    O que falta confirmar com a SMEDU (supervisores, e-mail oficial, erros da lista, matrícula 2027, números, equipe e organograma) está em `docs/reuniao/smedu-dados-a-confirmar.md`, no repositório Portais-Publicos;
+  - o item de menu "Equipe gestora" (`/#titulo-equipe`) leva ao topo da home enquanto a equipe estiver vazia (o bloco fica oculto). Resolver quando os nomes chegarem;
+  - a ferramenta `execute_sql` do MCP do Supabase trava (60 s) ao gravar HTML com listas de documentos pessoais (RG, CPF...) em texto puro. Contorno: enviar o HTML em base64 e decodificar com `convert_from(decode(...,'base64'),'UTF8')`;
   - na produção, enviar o brasão e as fotos pelo painel (Identidade visual e Mídias). Na homologação foram enviados por uma Edge Function temporária, `carga-midias-temporaria`, já desativada (responde 410) e que pode ser excluída no painel do Supabase;
   - conteúdo da homologação: 7 notícias reais do site da Prefeitura, com crédito e link. As datas são aproximadas (o site não expõe a data de cada notícia), exceto a do uniforme (9/10). Fotos com crianças, já publicadas pela Prefeitura, precisam de revisão antes de irem ao ar (ECA);
   - blocos ainda vazios na SMEDU: agenda (sem eventos) e equipe gestora (sem nomes); a busca do supervisor precisa da lista de escolas e supervisores;
