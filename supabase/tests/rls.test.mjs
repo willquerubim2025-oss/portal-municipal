@@ -349,5 +349,200 @@ espera('outro município NÃO vê o acompanhamento do PNTP', Number(r.rows?.[0]?
 r = await como('admin', `insert into pntp_criterios (id, ciclo, dimensao, descricao) values ('x', 2026, 'x', 'x')`)
 espera('admin do município NÃO altera a matriz', !!r.erro)
 
+
+console.log('\nSegurança (0016)')
+const novoU = 'a0000000-0000-4000-8000-000000000005'
+await db.exec(`insert into auth.users values ('${novoU}', 'novo@x'); insert into membros (municipio_id, user_id, papel) values ('${J}', '${novoU}', 'editor')`)
+r = await como('outro', `insert into perfis (user_id, nome, email) values ('${novoU}', 'Intruso', 'novo@x')`)
+espera('admin de outro município NÃO cria perfil de membro de Jeriquara', !!r.erro)
+r = await como('admin', `insert into perfis (user_id, nome, email) values ('${novoU}', 'Novo', 'novo@x') returning 1`)
+espera('admin cria perfil de membro do próprio município', r.rows?.length === 1)
+r = await como('admin', `select p.proname from pg_proc p where p.pronamespace = 'public'::regnamespace and p.prosecdef and p.prorettype <> 'trigger'::regtype
+     and (has_function_privilege('anon', p.oid, 'execute') or has_function_privilege('authenticated', p.oid, 'execute')) order by 1`)
+espera('nenhuma função SECURITY DEFINER do schema public é chamável por anon ou authenticated', r.rows?.length === 0)
+const acessosAntes = Number((await db.query(`select acessos from redirecionamentos where id = '${redir}'`)).rows[0].acessos)
+r = await como('anon', `select registrar_acesso_redirecionamento('${redir}')`)
+const acessosDepois = Number((await db.query(`select acessos from redirecionamentos where id = '${redir}'`)).rows[0].acessos)
+espera('anon ainda conta acesso de redirecionamento', !r.erro && acessosDepois === acessosAntes + 1)
+r = await como('anon', `select count(*)::int n from municipios where public.is_membro(id)`)
+espera('policies continuam funcionando para o anon (is_membro = falso)', r.rows?.[0]?.n === 0)
+r = await como('admin', `select is_admin('${J}') a, is_admin('${O}') b`)
+espera('is_admin continua respondendo pelo usuário', r.rows?.[0]?.a === true && r.rows?.[0]?.b === false)
+const midiaRasc = (await db.query(`insert into midias (municipio_id, storage_path, nome_original, mime_type) values ('${J}', '${J}/edital-rascunho.pdf', 'edital.pdf', 'application/pdf') returning id`)).rows[0].id
+await db.exec(`insert into documento_arquivos (documento_id, midia_id, rotulo) values ('${leiNova}', '${midiaRasc}', 'Edital')`)
+r = await como('anon', `select count(*)::int n from midias where id = '${midiaRasc}'`)
+espera('anon NÃO vê mídia de documento em rascunho (nem o storage_path)', r.rows?.[0]?.n === 0)
+r = await como('anon', `select count(*)::int n from midias where id = '${midiaJ}'`)
+espera('anon vê mídia da galeria de notícia publicada', r.rows?.[0]?.n === 1)
+r = await como('anon', `select g.midia from publicacoes p, lateral (select json_agg(m.storage_path) midia from publicacao_midias pm join midias m on m.id = pm.midia_id where pm.publicacao_id = p.id) g where p.id = '${pubId}'`)
+espera('portal monta a galeria da notícia publicada', JSON.stringify(r.rows?.[0]?.midia) === JSON.stringify([`${J}/foto1.jpg`]))
+r = await como('outro', `select count(*)::int n from midias where id = '${midiaRasc}'`)
+espera('admin de outro município NÃO vê mídia de rascunho de Jeriquara', r.rows?.[0]?.n === 0)
+r = await como('editor', `select count(*)::int n from midias where id = '${midiaRasc}'`)
+espera('membro vê todas as mídias do próprio município', r.rows?.[0]?.n === 1)
+
+console.log('\nOrganização contratante (0017)')
+r = await como('admin', `update municipios set tipo_ente = 'camara' where id = '${J}'`)
+espera('admin NÃO altera o tipo da organização', !!r.erro)
+r = await como('admin', `update municipios set cidade = 'Outra' where id = '${J}'`)
+espera('admin NÃO altera a cidade da organização', !!r.erro)
+r = await como('plat', `select criar_municipio('cidade-educacao', 'Secretaria de Educação de Cidade', 'sp') id`)
+const sec = r.rows?.[0]?.id
+r = await como('plat', `update municipios set tipo_ente = 'secretaria', cidade = 'Cidade', codigo_ibge = '3500000' where id = '${sec}' returning 1`)
+espera('SECKE cadastra secretaria como organização própria', r.rows?.length === 1)
+r = await como('admin', `insert into publicacoes (municipio_id, titulo, slug) values ('${sec}', 'Invasão', 'invasao-sec')`)
+espera('admin da prefeitura NÃO escreve na secretaria (organizações isoladas)', !!r.erro)
+r = await como('plat', `update municipios set codigo_ibge = '123' where id = '${sec}'`)
+espera('código IBGE exige 7 dígitos', !!r.erro)
+
+
+console.log('\nPermissões configuráveis (0018)')
+const UP = { dir: 'a0000000-0000-4000-8000-000000000011', viz: 'a0000000-0000-4000-8000-000000000012',
+             adm: 'a0000000-0000-4000-8000-000000000013', vinc: 'a0000000-0000-4000-8000-000000000014',
+             reg: 'a0000000-0000-4000-8000-000000000015' }
+Object.assign(U, UP)
+await db.exec(`insert into auth.users values ${Object.values(UP).map(u => `('${u}', '${u}@x')`).join(',')}`)
+// No teste as organizações vêm do seed (depois das migrações); em produção a 0018 já as provisiona.
+await db.exec(`select provisionar_papeis(id) from municipios`)
+const papel = async (m, slug) => (await db.query(`select id from papeis where municipio_id = '${m}' and slug = '${slug}'`)).rows[0]?.id
+espera('organizações existentes recebem os papéis padrão', !!(await papel(J, 'administrador')) && !!(await papel(J, 'diretor')))
+r = await db.query(`select count(*)::int n from papel_permissoes pp join papeis p on p.id = pp.papel_id where p.municipio_id = '${J}' and p.slug = 'administrador' and pp.ativo`)
+espera('Administrador nasce com todo o catálogo ligado', r.rows[0].n === Number((await db.query(`select count(*) n from permissoes where ativa`)).rows[0].n))
+r = await como('plat', `select criar_municipio('org-nova-papeis', 'Org Nova', 'sp') id`)
+espera('organização criada já nasce com papéis', !!(await papel(r.rows?.[0]?.id, 'administrador')))
+
+// Unidades e região de Jeriquara
+await db.exec(`
+  insert into regioes (id, municipio_id, nome, slug) values ('c0000000-0000-4000-8000-000000000001', '${J}', 'Norte', 'norte');
+  insert into unidades (id, municipio_id, nome, slug, bairro, regiao_id) values
+    ('b0000000-0000-4000-8000-000000000001', '${J}', 'EMEF João Aranha', 'emef-joao-aranha', 'Jardim Bela Vista', 'c0000000-0000-4000-8000-000000000001'),
+    ('b0000000-0000-4000-8000-000000000002', '${J}', 'EMEI Vizinha', 'emei-vizinha', 'Centro', null);
+  insert into unidades (id, municipio_id, nome, slug) values ('b0000000-0000-4000-8000-000000000009', '${O}', 'Escola de Outra', 'escola-outra');
+`)
+const E1 = 'b0000000-0000-4000-8000-000000000001', E2 = 'b0000000-0000-4000-8000-000000000002', EO = 'b0000000-0000-4000-8000-000000000009'
+r = await como('admin', `insert into usuario_papeis (municipio_id, user_id, papel_id) values ('${J}', '${U.adm}', '${await papel(J, 'administrador')}')`)
+espera('admin antigo (membros) NÃO usa os módulos novos sem papel novo', !!r.erro)
+r = await como('plat', `insert into usuario_papeis (municipio_id, user_id, papel_id) values ('${J}', '${U.adm}', '${await papel(J, 'administrador')}') returning 1`)
+espera('SECKE atribui o primeiro Administrador', r.rows?.length === 1)
+r = await como('adm', `insert into usuario_papeis (municipio_id, user_id, papel_id, unidade_id) values ('${J}', '${U.dir}', '${await papel(J, 'diretor')}', '${E1}') returning 1`)
+espera('Administrador vincula diretor à escola', r.rows?.length === 1)
+r = await como('adm', `insert into usuario_papeis (municipio_id, user_id, papel_id) values ('${J}', '${U.adm}', '${await papel(J, 'diretor')}')`)
+espera('ninguém se dá papel sozinho', !!r.erro)
+r = await como('adm', `insert into usuario_papeis (municipio_id, user_id, papel_id, unidade_id) values ('${J}', '${U.dir}', '${await papel(J, 'diretor')}', '${EO}')`)
+espera('vínculo NÃO aponta unidade de outra organização', !!r.erro)
+r = await como('adm', `insert into usuario_papeis (municipio_id, user_id, papel_id) values ('${O}', '${U.dir}', '${await papel(O, 'administrador')}')`)
+espera('Administrador de uma organização NÃO vincula na outra', !!r.erro)
+
+r = await como('dir', `update unidades set telefone = '16 1111-1111' where id = '${E1}' returning 1`)
+espera('diretor edita a própria escola', r.rows?.length === 1)
+r = await como('dir', `update unidades set telefone = '16 2222-2222' where id = '${E2}' returning 1`)
+espera('diretor NÃO edita a escola vizinha', !r.rows?.length)
+r = await como('dir', `update unidades set ativo = false where id = '${E1}'`)
+espera('diretor NÃO desativa a própria escola (campo da rede)', !!r.erro)
+r = await como('dir', `insert into unidades (municipio_id, nome, slug) values ('${J}', 'Nova', 'nova')`)
+espera('diretor NÃO cria unidade', !!r.erro)
+r = await como('adm', `update unidades set ativo = false where id = '${E2}' returning 1`)
+espera('Administrador gerencia unidades', r.rows?.length === 1)
+await como('adm', `update unidades set ativo = true where id = '${E2}'`)
+
+// Escopo região
+const papelReg = (await como('adm', `insert into papeis (municipio_id, slug, nome) values ('${J}', 'coordenador-regional', 'Coordenador regional') returning id`)).rows?.[0]?.id
+espera('papel novo criado pelo painel', !!papelReg)
+r = await como('adm', `insert into papel_permissoes (municipio_id, papel_id, permissao_codigo, ativo, escopo) values ('${J}', '${papelReg}', 'unidades.editar', true, 'regiao') returning 1`)
+espera('Administrador liga permissão com escopo região', r.rows?.length === 1)
+r = await como('adm', `insert into papel_permissoes (municipio_id, papel_id, permissao_codigo, ativo, escopo) values ('${J}', '${papelReg}', 'equipe.gerenciar', true, 'unidade')`)
+espera('escopo que não se aplica à permissão é recusado', !!r.erro)
+await como('adm', `insert into usuario_papeis (municipio_id, user_id, papel_id, regiao_id) values ('${J}', '${U.reg}', '${papelReg}', 'c0000000-0000-4000-8000-000000000001')`)
+r = await como('reg', `update unidades set email = 'a@x' where id = '${E1}' returning 1`)
+espera('escopo região edita escola da região', r.rows?.length === 1)
+r = await como('reg', `update unidades set email = 'a@x' where id = '${E2}' returning 1`)
+espera('escopo região NÃO edita escola fora da região', !r.rows?.length)
+r = await como('adm', `update papel_permissoes set ativo = false where papel_id = '${papelReg}' and permissao_codigo = 'unidades.editar' returning 1`)
+r = await como('reg', `update unidades set email = 'b@x' where id = '${E1}' returning 1`)
+espera('permissão desligada bloqueia no banco', !r.rows?.length)
+
+// Salvaguardas
+r = await como('adm', `update papel_permissoes set ativo = false where papel_id = '${await papel(J, 'administrador')}' and permissao_codigo = 'permissoes.gerenciar' returning 1`)
+espera('Administrador NÃO perde permissoes.gerenciar', !!r.erro)
+r = await como('adm', `delete from papeis where id = '${await papel(J, 'administrador')}'`)
+espera('papel Administrador NÃO é excluído', !!r.erro)
+r = await como('adm', `update papeis set protegido = true where id = '${papelReg}'`)
+espera('ninguém marca papel como protegido pelo painel', !!r.erro)
+await db.exec(`insert into usuario_papeis (municipio_id, user_id, papel_id) select '${J}', '${U.vinc}', id from papeis where municipio_id = '${J}' and slug = 'professor'`)
+const papelVinc = (await como('adm', `insert into papeis (municipio_id, slug, nome) values ('${J}', 'secretario-escolar', 'Secretário') returning id`)).rows[0].id
+await como('adm', `insert into papel_permissoes (municipio_id, papel_id, permissao_codigo, ativo) values ('${J}', '${papelVinc}', 'usuarios.vincular', true)`)
+await como('adm', `insert into usuario_papeis (municipio_id, user_id, papel_id) values ('${J}', '${U.vinc}', '${papelVinc}')`)
+r = await como('vinc', `insert into usuario_papeis (municipio_id, user_id, papel_id) values ('${J}', '${U.viz}', '${await papel(J, 'administrador')}')`)
+espera('quem só vincula NÃO dá o papel Administrador', !!r.erro)
+r = await como('vinc', `insert into usuario_papeis (municipio_id, user_id, papel_id) values ('${J}', '${U.viz}', '${await papel(J, 'professor')}') returning 1`)
+espera('quem vincula dá papel comum', r.rows?.length === 1)
+r = await como('adm', `select tabela, acao, user_id from log_permissoes where municipio_id = '${J}' and papel_id = '${papelReg}' order by id`)
+espera('histórico registra quem ligou e desligou', r.rows?.length >= 3 && r.rows.every(x => x.user_id === U.adm))
+r = await como('dir', `select count(*)::int n from log_permissoes`)
+espera('diretor NÃO lê o histórico de permissões', r.rows?.[0]?.n === 0)
+r = await como('outro', `select count(*)::int n from papeis where municipio_id = '${J}'`)
+espera('admin de outra organização NÃO vê os papéis de Jeriquara', r.rows?.[0]?.n === 0)
+r = await como('dir', `select permissao, escopo, unidade_id from minhas_permissoes('${J}')`)
+espera('painel sabe o que o diretor pode (e onde)', r.rows?.length === 1 && r.rows[0].permissao === 'unidades.editar' && r.rows[0].unidade_id === E1)
+r = await como('anon', `select count(*)::int n from permissoes`)
+espera('anon NÃO lê o catálogo de permissões', !!r.erro || r.rows?.[0]?.n === 0)
+
+// Catálogo vindo do código
+await db.query(`select sincronizar_permissoes($1)`, [JSON.stringify([
+  ...(await db.query(`select codigo, modulo, nome, escopos from permissoes where ativa`)).rows,
+  { codigo: 'noticias.publicar', modulo: 'Notícias', nome: 'Publicar notícias', escopos: ['rede', 'unidade'] }])])
+r = await db.query(`select count(*)::int n from papel_permissoes where permissao_codigo = 'noticias.publicar' and ativo`)
+espera('permissão nova do código nasce desligada para todos', r.rows[0].n === 0)
+r = await como('adm', `select sincronizar_permissoes('[]')`)
+espera('só o servidor sincroniza o catálogo', /permission denied/.test(r.erro ?? ''))
+
+console.log('\nEquipe gestora e unidades (0019)')
+r = await como('adm', `insert into equipe (municipio_id, nome, cargo, nivel, visivel, dados_confirmados, email) values ('${J}', 'Ana Supervisora', 'Supervisora de Ensino', 2, true, true, 'ana@x') returning id`)
+const sup = r.rows?.[0]?.id
+espera('Administrador cadastra membro da equipe', !!sup)
+await como('adm', `update unidades set supervisor_id = '${sup}' where id = '${E1}'`)
+r = await como('dir', `update unidades set supervisor_id = null where id = '${E1}'`)
+espera('diretor NÃO troca o supervisor da escola', !!r.erro)
+const fotoEq = (await db.query(`insert into midias (municipio_id, storage_path, nome_original, mime_type) values ('${J}', '${J}/ana.jpg', 'ana.jpg', 'image/jpeg') returning id`)).rows[0].id
+r = await como('adm', `update equipe set foto_id = '${fotoEq}' where id = '${sup}'`)
+espera('foto sem autorização de imagem é recusada', !!r.erro)
+r = await como('adm', `update equipe set foto_id = '${fotoEq}', autorizacao_imagem = true where id = '${sup}' returning 1`)
+espera('foto com autorização é aceita', r.rows?.length === 1)
+r = await como('anon', `select count(*)::int n from midias where id = '${fotoEq}'`)
+espera('foto autorizada de membro visível é pública', r.rows?.[0]?.n === 1)
+r = await como('adm', `insert into equipe (municipio_id, nome, cargo, nivel) values ('${J}', 'Oculto', 'Diretor de Divisão', 3) returning id`)
+r = await como('anon', `select nome from equipe where municipio_id = '${J}'`)
+espera('anon vê só membros visíveis', r.rows?.length === 1 && r.rows[0].nome === 'Ana Supervisora')
+r = await como('anon', `select nome, supervisor_nome, supervisor_email from buscar_unidade('${J}', 'bela vista')`)
+espera('busca por bairro sem acento acha a escola e o supervisor', r.rows?.length === 1 && r.rows[0].supervisor_nome === 'Ana Supervisora')
+r = await como('anon', `select count(*)::int n from buscar_unidade('${O}', 'joao')`)
+espera('busca de unidade não vaza entre organizações', r.rows?.[0]?.n === 0)
+await como('plat', `update municipios set config = config || '{"modulos": {"equipe_gestora": false}}' where id = '${J}'`)
+r = await como('anon', `select count(*)::int n from equipe where municipio_id = '${J}'`)
+espera('seção desligada esconde a equipe inteira', r.rows?.[0]?.n === 0)
+r = await como('anon', `select supervisor_nome from buscar_unidade('${J}', 'aranha')`)
+espera('com a seção desligada, a busca traz a escola sem o supervisor', r.rows?.length === 1 && r.rows[0].supervisor_nome === null)
+r = await como('dir', `insert into equipe (municipio_id, nome, cargo, nivel) values ('${J}', 'X', 'Y', 1)`)
+espera('diretor NÃO mexe na equipe gestora', !!r.erro)
+r = await como('outro', `insert into equipe (municipio_id, nome, cargo, nivel) values ('${J}', 'X', 'Y', 1)`)
+espera('outra organização NÃO mexe na equipe', !!r.erro)
+
+console.log('\nPágina inicial (0020)')
+r = await como('admin', `insert into destaques (municipio_id, tipo, nivel, titulo, status, publicado_em, fim_em) values ('${J}', 'alerta', 'urgente', 'Matrículas até sexta', 'publicado', now() - interval '2 days', now() - interval '1 day') returning id, versao, frequencia`)
+const av = r.rows?.[0]
+espera('aviso nasce na versão 1, uma vez por visitante', av?.versao === 1 && av?.frequencia === 'uma_vez')
+r = await como('admin', `update destaques set titulo = 'Matrículas até segunda' where id = '${av.id}' returning versao`)
+espera('editar o aviso sobe a versão (volta a aparecer)', r.rows?.[0]?.versao === 2)
+r = await como('admin', `insert into destaques (municipio_id, tipo, titulo, publicacao_id) values ('${O}', 'alerta', 'x', '${pubId}')`)
+espera('destaque NÃO liga notícia de outra organização', !!r.erro)
+r = await como('admin', `update publicacoes set prioridade = 'manchete' where id = '${pubId}'`)
+espera('prioridade só aceita principal/secundária', !!r.erro)
+r = await como('admin', `insert into servicos (municipio_id, titulo, slug, na_home, em_breve, ordem, icone) values ('${J}', 'Área do Estudante', 'area-do-estudante', true, true, 2, 'graduation-cap') returning 1`)
+espera('card de serviço "em breve" cadastrado', r.rows?.length === 1)
+
+console.log('\nExclusão de organização com permissões')
+r = await como('plat', `delete from municipios where slug = 'org-nova-papeis' returning 1`)
+espera('SECKE exclui organização com papéis (cascata não trava)', r.rows?.length === 1)
+
 console.log(`\n${ok} ok, ${falhas} falhas`)
 process.exit(falhas ? 1 : 0)

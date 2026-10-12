@@ -247,3 +247,28 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **Cota e custo:** grátis até **5.000 transformações únicas por mês** (cada imagem + largura conta uma vez por mês). Passando disso, a Cloudflare **não cobra**: recusa as novas, e a rota entrega o original (com cache de 1 dia, para tentar de novo). Para economizar cota, só 6 larguras (320, 480, 640, 800, 1200, 1600). Se o volume crescer com várias prefeituras, o plano pago custa US$ 0,50 por 1.000 transformações acima das 5.000.
 - **Segurança:** a rota só atende larguras da lista e só imagens da pasta da **própria prefeitura** (o domínio define o município), para um município não gastar a cota de outro; caminhos com `..` são recusados.
 - **Alternativas descartadas:** transformação de imagens do Supabase (cobrada por imagem de origem, e com o teto de gastos ligado o excedente falharia sem plano B); gerar miniaturas no upload (exigiria reprocessar 7 mil imagens e mudar o painel).
+
+**D-37 · 12/10/2026 · A linha de `municipios` é a organização contratante (tenant)**
+- **Contexto:** o Portal Educação Paulínia (SMEDU) é o primeiro cliente que não é uma prefeitura inteira. A base precisa abrigar secretarias, câmaras e autarquias com separação rigorosa entre elas.
+- **Decisão:** cada portal é uma organização isolada, uma linha em `municipios`. Duas organizações da mesma cidade (ex.: Prefeitura e SMEDU de Paulínia) **não** compartilham dados. O nome `municipio_id` fica por compatibilidade. `orgaos` continua sendo o organograma dentro da organização. Migration 0017: `tipo_ente`, `cidade`, `codigo_ibge`, protegidos como a identidade oficial (D-20).
+- **Alternativa descartada:** um nível "órgão" abaixo do município como unidade isolada. Exigiria `orgao_id` em cerca de 30 tabelas e reescrever as 90 policies, o Storage e o provisionamento, arriscando o isolamento que já funciona.
+- **Junto (0016), correções do diagnóstico de segurança:**
+  - `perfis` só entre membros da mesma organização;
+  - `is_plataforma`, `tem_papel` e `registrar_acesso_redirecionamento` movidas para o schema `seguranca`, não exposto, com invólucros SECURITY INVOKER de mesmo nome em `public`;
+  - `midias` só pública quando usada em conteúdo visível (antes o `storage_path` de anexos em rascunho era listável);
+  - proteção contra senhas vazadas ligada no Auth (painel).
+- **Repositório do Portal Educação:** `willquerubim2025-oss/Portais-Publicos` (docs, plano e diagnóstico).
+
+**D-38 · 12/10/2026 · Permissões configuráveis por papel, com escopo (fase 1A)**
+- **Decisão:** cada organização cria seus papéis e liga/desliga cada permissão, com escopo `rede`, `regiao`, `unidade` ou `proprio`. O catálogo de permissões é global e vem do código: `sincronizar_permissoes()`, só service_role; permissão nova nasce desligada. A autorização é `pode(organização, permissão, unidade, dono)`, sempre no banco (RLS).
+- **Fase 1A (0018–0020):** só os módulos novos usam `pode()`: unidades, regiões, equipe gestora e os próprios papéis. Notícias, páginas, destaques e serviços seguem com `membros.papel` até a **fase 1B**, para Jeriquara não mudar.
+- **Salvaguardas:**
+  - o master é a `equipe_plataforma`, não um papel;
+  - o Administrador (papel protegido) não é excluído nem perde `permissoes.gerenciar` e `usuarios.vincular`;
+  - ninguém se vincula a si mesmo;
+  - só quem tem `permissoes.gerenciar` dá o papel de Administrador;
+  - histórico em `log_permissoes`.
+- **Também:** equipe gestora em 3 níveis (foto só com `autorizacao_imagem`, regra no banco); um supervisor por unidade; `buscar_unidade()` por nome ou bairro; avisos com frequência e versão; manchete (`publicacoes.prioridade`); cards de serviço com "em breve".
+- **Corrigido:** `registrar_auditoria()` e `interno.marcar_cache_pendente()` impediam excluir uma organização (gravavam linhas apagadas em cascata com FK para a organização já excluída).
+- **Testes:** 164 verificações, 0 falhas.
+

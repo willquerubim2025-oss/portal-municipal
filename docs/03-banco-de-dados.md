@@ -33,6 +33,11 @@
 | 0015_pntp_2026 | `pntp_criterios` ganha matriz, código, classificação, aspectos e sugestão de evidência; carga dos 181 critérios oficiais do ciclo 2026; `pntp_atendimento.evidencia_url` | RF11, D-35 |
 | 0011_cache_portal | Schema `interno` (não exposto); fila `interno.cache_pendente`; gatilhos em 22 tabelas; `interno.limpar_cache_portal()` agendada no `pg_cron` a cada minuto (envia a limpeza via `pg_net`) | D-30 |
 | 0007_modulos_genericos | `orgaos`, `perguntas_frequentes`, `documento_relacoes` + `documentos.situacao`, `destaques`, `publicacao_midias`, `eventos`, `publicacoes.expira_em`, `orgao_id` em serviços/documentos/publicações, `buscar()` ampliada, `provisionar_municipio()` e `criar_municipio()` | D-10, D-12 (doc 08) |
+| 0016_seguranca | `perfis` só entre membros da mesma organização; schema `seguranca` (não exposto) com as funções SECURITY DEFINER, invólucros SECURITY INVOKER em `public`; `midias` pública só quando usada em conteúdo visível (`seguranca.midia_publica()`) | D-37 |
+| 0017_organizacao_contratante | `municipios` = organização contratante: `tipo_ente`, `cidade`, `codigo_ibge` (só a SECKE altera) | D-37 |
+| 0018_estrutura_permissoes | `regioes`, `unidades`, `permissoes` (catálogo global), `papeis`, `papel_permissoes`, `usuario_papeis`, `log_permissoes`; `pode()`, `minhas_permissoes()`, `sincronizar_permissoes()`, `provisionar_papeis()`; corrige auditoria e fila de cache na exclusão de organização | D-38 |
+| 0019_equipe_gestora | `equipe` (3 níveis, foto só com autorização), `unidades.supervisor_id`, `buscar_unidade()` | D-38 |
+| 0020_home_portal | `destaques`: `botao_rotulo`, `frequencia`, `versao`, `publicacao_id`; `publicacoes.prioridade`; `servicos`: `icone`, `ordem`, `na_home`, `em_breve`, `sistema_id` | D-38 |
 
 ## Tabelas, em resumo
 
@@ -95,6 +100,14 @@ Perguntas frequentes, eventos e destaques seguem o mesmo fluxo editorial de publ
 
 Funções de autorização (`security definer`): `is_plataforma()`, `tem_papel(municipio, papeis[])`, `is_membro()`, `pode_publicar()`, `is_admin()`.
 
+**Permissões configuráveis (0018, D-38).** Valem para os módulos novos: unidades, regiões, equipe gestora e papéis. A pergunta é sempre `pode(organização, 'modulo.acao', unidade, dono)`, e a resposta é verdadeira para a SECKE ou para quem tem um papel ativo com a permissão ligada e um escopo que cubra o alvo:
+- `rede`: toda a organização;
+- `regiao`: as unidades da região do vínculo;
+- `unidade`: só a unidade do vínculo;
+- `proprio`: só o que a pessoa criou.
+
+Papéis padrão: Administrador (protegido), Diretor (`unidades.editar` na própria unidade), Professor e Estudante. O painel usa `minhas_permissoes(organização)` para montar o menu. Funções auxiliares SECURITY DEFINER ficam em `seguranca` (`pode`, `tenho_o_papel`, `papel_protegido`, `midia_publica`), fora da Data API, para as policies não entrarem em recursão.
+
 **Proteção do conteúdo publicado:** a policy de UPDATE só enxerga a linha nova. Por isso existe o trigger `checar_permissao_publicacao`, que barra o editor quando o status antigo **ou** o novo é `publicado`. Sem ele, o editor conseguiria despublicar (falha encontrada e corrigida em 02/10/2026).
 
 ## Busca
@@ -135,9 +148,7 @@ O projeto foi criado com *Automatically expose new tables* **desligado** e *auto
 - **Funções de trigger** não precisam de EXECUTE.
 - **service_role** também precisa de GRANT (0009). Ao criar uma tabela nova, repetir o grant para ele.
 
-**Avisos aceitos do Security Advisor (02/10/2026):**
-- `is_plataforma()` e `tem_papel()` são SECURITY DEFINER executáveis por anon/authenticated via RPC. São necessárias às policies e só respondem sobre o **próprio** usuário. Melhoria futura: movê-las para um schema não exposto (pendência).
-- `registrar_acesso_redirecionamento()` executável por anon: intencional (o portal registra o acesso ao servir o 301). O risco é só inflar o contador.
+**Security Advisor:** desde a 0016 (12/10/2026), nenhuma função SECURITY DEFINER do schema `public` é executável por anon ou authenticated. Elas ficam em `seguranca`, com invólucros SECURITY INVOKER de mesmo nome em `public`. Sobra só o aviso informativo das tabelas internas fechadas de propósito (`interno.*`, `verificacao_fila`).
 
 ## Storage
 - Bucket público `midias`; a primeira pasta do caminho é o `municipio_id`.
@@ -145,7 +156,7 @@ O projeto foi criado com *Automatically expose new tables* **desligado** e *auto
 
 ## Testes
 `node supabase/tests/rls.test.mjs` (requer `npm i`, já tem `@electric-sql/pglite` no package.json).
-O teste simula `auth.uid()` e o `storage` do Supabase, aplica todas as migrations e o seed, e verifica **98 regras**: publicação por papel, isolamento entre municípios (RLS e FKs compostas), busca, auditoria, chamados e saldo, nota interna, pastas do Storage, proteção de conteúdo publicado (arquivos e substituição no Storage), provisionamento (idempotência, só a SECKE cria município), os módulos da 0007 e as permissões explícitas da 0008, os campos do município (0010), a fila do cache (0011), a verificação de links (0012, inclusive a extração de links) e a exportação (0013). Nesse Postgres local não há `pg_cron`, `pg_net` nem Vault: a 0011 só agenda a rotina onde eles existem. O teste **não** concede nada no schema `public`: usa só os GRANTs das migrations, como no projeto real.
+O teste simula `auth.uid()` e o `storage` do Supabase, aplica todas as migrations e o seed, e verifica **164 regras**: publicação por papel, isolamento entre municípios (RLS e FKs compostas), busca, auditoria, chamados e saldo, nota interna, pastas do Storage, proteção de conteúdo publicado (arquivos e substituição no Storage), provisionamento (idempotência, só a SECKE cria município), os módulos da 0007 e as permissões explícitas da 0008, os campos do município (0010), a fila do cache (0011), a verificação de links (0012, inclusive a extração de links) e a exportação (0013), as correções de segurança (0016), a organização contratante (0017), as permissões por papel com escopo, salvaguardas e histórico (0018), a equipe gestora e a busca de unidade (0019) e os campos da página inicial (0020). Nesse Postgres local não há `pg_cron`, `pg_net` nem Vault: a 0011 só agenda a rotina onde eles existem. O teste **não** concede nada no schema `public`: usa só os GRANTs das migrations, como no projeto real.
 
 ## Pendências do banco
 Ver [07-pendencias](07-pendencias.md): export diário por município, Edge Functions de links e exportação, carga dos critérios PNTP, conferência das seções da Central com a matriz PNTP vigente.
