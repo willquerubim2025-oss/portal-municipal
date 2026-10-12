@@ -163,13 +163,13 @@
 .v-tom-2 { background: var(--v-tom-2, var(--v-tom-0)); } .v-tom-3 { background: var(--v-tom-3, var(--v-tom-0)); }
 .v-tom-4 { background: var(--v-tom-4, var(--v-tom-0)); } .v-tom-5 { background: var(--v-tom-5, var(--v-tom-0)); }
 .v-secao-titulo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem 1.5rem; margin-bottom: 1.75rem;
-  min-height: 3.5rem; padding: .55rem .6rem .55rem 1.1rem; border-radius: 16px; background: var(--v-faixa-neutra); }
-.v-fundo-tom .v-secao-titulo { background: #fff; box-shadow: var(--v-sombra); }
+  min-height: 3.5rem; padding: .55rem .6rem .55rem 1.1rem; border-radius: 16px;
+  background: var(--v-regua, color-mix(in srgb, var(--cor-secundaria) 18%, #fff)); }
 .v-secao-titulo h2 { margin: 0; font-size: var(--v-h2, 1.25rem); font-weight: 600; display: flex; align-items: center; gap: .75rem; }
-.v-secao-titulo h2::before { content: ""; flex: none; width: 6px; height: 1.5em; border-radius: 3px; background: linear-gradient(var(--v-acento), var(--cor-secundaria)); }
-.v-secao-titulo .v-link-seta { display: inline-flex; align-items: center; gap: .7rem; margin-left: auto; text-transform: none; letter-spacing: 0; font-size: .85rem; font-weight: 500; color: var(--v-secundaria-escura); }
-.v-secao-titulo .v-link-seta::after { content: "→"; display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 50%; background: var(--v-acento);
-  color: var(--cor-primaria); font-size: 1.1rem; font-weight: 700; transition: transform .2s ease, box-shadow .2s ease; }
+.v-secao-titulo h2::before { content: ""; flex: none; width: 6px; height: 1.5em; border-radius: 3px; background: linear-gradient(var(--cor-primaria), var(--cor-secundaria)); }
+.v-secao-titulo .v-link-seta { display: inline-flex; align-items: center; gap: .7rem; margin-left: auto; text-transform: none; letter-spacing: 0; font-size: .85rem; font-weight: 600; color: var(--v-regua-texto, color-mix(in srgb, var(--cor-primaria) 80%, var(--cor-secundaria))); }
+.v-secao-titulo .v-link-seta::after { content: "→"; display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 50%; background: var(--cor-primaria);
+  color: #fff; font-size: 1.1rem; font-weight: 700; transition: transform .2s ease, box-shadow .2s ease; }
 .v-secao-titulo .v-link-seta:hover::after, .v-secao-titulo .v-link-seta:focus-visible::after { transform: translateX(3px); box-shadow: var(--v-sombra-alta); }
 :root.contraste.vitrine .v-secao-titulo { background: #000; border: 1px solid #fff; box-shadow: none; }
 :root.contraste.vitrine .v-secao-titulo .v-link-seta::after { background: #ff0; color: #000; }

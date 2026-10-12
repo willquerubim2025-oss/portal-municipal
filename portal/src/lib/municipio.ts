@@ -15,6 +15,8 @@ export interface Tema {
   cor_secundaria_escura?: string;
   /** Chamadas de ação (botão do destaque, faixa de aviso informativo). Texto em cor_primaria. */
   cor_acento?: string;
+  /** Fundo da régua de título das seções (D-46); padrão: a cor secundária bem clara. */
+  cor_regua?: string;
   /** Cores vivas das seções e dos cards: `forte` aceita texto branco; `claro` é fundo de seção. */
   cores_vivas?: { nome: string; forte: string; claro: string }[];
   /** Famílias auto-hospedadas pelo portal (FONTES_DISPONIVEIS); outra família cai na fonte do sistema. */

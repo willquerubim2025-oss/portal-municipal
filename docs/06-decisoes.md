@@ -344,3 +344,7 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - A primeira cor viva passou de amarelo para "areia": forte `#8a5a3c` (branco sobre ela: 5,8) e claro `#f7efe6`.
   - O chip "Em breve" segue o tema, sem cor fixa. O anel de foco do teclado continua amarelo, porque é recurso de acessibilidade e só aparece na navegação por teclado.
 - **Em foco:** cada card ocupa a largura toda, com foto de um lado e painel colorido do outro, e os lados alternam. Os cards ficam empilhados e têm a mesma altura mínima. No celular, a foto vai para cima.
+
+**D-46 · 12/10/2026 · Régua das seções em verde-água claro (a pedido do usuário; ajusta D-43)**
+- **Fundo da régua:** verde-água claro `#d5ede6` (`tema.cor_regua`, configurável). Sem esse campo, usa a cor secundária a 18% sobre branco. É o mesmo em todas as seções, sem sombra.
+- **Hierarquia:** título em petróleo (contraste 9,0), link "Todas as…" em petróleo com um toque de turquesa e peso 600 (6,3), botão redondo petróleo com seta branca e marcador vertical em degradê petróleo → turquesa. O salmão (acento) fica só nos botões de ação, porque sobre o verde ele quase some (1,3).
