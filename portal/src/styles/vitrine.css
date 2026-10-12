@@ -12,8 +12,8 @@
   --v-fonte-texto: var(--fonte);
   --v-cor-0: var(--cor-primaria); --v-tom-0: var(--cor-fundo-alt);
   --v-raio: 14px;
-  --v-sombra: 0 1px 2px rgb(17 53 103 / .08), 0 6px 18px rgb(17 53 103 / .08);
-  --v-sombra-alta: 0 4px 8px rgb(17 53 103 / .10), 0 18px 36px rgb(17 53 103 / .16);
+  --v-sombra: 0 1px 2px color-mix(in srgb, var(--cor-primaria) 10%, transparent), 0 6px 18px color-mix(in srgb, var(--cor-primaria) 10%, transparent);
+  --v-sombra-alta: 0 4px 8px color-mix(in srgb, var(--cor-primaria) 12%, transparent), 0 18px 36px color-mix(in srgb, var(--cor-primaria) 20%, transparent);
   --v-texto-suave: #4b5b6b;
   --largura: 1200px;
 }
@@ -70,7 +70,7 @@
 .v-slide-vazio::after { background: radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--cor-secundaria) 55%, transparent) 0 22%, transparent 23%), radial-gradient(circle at 70% 95%, color-mix(in srgb, var(--v-acento) 85%, transparent) 0 14%, transparent 15%); }
 .v-slide-texto { display: grid; gap: 1rem; padding-block: 3rem 4.5rem; justify-items: start; }
 .v-slide-texto h2 { color: #fff; margin: 0; font-weight: 800; font-size: clamp(1.8rem, 1.2rem + 2.6vw, 3.1rem); max-width: 20ch; line-height: 1.1; }
-.v-slide-texto p { margin: 0; max-width: 52ch; font-size: 1.125rem; color: #e3ebf5; }
+.v-slide-texto p { margin: 0; max-width: 52ch; font-size: 1.125rem; color: #e8f1f1; }
 .v-carrossel-controles { position: absolute; inset: auto 0 1.1rem; display: flex; align-items: center; gap: 1rem; z-index: 2; }
 .v-carrossel-pontos { display: flex; gap: .5rem; }
 .v-carrossel-pontos button { width: 30px; height: 30px; padding: 0; border: 0; background: transparent; cursor: pointer; display: grid; place-items: center; }
@@ -90,7 +90,7 @@
 .v-aviso-fechar:hover { background: rgb(0 0 0 / .16); }
 .v-aviso-fechar svg { width: 1.1rem; height: 1.1rem; }
 .v-modal { border: 0; padding: 0; border-radius: 18px; width: min(92vw, 480px); box-shadow: var(--v-sombra-alta); color: var(--cor-texto); }
-.v-modal::backdrop { background: rgb(13 30 56 / .55); }
+.v-modal::backdrop { background: color-mix(in srgb, var(--cor-primaria) 60%, transparent); }
 .v-modal-topo { background: #b3261e; color: #fff; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .7rem .8rem .7rem 1.2rem; font-family: var(--v-fonte-titulos); font-weight: 700; }
 .v-modal-topo .v-aviso-fechar { background: rgb(255 255 255 / .15); }
 .v-modal-corpo { padding: 1.2rem 1.3rem 1.4rem; display: grid; gap: .9rem; }
@@ -191,7 +191,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .v-escola-supervisor { margin-top: .5rem; padding: .8rem 1rem; border-radius: 10px; background: var(--v-tom-0); }
 
 /* ---------------------------------------------------- rodapé */
-.vitrine .rodape { background: var(--cor-primaria); color: #dbe6f3; }
+.vitrine .rodape { background: var(--cor-primaria); color: #e2eeee; }
 .vitrine .rodape h2 { color: #fff; font-family: var(--v-fonte-titulos); }
 .vitrine .rodape-base { background: color-mix(in srgb, var(--cor-primaria) 80%, #000); border-top-color: var(--cor-secundaria); }
 

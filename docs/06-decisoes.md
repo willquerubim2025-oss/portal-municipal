@@ -282,10 +282,11 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - busca do supervisor por escola.
 - **Motivo:** "configuração, não código" (D-10). O portal já resolve SEO, acessibilidade, cache, imagens e 301, e a meta de vários portais públicos exige que cada novo portal saia de dados.
 - **Alternativa descartada:** um site React + Vite separado para a SMEDU. Duplicaria o que o portal resolve, seria SPA (vetado em D-16) e não se replicaria.
-- **Identidade da SMEDU (proposta em aprovação):**
-  - estrutura nas cores do site da Prefeitura de Paulínia (marinho `#113567`, turquesa `#24a9b3`, azul `#325497`, azul-céu `#2996cc`, fonte Montserrat);
-  - quatro cores vivas da Educação (amarelo `#f5b700`, coral `#e8604c`/`#c2412d`, verde `#2e9e5b`/`#1e7a44`, lilás `#7356c4`);
+- **Identidade da SMEDU (corrigida em 12/10/2026, a pedido do usuário):**
+  - **estrutura** (barra do ente, cabeçalho, menu, rodapé) no verde-petróleo do site da Prefeitura de Paulínia, medido nos pixels renderizados: petróleo `#004348`, turquesa `#24a9b3` (escuro `#127882` para texto e botões), fonte Montserrat;
+  - **meio da página** com cores vivas que o portal da Prefeitura não usa, para dar identidade própria: amarelo `#f5b700` (acento; texto `#8a5a00` sobre `#fff4d1`), lilás `#7356c4`/`#efeafa`, coral `#c2412d`/`#fdebe7`, anil `#3b4fb8`/`#eaedfa`;
   - textos em Source Sans 3;
-  - contrastes medidos pelo eMAG/WCAG.
+  - contrastes com texto branco: petróleo 11,07; turquesa escuro 5,20; anil 7,01; lilás 5,44; coral 5,14; amarelo sobre petróleo 6,15 (todos ≥ 4,5, eMAG/WCAG AA).
+  - **Erro registrado:** a primeira proposta usou marinho `#113567`, tirado das variáveis CSS do site da Prefeitura, mas o site renderiza verde. Lição: medir a cor na tela renderizada, não no CSS.
   - Amostra: `docs/design/sistema-visual.html` no repositório `Portais-Publicos`.
 
