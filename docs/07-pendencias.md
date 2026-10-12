@@ -28,6 +28,11 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
     - página `educacao-em-numeros`, com o card apontando para ela;
     - card "Secretaria de Educação" apontando para /estrutura-organizacional.
     O que falta confirmar com a SMEDU (supervisores, e-mail oficial, erros da lista, matrícula 2027, números, equipe e organograma) está em `docs/reuniao/smedu-dados-a-confirmar.md`, no repositório Portais-Publicos;
+  - **dados fictícios na homologação da SMEDU (12/10/2026, para a apresentação):** remover antes de publicar:
+    - 10 pessoas na `equipe` (resumo começa com "FICTÍCIO");
+    - as fotos `carga/ficticio-*.jpg` (midias com `legado.ficticio = true`);
+    - as imagens de banco `carga/foco-*.jpg` (Unsplash).
+    William vai enviar o material real (equipe, fotos e textos). A página "Bolsa de Estudo" (/servicos/bolsa-de-estudo) só tem a descrição genérica: faltam regras, prazos e documentos do programa;
   - o item de menu "Equipe gestora" (`/#titulo-equipe`) leva ao topo da home enquanto a equipe estiver vazia (o bloco fica oculto). Resolver quando os nomes chegarem;
   - a ferramenta `execute_sql` do MCP do Supabase trava (60 s) ao gravar HTML com listas de documentos pessoais (RG, CPF...) em texto puro. Contorno: enviar o HTML em base64 e decodificar com `convert_from(decode(...,'base64'),'UTF8')`;
   - na produção, enviar o brasão e as fotos pelo painel (Identidade visual e Mídias). Na homologação foram enviados por uma Edge Function temporária, `carga-midias-temporaria`, já desativada (responde 410) e que pode ser excluída no painel do Supabase;

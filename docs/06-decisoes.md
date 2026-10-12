@@ -330,3 +330,10 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - à direita, o link "Todas as…" em texto e um botão redondo amarelo com seta. O amarelo não aparece no portal da Prefeitura.
 - Serviços ganhou o link "Todos os serviços".
 - **Verificação:** axe sem violações, com e sem alto contraste.
+
+**D-44 · 12/10/2026 · Bloco "Em foco" e equipe gestora em cards compactos (layout vitrine, a pedido do usuário)**
+- **Em foco (bloco novo `foco`):** divisões ou programas com muita procura do cidadão ganham, na home, um card grande com foto, chamada, título, texto, atalhos em pílula e botão amarelo. O conteúdo vem de `config.home.foco` (lista); cada card usa uma cor viva (`cor`). Os cards alternam o desenho (foto em cima ou embaixo), a largura (7/5 da grade) e a altura, para dar movimento à página. A seção tem fundo próprio (branco → neutro) e fica fora da alternância de fundos. Na SMEDU: Matrícula escolar (anil) e Bolsa de estudo (lilás).
+- **Equipe gestora:** os três níveis ficam numa seção só, com cards compactos:
+  - direção: cards maiores, com foto de 84 px, filete da cor primária e cargo em caixa alta;
+  - supervisão e divisões: grade de cards pequenos, com foto de 56 px.
+- **Homologação:** para a apresentação, a equipe é **fictícia**. São nomes inventados, e as fotos vêm do randomuser.me, retratos de banco de imagens para protótipo. As fotos do "Em foco" vêm do Unsplash. Tudo isso tem de sair antes de qualquer publicação real.

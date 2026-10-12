@@ -1,56 +1,52 @@
 ---
-// Equipe gestora (0019): três níveis com cards de tamanhos diferentes; o nível 3 é agrupado
-// pela divisão (orgaos). Sem foto autorizada, um avatar com as iniciais (nunca foto de banco).
+// Equipe gestora (0019, D-44): três níveis em cards compactos, numa seção só.
+//  1 · direção (Secretária e Adjunto): cards horizontais um pouco maiores;
+//  2 · supervisão de ensino e 3 · divisões e departamentos: grade de cards pequenos.
+// Sem foto autorizada, um avatar com as iniciais (nunca foto de banco em pessoa real).
 import { urlImagem } from '../../lib/imagens';
 interface Props { pessoas: any[]; titulo: string }
 const { pessoas, titulo } = Astro.props;
 const nivel = (n: number) => pessoas.filter((p) => p.nivel === n);
-const divisoes = new Map<string, any[]>();
-for (const p of nivel(3)) {
-  const d = p.orgao?.nome ?? 'Divisões';
-  divisoes.set(d, [...(divisoes.get(d) ?? []), p]);
-}
 const iniciais = (nome: string) => nome.split(/\s+/).filter((x) => x.length > 2 || /^[A-ZÁ-Ú]/.test(x)).map((x) => x[0]).slice(0, 2).join('').toUpperCase();
-const ROTULOS: Record<number, string> = { 1: 'Direção', 2: 'Supervisão de ensino', 3: 'Divisões e departamentos' };
+const GRUPOS: [number, string][] = [[2, 'Supervisão de ensino'], [3, 'Divisões e departamentos']];
 ---
 <div class="v-secao-titulo"><h2 id="titulo-equipe">{titulo}</h2></div>
-{[1, 2].map((n) => nivel(n).length > 0 && (
-  <section class={`v-equipe-nivel v-equipe-${n}`} aria-label={ROTULOS[n]}>
-    {n > 1 && <h3 class="v-rotulo">{ROTULOS[n]}</h3>}
-    <ul>
-      {nivel(n).map((p) => (
-        <li class="v-pessoa">
+<div class="v-equipe">
+  {nivel(1).length > 0 && (
+    <ul class="v-equipe-direcao" aria-label="Direção">
+      {nivel(1).map((p) => (
+        <li class="v-pessoa v-pessoa-grande">
           {p.foto
-            ? <img src={urlImagem(p.foto.storage_path, 320)} alt={p.foto.texto_alternativo ?? `Foto de ${p.nome}`} width="160" height="160" loading="lazy" decoding="async" />
+            ? <img src={urlImagem(p.foto.storage_path, 320)} alt={p.foto.texto_alternativo ?? `Foto de ${p.nome}`} width="88" height="88" loading="lazy" decoding="async" />
             : <span class="v-avatar" aria-hidden="true">{iniciais(p.nome)}</span>}
           <div>
-            <p class="v-pessoa-nome">{p.nome}</p>
             <p class="v-pessoa-cargo">{p.cargo}</p>
+            <p class="v-pessoa-nome">{p.nome}</p>
             {p.email && <p class="v-pessoa-contato"><a href={`mailto:${p.email}`}>{p.email}</a></p>}
             {p.telefone && <p class="v-pessoa-contato">{p.telefone}</p>}
           </div>
         </li>
       ))}
     </ul>
-  </section>
-))}
-{divisoes.size > 0 && (
-  <section class="v-equipe-nivel v-equipe-3" aria-label={ROTULOS[3]}>
-    <h3 class="v-rotulo">{ROTULOS[3]}</h3>
-    <div class="v-divisoes">
-      {[...divisoes].map(([divisao, membros]) => (
-        <div class="v-divisao">
-          <h4>{divisao}</h4>
-          <ul>
-            {membros.map((p) => (
-              <li class="v-pessoa">
-                <span class="v-avatar" aria-hidden="true">{iniciais(p.nome)}</span>
-                <div><p class="v-pessoa-nome">{p.nome}</p><p class="v-pessoa-cargo">{p.cargo}</p></div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-  </section>
-)}
+  )}
+  {GRUPOS.map(([n, rotulo]) => nivel(n).length > 0 && (
+    <section class="v-equipe-grupo" aria-label={rotulo}>
+      <h3 class="v-rotulo">{rotulo}</h3>
+      <ul class="v-equipe-grade">
+        {nivel(n).map((p) => (
+          <li class="v-pessoa">
+            {p.foto
+              ? <img src={urlImagem(p.foto.storage_path, 320)} alt={p.foto.texto_alternativo ?? `Foto de ${p.nome}`} width="56" height="56" loading="lazy" decoding="async" />
+              : <span class="v-avatar" aria-hidden="true">{iniciais(p.nome)}</span>}
+            <div>
+              <p class="v-pessoa-nome">{p.nome}</p>
+              <p class="v-pessoa-cargo">{p.cargo}</p>
+              {p.orgao?.nome && !p.cargo.includes(p.orgao.nome) && <p class="v-pessoa-cargo">{p.orgao.nome}</p>}
+              {p.email && <p class="v-pessoa-contato"><a href={`mailto:${p.email}`}>{p.email}</a></p>}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</div>

@@ -144,9 +144,13 @@ Tipos em `portal/src/lib/municipio.ts`.
   "brasao_url": "https://..." }                          // alternativa a brasao_path (este tem preferência)
 // config (além dos campos acima)
 { "marca": { "linha1": "Prefeitura de Paulínia", "linha2": "Secretaria Municipal de Educação" },  // padrão: "Prefeitura de" + nome curto
-  "site_prefeitura": "https://www.paulinia.sp.gov.br",   // barra "Voltar ao site da Prefeitura" (só https)
-  "home": { "blocos": ["destaque", "noticias", "servicos", "agenda", "equipe"],   // também "atalhos"; na ordem da página
-            "titulos": { "servicos": "Serviços" } },
+  "site_prefeitura": "https://www.paulinia.sp.gov.br",   // botão "Site da Prefeitura" no painel de acessibilidade (só https)
+  "home": { "blocos": ["destaque", "noticias", "foco", "servicos", "agenda", "equipe"],   // também "atalhos"; na ordem da página
+            "titulos": { "servicos": "Serviços", "foco": "Em foco" },
+            "foco": [ { "chamada": "Divisão de Matrícula e Vida Escolar", "titulo": "Matrícula escolar", "texto": "...",
+                        "imagem_path": "<id>/carga/foco-matricula.jpg", "imagem_alt": "...", "cor": 3,   // índice em tema.cores_vivas
+                        "botao": { "rotulo": "Como fazer a matrícula", "url": "/servicos/matricula-escolar" },
+                        "links": [ { "rotulo": "Inscrição na creche (SISS)", "url": "https://..." } ] } ] },   // D-44
   "modulos": { "equipe_gestora": true } }               // a seção some com false (também no RLS, 0019)
 ```
 O portal só aceita cores no formato `#rgb`/`#rrggbb` e nomes de fonte da lista: o tema vem do banco e vai para o `style` do `<html>`. Blocos sem conteúdo (sem serviços na home, sem equipe visível, sem eventos) não aparecem. Rota nova: `/fale-com-o-supervisor` (busca de unidade, `buscar_unidade`).

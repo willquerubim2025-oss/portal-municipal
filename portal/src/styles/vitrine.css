@@ -227,25 +227,47 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .v-atalhos a:hover { border-color: var(--cor-secundaria); transform: translateY(-2px); }
 
 /* ---------------------------------------------------- equipe gestora */
-.v-equipe-nivel { margin-top: 1.5rem; }
-.v-equipe-nivel ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
-.v-equipe-1 ul { grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
-.v-equipe-2 ul { grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); }
-.v-pessoa { display: flex; align-items: center; gap: 1rem; background: #fff; border-radius: var(--v-raio); padding: 1rem; box-shadow: var(--v-sombra); min-width: 0; }
+/* Equipe gestora (D-44): cards compactos; a direção um pouco maior, com faixa da cor primária. */
+.v-equipe { display: grid; gap: 1.75rem; }
+.v-equipe ul { list-style: none; padding: 0; margin: 0; display: grid; gap: .9rem; }
+.v-equipe-direcao { grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+.v-equipe-grade { grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+.v-equipe-grupo .v-rotulo { margin-bottom: .7rem; }
+.v-pessoa { display: flex; align-items: center; gap: .85rem; background: #fff; border-radius: 14px; padding: .75rem .9rem; box-shadow: var(--v-sombra); min-width: 0;
+  transition: transform .2s ease, box-shadow .2s ease; }
+.v-pessoa:hover { transform: translateY(-2px); box-shadow: var(--v-sombra-alta); }
 .v-pessoa > div { min-width: 0; }
-.v-pessoa p { margin: 0; }
-.v-pessoa img, .v-avatar { flex: none; width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
-.v-equipe-1 .v-pessoa { padding: 1.4rem; }
-.v-equipe-1 .v-pessoa img, .v-equipe-1 .v-avatar { width: 96px; height: 96px; font-size: 1.8rem; }
-.v-avatar { display: grid; place-items: center; background: var(--v-tom-0); color: var(--cor-primaria); font-family: var(--v-fonte-titulos); font-weight: 800; font-size: 1.2rem; border: 3px solid #fff; box-shadow: 0 0 0 2px var(--cor-secundaria); }
-.v-pessoa-nome { font-family: var(--v-fonte-titulos); font-weight: 700; color: var(--cor-primaria); }
-.v-equipe-1 .v-pessoa-nome { font-size: 1.2rem; }
-.v-pessoa-cargo { color: var(--v-texto-suave); font-size: .95rem; }
-.v-pessoa-contato { font-size: .9rem; overflow-wrap: anywhere; }
-.v-divisoes { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
-.v-divisao h4 { margin: 0 0 .5rem; font-size: 1rem; color: var(--cor-primaria); }
-.v-divisao .v-pessoa { box-shadow: none; border: 1px solid #d8e0e8; padding: .6rem .8rem; }
-.v-divisao .v-avatar { width: 44px; height: 44px; font-size: .95rem; }
+.v-pessoa p { margin: 0; line-height: 1.35; }
+.v-pessoa img, .v-avatar { flex: none; width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; box-shadow: 0 0 0 2px var(--cor-secundaria); }
+.v-avatar { display: grid; place-items: center; background: var(--v-tom-0); color: var(--cor-primaria); font-family: var(--v-fonte-titulos); font-weight: 700; font-size: 1.05rem; }
+.v-pessoa-nome { font-family: var(--v-fonte-titulos); font-weight: 600; color: var(--cor-primaria); font-size: .98rem; }
+.v-pessoa-cargo { color: var(--v-texto-suave); font-size: .85rem; }
+.v-pessoa-contato { font-size: .85rem; overflow-wrap: anywhere; }
+.v-pessoa-grande { padding: 1rem 1.2rem; gap: 1.1rem; border-left: 6px solid var(--cor-primaria); }
+.v-pessoa-grande img, .v-pessoa-grande .v-avatar { width: 84px; height: 84px; font-size: 1.5rem; box-shadow: 0 0 0 2px var(--v-acento); }
+.v-pessoa-grande .v-pessoa-nome { font-size: 1.15rem; }
+.v-pessoa-grande .v-pessoa-cargo { font-family: var(--v-fonte-titulos); font-size: .75rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--v-secundaria-escura); }
+@media (prefers-reduced-motion: reduce) { .v-pessoa { transition: none; } .v-pessoa:hover { transform: none; } }
+
+/* Em foco (D-44): cards grandes, alternando foto em cima e embaixo e com alturas diferentes. */
+.v-fundo-foco { background: linear-gradient(180deg, #fff 0, var(--v-faixa-neutra) 100%); }
+.v-foco { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 7fr 5fr; gap: 1.5rem; align-items: start; }
+.v-foco-item { display: flex; flex-direction: column; border-radius: 22px; overflow: hidden; background: var(--forte, var(--cor-primaria)); color: #fff; box-shadow: var(--v-sombra); }
+.v-foco-invertido { flex-direction: column-reverse; margin-top: 3.5rem; }
+.v-foco-foto { width: 100%; height: clamp(220px, 24vw, 340px); object-fit: cover; }
+.v-foco-invertido .v-foco-foto { height: clamp(180px, 18vw, 250px); }
+.v-foco-painel { position: relative; display: grid; gap: .8rem; justify-items: start; padding: clamp(1.25rem, 2.5vw, 2rem); }
+.v-foco-painel::before { content: ""; position: absolute; right: -40px; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: rgb(255 255 255 / .08); pointer-events: none; }
+.v-foco-chamada { margin: 0; font-family: var(--v-fonte-titulos); font-size: .75rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: rgb(255 255 255 / .9); }
+.v-foco-painel h3 { margin: 0; color: #fff; font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem); font-weight: 700; line-height: 1.15; }
+.v-foco-painel > p { margin: 0; max-width: 46ch; color: rgb(255 255 255 / .95); }
+.v-foco-links { list-style: none; display: flex; flex-wrap: wrap; gap: .5rem; margin: .2rem 0 .4rem; padding: 0; }
+.v-foco-links a { display: inline-block; padding: .4rem .85rem; border-radius: 999px; border: 1px solid rgb(255 255 255 / .6); color: #fff; text-decoration: none; font-size: .85rem; font-weight: 500; }
+.v-foco-links a:hover, .v-foco-links a:focus-visible { background: #fff; color: var(--forte); }
+.v-foco-item .v-botao-acento svg { width: 1.1em; height: 1.1em; }
+@media (max-width: 860px) { .v-foco { grid-template-columns: 1fr; } .v-foco-invertido { margin-top: 0; } }
+:root.contraste.vitrine .v-foco-item { background: #000; border: 1px solid #fff; }
+:root.contraste.vitrine .v-foco-painel h3, :root.contraste.vitrine .v-foco-links a { color: #ff0; border-color: #ff0; }
 
 /* ---------------------------------------------------- busca de escola */
 .v-busca-escola { display: flex; flex-wrap: wrap; gap: .5rem; max-width: 640px; margin-block: 1rem 2rem; }

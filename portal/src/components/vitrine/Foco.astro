@@ -1,0 +1,39 @@
+---
+// Bloco "Em foco" (vitrine, D-44): divisões ou programas com muita procura do cidadão ganham um card
+// grande com foto, texto e atalhos (config.home.foco). Os cards alternam o desenho (foto em cima ou embaixo)
+// e a altura, para dar movimento à página; cada um usa uma das cores vivas do tema (campo cor).
+import { urlImagem, srcsetImagem } from '../../lib/imagens';
+import type { ItemFoco } from '../../lib/municipio';
+interface Props { itens: ItemFoco[]; titulo: string; cores: number }
+const { itens, titulo, cores } = Astro.props;
+const externo = (u: string) => /^https?:/.test(u);
+const seta = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+---
+<div class="v-secao-titulo"><h2 id="titulo-foco">{titulo}</h2></div>
+<ul class="v-foco">
+  {itens.map((f, i) => (
+    <li class={`v-foco-item ${i % 2 ? 'v-foco-invertido' : ''} v-cor-${cores ? (f.cor ?? i) % cores : 0}`}>
+      {f.imagem_path && (
+        <img class="v-foco-foto" src={urlImagem(f.imagem_path, 800)} srcset={srcsetImagem(f.imagem_path, [480, 800, 1200])}
+          sizes="(max-width: 800px) 100vw, 60vw" alt={f.imagem_alt ?? ''} loading="lazy" decoding="async" width="800" height="533" />
+      )}
+      <div class="v-foco-painel">
+        {f.chamada && <p class="v-foco-chamada">{f.chamada}</p>}
+        <h3>{f.titulo}</h3>
+        {f.texto && <p>{f.texto}</p>}
+        {f.links && f.links.length > 0 && (
+          <ul class="v-foco-links" aria-label={`Atalhos: ${f.titulo}`}>
+            {f.links.map((l) => (
+              <li><a href={l.url} target={externo(l.url) ? '_blank' : undefined} rel={externo(l.url) ? 'noopener' : undefined}>
+                {l.rotulo}{externo(l.url) && <span class="sr-only"> (abre em nova aba)</span>}
+              </a></li>
+            ))}
+          </ul>
+        )}
+        {f.botao && (
+          <a class="v-botao v-botao-acento" href={f.botao.url}>{f.botao.rotulo} <Fragment set:html={seta} /></a>
+        )}
+      </div>
+    </li>
+  ))}
+</ul>

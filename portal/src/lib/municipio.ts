@@ -29,7 +29,19 @@ export interface Tema {
 export const FONTES_DISPONIVEIS = ['Montserrat', 'Source Sans 3', 'Prompt'] as const;
 
 /** Blocos da página inicial no layout vitrine, na ordem em que aparecem. */
-export type BlocoHome = 'destaque' | 'noticias' | 'servicos' | 'agenda' | 'equipe' | 'atalhos';
+export type BlocoHome = 'destaque' | 'noticias' | 'foco' | 'servicos' | 'agenda' | 'equipe' | 'atalhos';
+
+/** Card do bloco "Em foco" (config.home.foco, D-44): divisão ou programa com muita procura do cidadão. */
+export interface ItemFoco {
+  chamada?: string;                    // linha pequena acima do título (ex.: nome da divisão)
+  titulo: string;
+  texto?: string;
+  imagem_path?: string;                // caminho no bucket midias
+  imagem_alt?: string;
+  cor?: number;                        // índice em tema.cores_vivas
+  botao?: { rotulo: string; url: string };
+  links?: { rotulo: string; url: string }[];
+}
 
 /** Dados institucionais e chaves de comportamento (municipios.config). */
 export interface Config {
@@ -50,7 +62,7 @@ export interface Config {
   /** Site do ente ao qual a organização pertence (ex.: a Prefeitura de uma secretaria): barra "Voltar ao site". */
   site_prefeitura?: string;
   /** Layout vitrine: blocos da página inicial e textos das seções. */
-  home?: { blocos?: BlocoHome[]; titulos?: Partial<Record<BlocoHome, string>> };
+  home?: { blocos?: BlocoHome[]; titulos?: Partial<Record<BlocoHome, string>>; foco?: ItemFoco[] };
 }
 
 export type Modulo =

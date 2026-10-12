@@ -10,6 +10,7 @@ import Destaque from '../components/vitrine/Destaque.astro';
 import NoticiasVitrine from '../components/vitrine/Noticias.astro';
 import ServicosVitrine from '../components/vitrine/Servicos.astro';
 import EquipeVitrine from '../components/vitrine/Equipe.astro';
+import FocoVitrine from '../components/vitrine/Foco.astro';
 import type { BlocoHome } from '../lib/municipio';
 
 const { municipio: m, dominioPrincipal } = Astro.locals.contexto;
@@ -24,14 +25,17 @@ const [banners, ultimas, proximos, atalhosMenu, cards, pessoas] = await Promise.
   tem('servicos') ? servicosHome(m.id) : Promise.resolve([]),
   tem('equipe') && moduloAtivo(m, 'equipe_gestora') ? equipe(m.id) : Promise.resolve([]),
 ]);
-const titulos = { noticias: 'Notícias', servicos: 'Serviços', agenda: 'Agenda', equipe: 'Equipe gestora', atalhos: 'Acesso rápido', ...(m.config.home?.titulos ?? {}) };
+const foco = (m.config.home?.foco ?? []).filter((f) => f?.titulo);
+const titulos = { noticias: 'Notícias', foco: 'Em foco', servicos: 'Serviços', agenda: 'Agenda', equipe: 'Equipe gestora', atalhos: 'Acesso rápido', ...(m.config.home?.titulos ?? {}) };
 const nCores = m.tema.cores_vivas?.length ?? 0;
 // Seções de largura total alternam branco e os tons claros das cores vivas.
 const vazio = (b: BlocoHome) =>
   (b === 'servicos' && cards.length === 0) || (b === 'equipe' && pessoas.length === 0) ||
-  (b === 'agenda' && !proximos?.itens.length) || b === 'destaque';
-const secoes = blocos.filter((b) => !vazio(b));
+  (b === 'agenda' && !proximos?.itens.length) || (b === 'foco' && foco.length === 0) || b === 'destaque';
+// "Em foco" tem fundo próprio e fica fora da alternância.
+const secoes = blocos.filter((b) => !vazio(b) && b !== 'foco');
 const fundo = (b: BlocoHome) => {
+  if (b === 'foco') return 'v-fundo-foco';
   const i = secoes.indexOf(b);
   return i % 2 === 0 ? 'v-fundo-branco' : `v-fundo-tom v-tom-${nCores ? Math.floor(i / 2) % nCores : 0}`;
 };
@@ -64,6 +68,7 @@ const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: m.n
           <section class={`v-secao ${fundo(b)}`} aria-labelledby={`titulo-${b}`}>
             <div class="v-miolo">
               {b === 'noticias' && <NoticiasVitrine noticias={ultimas.itens} titulo={titulos.noticias} />}
+              {b === 'foco' && <FocoVitrine itens={foco} titulo={titulos.foco} cores={nCores} />}
               {b === 'servicos' && <ServicosVitrine servicos={cards} titulo={titulos.servicos} cores={nCores} />}
               {b === 'equipe' && <EquipeVitrine pessoas={pessoas} titulo={titulos.equipe} />}
               {b === 'agenda' && proximos && (
