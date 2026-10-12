@@ -5,7 +5,7 @@ import Icone from '../Icone.astro';
 interface Props { servicos: any[]; titulo: string; cores: number }
 const { servicos, titulo, cores } = Astro.props;
 ---
-<div class="v-secao-titulo"><h2 id="titulo-servicos">{titulo}</h2></div>
+<div class="v-secao-titulo"><h2 id="titulo-servicos">{titulo}</h2><a href="/servicos" class="v-link-seta">Todos os serviços</a></div>
 <ul class="v-servicos">
   {servicos.map((s, i) => {
     const cor = `v-cor-${cores ? i % cores : 0}`;

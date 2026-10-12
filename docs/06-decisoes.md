@@ -322,3 +322,11 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **Larguras:** o cabeçalho usa uma margem menor que a do destaque, `min(margem_destaque, 3vw)`, para os itens do menu caberem.
 - **Telas menores:** até 1180 px de largura o menu não cabe e vira o botão "Menu", abaixo da marca.
 - **Verificação:** axe (WCAG 2.1 AA) sem violações em 1920, 1366, 1280, 1024 e 390 px, com os painéis abertos e em alto contraste.
+
+**D-43 · 12/10/2026 · Régua de título das seções da home (layout vitrine)**
+- **Decisão:** inspirada na barra que separa as seções no portal da Prefeitura, mas com desenho próprio para não ficar igual:
+  - barra de cantos arredondados (16 px), não em pílula. É cinza-esverdeada sobre fundo branco e branca com sombra sobre os fundos coloridos;
+  - à esquerda, um marcador vertical em degradê do amarelo (acento) para o turquesa;
+  - à direita, o link "Todas as…" em texto e um botão redondo amarelo com seta. O amarelo não aparece no portal da Prefeitura.
+- Serviços ganhou o link "Todos os serviços".
+- **Verificação:** axe sem violações, com e sem alto contraste.
