@@ -1,19 +1,26 @@
 ---
 import type { ItemMenu } from '../lib/consultas';
-interface Props { itens: ItemMenu[]; atual: string; nivel?: number }
+interface Props { itens: ItemMenu[]; atual: string; nivel?: number; ativo?: string | null }
 const { itens, atual, nivel = 0 } = Astro.props;
-const ativo = (href: string | null) => !!href && (href === '/' ? atual === '/' : atual === href || atual.startsWith(`${href}/`));
+// Só um item fica marcado como atual: o de endereço mais longo que casa com a página
+// (ex.: em /servicos/matricula-escolar marca "Matrícula", não também "Serviços").
+const casa = (href: string) => href === '/' ? atual === '/' : atual === href || atual.startsWith(`${href}/`);
+const todos = (lista: ItemMenu[]): string[] => lista.flatMap((i) => [...(i.href ? [i.href] : []), ...todos(i.filhos)]);
+const ativo = Astro.props.ativo !== undefined ? Astro.props.ativo
+  : todos(itens).filter((h) => !h.includes('#') && casa(h)).sort((a, b) => b.length - a.length)[0] ?? null;
 ---
 <ul class={nivel ? 'submenu' : 'menu-lista'}>
   {itens.map((item) => (
     <li class={item.filhos.length ? 'tem-submenu' : undefined}>
       {item.href
-        ? <a href={item.href} aria-current={ativo(item.href) ? 'page' : undefined}
+        ? <a href={item.href} aria-current={item.href === ativo ? 'page' : undefined}
             target={item.novaAba ? '_blank' : undefined} rel={item.novaAba ? 'noopener' : undefined}>
             {item.rotulo}{item.novaAba && <span class="sr-only"> (abre em nova aba)</span>}
           </a>
-        : <span class="menu-grupo">{item.rotulo}</span>}
-      {item.filhos.length > 0 && <Astro.self itens={item.filhos} atual={atual} nivel={nivel + 1} />}
+        : item.filhos.length > 0
+          ? <button type="button" class="menu-grupo" aria-expanded="false" data-submenu>{item.rotulo}</button>
+          : <span class="menu-grupo">{item.rotulo}</span>}
+      {item.filhos.length > 0 && <Astro.self itens={item.filhos} atual={atual} nivel={nivel + 1} ativo={ativo} />}
     </li>
   ))}
 </ul>

@@ -321,6 +321,13 @@ const caminhoAtual = Astro.url.pathname;
     const ajustar = () => { if (menuMovel) menuMovel.open = !mq.matches; };
     ajustar();
     mq.addEventListener('change', ajustar);
+    // Grupos do menu (item com submenu e sem link próprio): abrem com clique, Enter ou espaço; Esc fecha.
+    document.querySelectorAll<HTMLButtonElement>('[data-submenu]').forEach((b) => {
+      const fechar = () => b.setAttribute('aria-expanded', 'false');
+      b.addEventListener('click', () => b.setAttribute('aria-expanded', String(b.getAttribute('aria-expanded') !== 'true')));
+      b.parentElement?.addEventListener('keydown', (e) => { if (e.key === 'Escape') { fechar(); b.focus(); } });
+      b.parentElement?.addEventListener('focusout', (e) => { if (!b.parentElement!.contains(e.relatedTarget as Node)) fechar(); });
+    });
   </script>
 </body>
 </html>

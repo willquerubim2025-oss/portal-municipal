@@ -19,7 +19,7 @@
 }
 .vitrine body { font-family: var(--v-fonte-texto); }
 .vitrine h1, .vitrine h2, .vitrine h3, .vitrine h4,
-.vitrine .marca-nome, .vitrine .menu-lista a, .vitrine .v-botao, .vitrine .v-rotulo { font-family: var(--v-fonte-titulos); }
+.vitrine .marca-nome, .vitrine .menu-lista a, .vitrine .menu-lista .menu-grupo, .vitrine .v-botao, .vitrine .v-rotulo { font-family: var(--v-fonte-titulos); }
 .vitrine h1, .vitrine h2, .vitrine h3 { text-wrap: balance; color: var(--cor-primaria); }
 .vitrine main { padding-bottom: 0; }
 .vitrine main > .container { padding-bottom: 3rem; }
@@ -207,12 +207,35 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
   .v-slide-texto { padding-block: 2.5rem 4.5rem; }
 }
 
+/* ---------------------------------------------------- páginas internas */
+/* Migalhas e cabeçalho da página numa faixa clara de ponta a ponta, com o traço do acento sob o título. */
+.vitrine .migalhas, .vitrine .cabecalho-pagina { background: var(--v-tom-0); box-shadow: 0 0 0 100vmax var(--v-tom-0); clip-path: inset(0 -100vmax); }
+.vitrine .migalhas ol { padding-block: 1.1rem 0; }
+.vitrine .cabecalho-pagina { padding: 1.2rem 0 2rem; margin-bottom: 2rem; }
+.vitrine .cabecalho-pagina h1 { margin-top: 0; }
+.vitrine .cabecalho-pagina h1::after { content: ""; display: block; width: 3.5rem; height: 5px; border-radius: 3px; background: var(--v-acento, var(--cor-secundaria)); margin-top: .7rem; }
+.vitrine .cabecalho-pagina p { max-width: 65ch; font-size: 1.06rem; }
+.vitrine .cartao { border: 0; border-radius: var(--v-raio); box-shadow: var(--v-sombra); transition: transform .25s ease, box-shadow .25s ease; }
+.vitrine .cartao:hover, .vitrine .cartao:focus-within { transform: translateY(-4px); box-shadow: var(--v-sombra-alta); }
+.vitrine .cartao-titulo { font-family: var(--v-fonte-titulos); }
+.vitrine .cartao-titulo a { color: var(--cor-primaria); }
+.vitrine .cartao-corpo > p:last-child:not(.cartao-meta) { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden; }
+.vitrine .submenu { border: 0; border-top: 3px solid var(--cor-secundaria); border-radius: 0 0 10px 10px; box-shadow: var(--v-sombra-alta); padding: .4rem 0; }
+.vitrine .submenu a { font-family: var(--v-fonte-texto); font-weight: 600; font-size: 1rem; color: var(--cor-primaria); }
+.vitrine .submenu a:hover, .vitrine .submenu a:focus { background: var(--v-tom-0); box-shadow: inset 4px 0 0 var(--cor-secundaria); }
+@media (max-width: 800px) {
+  .vitrine .submenu { border-top: 0; box-shadow: none; }
+  .vitrine .submenu a { color: #fff; }
+  .vitrine .submenu a:hover, .vitrine .submenu a:focus { background: rgb(255 255 255 / .12); }
+}
+
 /* ---------------------------------------------------- alto contraste e movimento */
 :root.contraste.vitrine .cabecalho, :root.contraste.vitrine .v-barra-ente, :root.contraste.vitrine .v-secao,
 :root.contraste.vitrine .v-destaque, :root.contraste.vitrine .v-noticia, :root.contraste.vitrine .v-servico,
-:root.contraste.vitrine .v-pessoa, :root.contraste.vitrine .v-agenda li, :root.contraste.vitrine .v-escola { background: #000; color: #fff; border-color: #fff; }
+:root.contraste.vitrine .v-pessoa, :root.contraste.vitrine .v-agenda li, :root.contraste.vitrine .v-escola,
+:root.contraste.vitrine .migalhas, :root.contraste.vitrine .cabecalho-pagina, :root.contraste.vitrine .cartao, :root.contraste.vitrine .submenu { background: #000; color: #fff; border-color: #fff; }
 :root.contraste.vitrine h1, :root.contraste.vitrine h2, :root.contraste.vitrine h3, :root.contraste.vitrine .marca,
-:root.contraste.vitrine .v-noticia h3 a, :root.contraste.vitrine .v-servico h3, :root.contraste.vitrine .v-pessoa-nome { color: #ff0; }
+:root.contraste.vitrine .v-noticia h3 a, :root.contraste.vitrine .cartao-titulo a, :root.contraste.vitrine .submenu a, :root.contraste.vitrine .v-servico h3, :root.contraste.vitrine .v-pessoa-nome { color: #ff0; }
 :root.contraste.vitrine .v-slide::after, :root.contraste.vitrine .v-slide-imagem { display: none; }
 :root.contraste.vitrine .marca-tipo, :root.contraste.vitrine .v-noticia time, :root.contraste.vitrine .v-noticia p,
 :root.contraste.vitrine .v-servico p, :root.contraste.vitrine .v-pessoa-cargo, :root.contraste.vitrine .meta,
@@ -226,4 +249,6 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 :root.contraste.vitrine .v-botao, :root.contraste.vitrine .v-aviso { background: #ff0; color: #000; border-color: #ff0; }
 @media (prefers-reduced-motion: reduce) {
   .v-slide, .v-slide-ativo { transition: none; }
+  .vitrine .cartao { transition: none; }
 }
+:root.contraste.vitrine .migalhas, :root.contraste.vitrine .cabecalho-pagina { box-shadow: 0 0 0 100vmax #000; }

@@ -290,3 +290,9 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - **Erro registrado:** a primeira proposta usou marinho `#113567`, tirado das variáveis CSS do site da Prefeitura, mas o site renderiza verde. Lição: medir a cor na tela renderizada, não no CSS.
   - Amostra: `docs/design/sistema-visual.html` no repositório `Portais-Publicos`.
 
+**D-40 · 12/10/2026 · Menu da SMEDU é dado; o portal marca um item só e grupos de menu abrem pelo teclado**
+- **Decisão:** o menu principal do Portal Educação fica em `menus`/`menu_itens` (sem código). Proposta cadastrada na homologação: Início · A Secretaria (Equipe gestora, Estrutura organizacional, Legislação, Documentos, Perguntas frequentes) · Matrícula · Escolas e supervisores · Notícias · Agenda · Serviços · Transparência. Ela é voltada aos pais: o que eles mais procuram vem primeiro.
+- **Correções genéricas no portal, que valem para todos os municípios:**
+  - só um item do menu fica marcado como página atual, o de endereço mais longo que casa com a página. Antes, em `/servicos/matricula-escolar`, "Matrícula" e "Serviços" ficavam marcados juntos;
+  - item de menu sem link e com submenu agora é um botão (`aria-expanded`) que abre com clique, Enter ou espaço, e fecha com Esc. Antes era um texto sem foco, e quem navega por teclado não chegava ao submenu.
+- **Páginas internas no layout vitrine:** migalhas e título numa faixa clara de ponta a ponta (primeiro tom das cores vivas), com o traço da cor de acento sob o título. Cartões de notícia com sombra e elevação, resumo limitado a 4 linhas e submenu no estilo da vitrine. Tudo foi verificado no axe (WCAG 2.1 AA), com e sem alto contraste, e sem violações.
