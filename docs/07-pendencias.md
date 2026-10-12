@@ -7,7 +7,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 
 | Frente | Pronto | O que falta |
 |---|---|---|
-| Base (banco, RLS, multi-prefeitura) | ~95% | índices de desempenho, mover `is_plataforma`/`tem_papel` para `interno` |
+| Base (banco, RLS, multi-prefeitura) | ~97% | índices de desempenho; fase 1B das permissões (D-38) |
 | Portal público (RF01–07) | ~93% | identidade visual de Jeriquara, tema ampliado (D-17) |
 | Transparência (RF08–11) | ~70% | links dos sistemas Fiorilli e de cada seção (prefeitura); preencher o PNTP com a prefeitura |
 | Painel (RF12–19) | ~90% | biblioteca de mídias, pré-visualização de rascunho |
@@ -17,6 +17,11 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 | Ida ao ar (domínio, produção, treinamento, aceite) | ~10% | quase tudo depende da reunião |
 
 ## Próximos passos
+- [ ] **Produção (12/10/2026):** aplicar 0012–0014 pelo roteiro `supabase/producao/aplicar-0012-0014.sql` do repositório `Portais-Publicos` (SQL Editor, branch main). O roteiro também move a extensão `pg_net` para o schema `extensions` (aviso do Security Advisor depois da 0011). A ferramenta de migração do MCP trava nesses arquivos: pede uma confirmação que não aparece na sessão.
+- [ ] **Permissões, fase 1B (D-38):** notícias, páginas, destaques e serviços passam a usar `pode()`; os papéis antigos (admin, publicador, editor) viram papéis do sistema com as mesmas permissões; notícias ganham escopo por unidade. Os 164 testes atuais garantem que Jeriquara não muda.
+- [ ] **Painel:** telas de papéis e permissões, vínculos de usuários, unidades e equipe gestora (D-38); registro de permissões no código + script de deploy que chama `sincronizar_permissoes()` com a chave de serviço; menu montado por `minhas_permissoes()`.
+- [ ] **Provisionamento por `tipo_ente` (D-37):** o pacote padrão é de prefeitura (Lei Orgânica, licitações, PPA). Adaptar para secretaria, câmara etc. antes de publicar a Central de Transparência de uma organização que não é prefeitura.
+- [ ] **SMEDU de Paulínia (`paulinia-educacao`):** domínio, código IBGE, CNPJ e o primeiro Administrador (papel novo; só a SECKE faz o primeiro vínculo). Detalhes no repositório `Portais-Publicos`.
 - [ ] Ordem sugerida antes da reunião: 1) ~~git + GitHub~~ (D-25); 2) migração completa na homologação (em andamento, 03/10/2026); 3) ~~publicar a homologação na Cloudflare~~ (D-27).
 - [ ] Homologação: definir o domínio de homologação do portal e criar no Auth **da branch** os usuários de teste (o Auth da branch é separado: o usuário da SECKE da produção não existe lá).
 - [ ] **Conta Cloudflare (03/10/2026):** o usuário tem conta grátis. Usar para a homologação. **Antes de Jeriquara ir ao ar, ativar o Workers Paid (US$ 5/mês por conta, cobre todos os municípios).** No Free: 100 mil requisições/dia somadas de todos os municípios e **10 ms de CPU por requisição**; passar disso dá erro ao visitante, não lentidão. Paid: 10 mi requisições + 30 mi ms de CPU por mês, até 30 s por requisição. Domínios das prefeituras via **Cloudflare for SaaS** (custom hostnames): 100 grátis, depois US$ 0,10/mês cada; a prefeitura só cria um CNAME, sem transferir o DNS. Avaliar se a conta deve ficar no e-mail da SECKE (produto da empresa).
@@ -33,7 +38,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 - [ ] **Arquivos acima de 50 MB: decidido manter o teto de gastos (D-26); resolver antes da migração final, ver o topo de `docs/11-checklist-ir-ao-ar.md`.** Histórico: O limite de 50 MB vem do **spend cap** (teto de gastos) do Supabase; só sobe (até 500 GB) desligando o teto, o que passa a cobrar o excedente da franquia do Pro (100 GB de armazenamento, 250 GB de tráfego/mês). Opções: **A)** desligar o teto e criar alerta de gasto (Billing → Usage alerts); **B, recomendada)** manter o teto e tratar os ~25 PDFs grandes à parte (lista para a prefeitura comprimir e reenviar pelo painel; o relatório da migração já lista os que falharam por tamanho). Amostra: 6 em 1.016 PDFs (~0,6%). "Image transformation" ligado não gera custo com o teto ativo (o portal ainda não usa).
 - [ ] **Validar com a prefeitura o mapa da migração** (`docs/reuniao/02-migracao-do-site-atual.md`): boletins, temas das notícias, o que descartar (coluna Destino), vigência das leis.
 - [ ] Migração: páginas migradas na homologação (D-29); ajustar o mapa conforme a reunião (2.4: História oficial, departamentos, webmail) e rodar `--paginas` de novo.
-- [ ] Cache (D-30): aplicar a 0011 na produção, com o segredo e o Vault de lá (ver o checklist). Monitorar falhas da limpeza: a rotina não avisa quando o portal recusa (ex.: segredo errado dá 401 em `net._http_response`); incluir essa consulta no monitoramento.
+- [ ] Cache (D-30): a 0011 foi aplicada na produção em 12/10/2026; falta o segredo no Worker e no Vault de lá (ver o checklist). Monitorar falhas da limpeza: a rotina não avisa quando o portal recusa (ex.: segredo errado dá 401 em `net._http_response`); incluir essa consulta no monitoramento.
 - [ ] Revisar aos poucos os textos alternativos automáticos das imagens migradas (`midias.legado.alt_automatico = true`; 552 só na amostra). Ideia: filtro no painel.
 - [ ] Usuário dedicado da SECKE para a migração na produção (aparece na auditoria).
 - [ ] Salvar uma cópia do PDF de requisitos em `docs/`.
