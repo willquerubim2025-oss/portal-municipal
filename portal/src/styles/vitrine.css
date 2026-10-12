@@ -83,7 +83,8 @@
 .v-aviso-linha { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; padding-block: .65rem; }
 .v-aviso-linha p { margin: 0; flex: 1 1 22rem; }
 .v-aviso-linha a { font-weight: 700; color: inherit; }
-.v-aviso-informativo { background: var(--v-acento); color: var(--cor-primaria); }
+.v-aviso-informativo { --v-neutro: color-mix(in srgb, var(--cor-primaria) 6%, #fff); background: var(--v-neutro); color: var(--cor-primaria); border-bottom: 1px solid color-mix(in srgb, var(--cor-primaria) 14%, #fff); }
+.v-aviso-informativo .v-aviso-linha p::before { content: ""; display: inline-block; width: .6rem; height: .6rem; margin: 0 .65rem 0 4px; border-radius: 50%; background: var(--cor-secundaria); box-shadow: 0 0 0 4px color-mix(in srgb, var(--cor-secundaria) 22%, transparent); vertical-align: .08em; }
 .v-aviso-atencao { background: #fff1c2; color: #5c4300; border-bottom: 1px solid #f0d78a; }
 .v-aviso-urgente { background: #b3261e; color: #fff; }
 .v-aviso-fechar { flex: none; width: 2.25rem; height: 2.25rem; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgb(0 0 0 / .08); color: inherit; cursor: pointer; }
@@ -208,8 +209,9 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 }
 
 /* ---------------------------------------------------- páginas internas */
-/* Migalhas e cabeçalho da página numa faixa clara de ponta a ponta, com o traço do acento sob o título. */
-.vitrine .migalhas, .vitrine .cabecalho-pagina { background: var(--v-tom-0); box-shadow: 0 0 0 100vmax var(--v-tom-0); clip-path: inset(0 -100vmax); }
+/* Migalhas e cabeçalho da página numa faixa neutra (cor primária bem clara) de ponta a ponta, com o traço do acento sob o título. */
+.vitrine { --v-faixa-neutra: color-mix(in srgb, var(--cor-primaria) 6%, #fff); }
+.vitrine .migalhas, .vitrine .cabecalho-pagina { background: var(--v-faixa-neutra); box-shadow: 0 0 0 100vmax var(--v-faixa-neutra); clip-path: inset(0 -100vmax); }
 .vitrine .migalhas ol { padding-block: 1.1rem 0; }
 .vitrine .cabecalho-pagina { padding: 1.2rem 0 2rem; margin-bottom: 2rem; }
 .vitrine .cabecalho-pagina h1 { margin-top: 0; }
