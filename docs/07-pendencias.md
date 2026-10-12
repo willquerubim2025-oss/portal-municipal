@@ -17,7 +17,6 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 | Ida ao ar (domínio, produção, treinamento, aceite) | ~10% | quase tudo depende da reunião |
 
 ## Próximos passos
-- [ ] **Produção (12/10/2026):** aplicar 0012–0014 pelo roteiro `supabase/producao/aplicar-0012-0014.sql` do repositório `Portais-Publicos` (SQL Editor, branch main). O roteiro também move a extensão `pg_net` para o schema `extensions` (aviso do Security Advisor depois da 0011). A ferramenta de migração do MCP trava nesses arquivos: pede uma confirmação que não aparece na sessão.
 - [ ] **Permissões, fase 1B (D-38):** notícias, páginas, destaques e serviços passam a usar `pode()`; os papéis antigos (admin, publicador, editor) viram papéis do sistema com as mesmas permissões; notícias ganham escopo por unidade. Os 164 testes atuais garantem que Jeriquara não muda.
 - [ ] **Painel:** telas de papéis e permissões, vínculos de usuários, unidades e equipe gestora (D-38); registro de permissões no código + script de deploy que chama `sincronizar_permissoes()` com a chave de serviço; menu montado por `minhas_permissoes()`.
 - [ ] **Provisionamento por `tipo_ente` (D-37):** o pacote padrão é de prefeitura (Lei Orgânica, licitações, PPA). Adaptar para secretaria, câmara etc. antes de publicar a Central de Transparência de uma organização que não é prefeitura.
