@@ -310,3 +310,15 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - menu: caixa alta, 13 px, peso 600.
   - O h1 das páginas internas fica em 28 px, peso 600, e o título do destaque em até 42 px, peso 700.
 - **Verificação:** axe (WCAG 2.1 AA), com e sem alto contraste, sem violações na home e em Notícias.
+
+**D-42 · 12/10/2026 · Cabeçalho do layout vitrine em linha única, no verde da Prefeitura (a pedido do usuário; ajusta D-41)**
+- **Decisão:** numa linha só ficam o brasão com o nome da Secretaria, os itens do menu, o botão de busca e o botão de acessibilidade. O fundo é a cor primária do tema (petróleo `#004348`, o verde predominante do portal da Prefeitura), com texto branco e um filete turquesa embaixo. A barra separada do menu deixou de existir. O cabeçalho tem 79 px de altura em 1280 px ou mais de largura.
+- **Busca e acessibilidade** abrem painéis brancos sob o cabeçalho, um de cada vez:
+  - painel de acessibilidade: página de acessibilidade, A−, A, A+, alto contraste e "Site da Prefeitura";
+  - os painéis fecham com Esc;
+  - o atalho 3 ("Ir para a busca") abre o painel da busca;
+  - sem JavaScript, os painéis ficam sempre visíveis numa faixa abaixo da linha.
+- **Brasão:** o brasão colorido fica num quadro branco de cantos arredondados, para não perder a leitura sobre o fundo escuro.
+- **Larguras:** o cabeçalho usa uma margem menor que a do destaque, `min(margem_destaque, 3vw)`, para os itens do menu caberem.
+- **Telas menores:** até 1180 px de largura o menu não cabe e vira o botão "Menu", abaixo da marca.
+- **Verificação:** axe (WCAG 2.1 AA) sem violações em 1920, 1366, 1280, 1024 e 390 px, com os painéis abertos e em alto contraste.

@@ -35,47 +35,74 @@
 .v-miolo { width: min(100% - 2rem, var(--largura)); margin-inline: auto; }
 .v-rotulo { font-weight: 700; font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--v-secundaria-escura); margin: 0 0 .75rem; }
 
-/* ---------------------------------------------------- cabeçalho único (D-41) */
+/* ---------------------------------------------------- cabeçalho em linha única (D-41, D-42) */
 /* Atalhos do eMAG: ocultos até receberem foco (Tab ou accesskey); aí aparecem no topo da página. */
 .vitrine .v-pular { position: absolute; top: 0; left: 0; right: 0; z-index: 50; background: var(--cor-primaria); border: 0;
   clip-path: inset(50%); height: 1px; overflow: hidden; }
 .vitrine .v-pular:focus-within { clip-path: none; height: auto; overflow: visible; }
 .vitrine .v-pular a { color: #fff; font-weight: 600; }
 .vitrine .v-pular .atalhos span { border-color: rgb(255 255 255 / .6); }
-.vitrine .cabecalho { background: #fff; color: var(--cor-primaria); }
-.vitrine .cabecalho-linha { flex-wrap: nowrap; gap: .75rem 1.5rem; padding-block: .7rem; }
-.vitrine .marca { color: var(--cor-primaria); gap: .85rem; flex: none; }
-.vitrine .marca img { width: 66px; height: 66px; }
-.vitrine .marca-tipo { font-size: .8rem; color: var(--v-texto-suave); opacity: 1; letter-spacing: .02em; }
-.vitrine .marca-nome { font-size: clamp(1.05rem, .95rem + .45vw, 1.3rem); font-weight: 700; line-height: 1.15; max-width: 22ch; }
-.vitrine .busca { margin-left: auto; flex: 1 1 260px; max-width: 400px; }
+
+/* Faixa única no verde da Prefeitura: marca · menu · busca · acessibilidade. */
+.vitrine { --v-margem-cab: 1rem; }
+.vitrine .v-cab { position: relative; z-index: 20; background: var(--cor-primaria); color: #fff; border-bottom: 3px solid var(--cor-secundaria); }
+.v-cab-linha { display: flex; align-items: center; gap: .75rem 1.25rem; width: calc(100% - 2 * var(--v-margem-cab)); margin-inline: auto; min-height: 76px; }
+.vitrine .v-cab .marca { flex: none; gap: .65rem; color: #fff; padding-block: .5rem; }
+.v-cab-brasao { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 12px; background: #fff; flex: none; }
+.v-cab-brasao img { width: 46px; height: 46px; object-fit: contain; }
+.vitrine .v-cab .marca-tipo { font-size: .7rem; color: rgb(255 255 255 / .8); letter-spacing: .03em; }
+.vitrine .v-cab .marca-nome { font-size: .98rem; font-weight: 600; line-height: 1.15; max-width: 15ch; color: #fff; }
+.vitrine .v-cab .menu-principal { flex: 1 1 auto; min-width: 0; background: none; border: 0; }
+.vitrine .v-cab .menu-lista { flex-wrap: nowrap; justify-content: center; }
+.vitrine .menu-lista a, .vitrine .menu-lista .menu-grupo { font-weight: 600; font-size: .78rem; letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; }
+.vitrine .v-cab .menu-lista > li > a, .vitrine .v-cab .menu-lista > li > .menu-grupo { padding: 1.75rem .55rem; color: #fff; }
+.vitrine .menu-lista > li > a:hover, .vitrine .menu-lista > li > a:focus-visible, .vitrine .menu-lista > li > a[aria-current="page"],
+.vitrine .menu-lista > li > .menu-grupo:hover, .vitrine .menu-lista > li > .menu-grupo[aria-expanded="true"] { background: rgb(255 255 255 / .1); text-decoration: none; box-shadow: inset 0 -4px 0 var(--cor-secundaria); }
+.vitrine .menu-movel > summary { color: #fff; }
+.v-cab-acoes { flex: none; display: flex; gap: .45rem; }
+.v-cab-botao { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; border: 1px solid rgb(255 255 255 / .4);
+  background: rgb(255 255 255 / .08); color: #fff; cursor: pointer; transition: background .2s, color .2s; }
+.v-cab-botao svg { width: 20px; height: 20px; }
+.v-cab-botao:hover, .v-cab-botao:focus-visible { background: rgb(255 255 255 / .2); }
+.v-cab-botao[aria-expanded="true"] { background: #fff; color: var(--cor-primaria); }
+
+/* Painéis da busca e da acessibilidade. Sem JavaScript ficam visíveis numa faixa abaixo da linha. */
+.v-cab-painel { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: .75rem 1rem; width: calc(100% - 2 * var(--v-margem-cab)); margin-inline: auto; padding-block: .6rem; }
+.js .v-cab-painel { position: absolute; top: 100%; right: var(--v-margem-cab); width: auto; padding: .8rem; margin-top: 3px; background: #fff; color: var(--cor-texto);
+  border-radius: 0 0 14px 14px; box-shadow: var(--v-sombra-alta); }
+.js .v-cab-painel:not(.aberto) { display: none; }
+.v-cab-painel .busca { width: min(440px, 80vw); max-width: none; flex: none; margin: 0; }
 .vitrine .busca input { border: 2px solid #d8e0e8; border-right: 0; border-radius: 999px 0 0 999px; padding: .5rem 1rem; }
 .vitrine .busca input:focus { border-color: var(--cor-secundaria); }
 .vitrine .busca button { border-radius: 0 999px 999px 0; background: var(--cor-primaria); color: #fff; padding: .5rem 1.1rem; }
-.v-cabecalho-acoes { flex: none; display: flex; align-items: center; gap: .9rem; }
 .v-ferramentas { list-style: none; display: flex; gap: .3rem; margin: 0; padding: 0; }
 .v-ferramentas .v-ferramenta { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; border: 1px solid #d3dede;
   background: #fff; color: var(--cor-primaria); font: 600 .8rem/1 var(--v-fonte-titulos); cursor: pointer; text-decoration: none; transition: background .2s, color .2s; }
 .v-ferramentas .v-ferramenta:hover, .v-ferramentas .v-ferramenta:focus-visible { background: var(--v-faixa-neutra, #eef4f4); }
 .v-ferramentas .v-ferramenta[aria-pressed="true"] { background: var(--cor-primaria); color: #fff; }
 .v-ferramenta .simbolo-acessibilidade { width: 20px; height: 20px; }
-.v-link-prefeitura { display: inline-flex; align-items: center; gap: .4rem; padding: .45rem .9rem; border-radius: 999px; background: var(--cor-primaria);
+.v-link-prefeitura { display: inline-flex; align-items: center; gap: .4rem; padding: .5rem .95rem; border-radius: 999px; background: var(--cor-primaria);
   color: #fff; font: 600 .8rem/1.2 var(--v-fonte-titulos); text-decoration: none; white-space: nowrap; }
 .v-link-prefeitura:hover, .v-link-prefeitura:focus-visible { background: var(--v-secundaria-escura); }
 .v-link-prefeitura svg { width: 1em; height: 1em; }
-@media (max-width: 1100px) { .v-link-prefeitura span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } .v-link-prefeitura { padding: .55rem; } }
-@media (max-width: 800px) {
-  .vitrine .cabecalho-linha { flex-wrap: wrap; }
-  .vitrine .marca img { width: 50px; height: 50px; }
-  .v-cabecalho-acoes { order: 2; margin-left: auto; gap: .5rem; }
-  .vitrine .busca { order: 3; flex-basis: 100%; max-width: none; margin-left: 0; }
-}
-@media (max-width: 480px) { .v-ferramentas li:nth-child(3) { display: none; } .v-ferramentas .v-ferramenta { width: 2rem; height: 2rem; } }
 
-.vitrine .menu-principal { background: var(--cor-primaria); border-top: 4px solid var(--cor-secundaria); }
-.vitrine .menu-lista a, .vitrine .menu-lista .menu-grupo { font-weight: 600; font-size: .8125rem; letter-spacing: .03em; text-transform: uppercase; }
-.vitrine .menu-lista a:hover, .vitrine .menu-lista a:focus, .vitrine .menu-lista a[aria-current="page"] { background: rgb(255 255 255 / .12); text-decoration: none; box-shadow: inset 0 -3px 0 var(--cor-secundaria); }
-.vitrine .menu-movel > summary { color: #fff; }
+/* Até 1180 px o menu não cabe na linha: vira o botão "Menu", aberto abaixo da marca. */
+@media (max-width: 1180px) {
+  .v-cab-linha { flex-wrap: wrap; min-height: 0; }
+  .v-cab-acoes { margin-left: auto; }
+  .vitrine .v-cab .menu-principal { order: 3; flex-basis: 100%; }
+  .vitrine .v-cab .menu-movel > summary { display: block; padding: .6rem 0; border-top: 1px solid rgb(255 255 255 / .2); }
+  .vitrine .v-cab .menu-lista { flex-direction: column; flex-wrap: wrap; padding-bottom: .5rem; }
+  .vitrine .v-cab .menu-lista > li > a, .vitrine .v-cab .menu-lista > li > .menu-grupo { padding: .65rem .5rem; }
+  .vitrine .v-cab .submenu { position: static; display: block; background: transparent; box-shadow: none; border: 0; padding-left: 1rem; }
+  .vitrine .v-cab .submenu a { color: #fff; }
+  .vitrine .v-cab .menu-grupo::after { display: none; }
+}
+@media (max-width: 480px) {
+  .v-cab-brasao { width: 46px; height: 46px; } .v-cab-brasao img { width: 38px; height: 38px; }
+  .js .v-cab-painel { left: var(--v-margem-cab); right: var(--v-margem-cab); }
+  .v-cab-painel .busca { width: 100%; }
+}
 
 /* ---------------------------------------------------- botões */
 .v-botao { --b: var(--cor-primaria); display: inline-flex; align-items: center; gap: .55rem; font-weight: 700; font-size: .95rem; padding: .8rem 1.35rem; border-radius: 999px; border: 2px solid var(--b); background: var(--b); color: #fff; text-decoration: none; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease; }
@@ -292,7 +319,8 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
    alinhados a ele; conteúdo das seções e do rodapé mais estreito (padrão 6 cm). Os fundos das seções
    continuam de ponta a ponta. Abaixo de 1100 px as margens diminuem para não espremer o conteúdo. */
 @media (min-width: 1100px) {
-  .vitrine .cabecalho .container, .vitrine .menu-principal .container, .vitrine .v-avisos .v-miolo, .vitrine .v-destaque {
+  .vitrine { --v-margem-cab: min(var(--v-margem-destaque), 3vw); }
+  .vitrine .v-avisos .v-miolo, .vitrine .v-destaque {
     width: calc(100% - 2 * var(--v-margem-destaque)); max-width: none; }
   .vitrine .v-destaque { margin: 1.25rem auto 0; border-radius: var(--v-raio); }
   .vitrine .v-secao > .v-miolo, .vitrine main > .container, .vitrine .migalhas.container, .vitrine .rodape .container {
