@@ -1,0 +1,80 @@
+---
+// Avisos (destaques tipo alerta) no layout vitrine (0020, D-39):
+//  - urgente: janela sobre todo o conteúdo (<dialog>), fecha com botão ou Esc;
+//  - informativo/atenção: faixa no topo, com botão de fechar.
+// Frequência por visitante (destaques.frequencia): 'uma_vez' (guardado no navegador com
+// id + versão ao aparecer; editar o aviso sobe a versão e ele volta), 'por_sessao' ou 'sempre'.
+// A página fica até 10 min no cache da borda: o fim_em também é conferido no navegador.
+// Sem JavaScript, todos aparecem como faixa (nada fica escondido).
+interface Props { avisos: any[] }
+const urgentes = Astro.props.avisos.filter((a) => a.nivel === 'urgente');
+const faixas = Astro.props.avisos.filter((a) => a.nivel !== 'urgente');
+const chave = (a: any) => `aviso-${a.id}-${a.versao ?? 1}`;
+---
+{faixas.length > 0 && (
+  <section class="v-avisos" aria-label="Avisos">
+    {faixas.map((a) => (
+      <div class={`v-aviso v-aviso-${a.nivel}`} data-aviso={chave(a)} data-frequencia={a.frequencia ?? 'uma_vez'} data-fim={a.fim_em ?? undefined}>
+        <div class="v-miolo v-aviso-linha">
+          <p><strong>{a.titulo}</strong>{a.texto && <> {a.texto}</>}</p>
+          {a.url && <a href={a.url} target={a.nova_aba ? '_blank' : undefined} rel={a.nova_aba ? 'noopener' : undefined}>{a.botao_rotulo ?? 'Saiba mais'}</a>}
+          <button type="button" class="v-aviso-fechar" data-fechar aria-label={`Fechar o aviso: ${a.titulo}`}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+      </div>
+    ))}
+  </section>
+)}
+
+{urgentes.map((a) => (
+  <>
+    <dialog class="v-modal" data-aviso={chave(a)} data-frequencia={a.frequencia ?? 'uma_vez'} data-fim={a.fim_em ?? undefined} data-modal aria-labelledby={`aviso-titulo-${a.id}`}>
+      <div class="v-modal-topo">
+        <span>Aviso importante</span>
+        <button type="button" class="v-aviso-fechar" data-fechar aria-label="Fechar o aviso">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="v-modal-corpo">
+        <h2 id={`aviso-titulo-${a.id}`}>{a.titulo}</h2>
+        {a.texto && <p>{a.texto}</p>}
+        <div class="v-modal-acoes">
+          {a.url && <a class="v-botao" href={a.url} target={a.nova_aba ? '_blank' : undefined} rel={a.nova_aba ? 'noopener' : undefined}>{a.botao_rotulo ?? 'Saiba mais'}</a>}
+          <button type="button" class="v-botao v-botao-contorno" data-fechar>Entendi</button>
+        </div>
+      </div>
+    </dialog>
+    <noscript>
+      <div class="v-aviso v-aviso-urgente"><div class="v-miolo v-aviso-linha"><p><strong>{a.titulo}</strong>{a.texto && <> {a.texto}</>}</p>{a.url && <a href={a.url}>{a.botao_rotulo ?? 'Saiba mais'}</a>}</div></div>
+    </noscript>
+  </>
+))}
+
+<script>
+  const ler = (f: string, k: string) => { try { return (f === 'por_sessao' ? sessionStorage : localStorage).getItem(k); } catch { return null; } };
+  const gravar = (f: string, k: string) => { try { (f === 'por_sessao' ? sessionStorage : localStorage).setItem(k, '1'); } catch {} };
+  const vencido = (el: HTMLElement) => !!el.dataset.fim && new Date(el.dataset.fim) <= new Date();
+
+  document.querySelectorAll<HTMLElement>('[data-aviso]').forEach((el) => {
+    const chave = el.dataset.aviso!;
+    const freq = el.dataset.frequencia ?? 'uma_vez';
+    const visto = freq !== 'sempre' && ler(freq, chave) === '1';
+    const fechar = () => {
+      if (freq !== 'sempre') gravar(freq, chave);
+      if (el instanceof HTMLDialogElement) el.close(); else el.hidden = true;
+    };
+    if (vencido(el) || visto) {
+      if (!(el instanceof HTMLDialogElement)) el.hidden = true;
+      return;
+    }
+    // Conta como visto já ao aparecer: na próxima página o aviso não volta (só se for editado).
+    if (freq !== 'sempre') gravar(freq, chave);
+    el.querySelectorAll('[data-fechar]').forEach((b) => b.addEventListener('click', fechar));
+    if (el instanceof HTMLDialogElement) {
+      el.addEventListener('cancel', () => { if (freq !== 'sempre') gravar(freq, chave); });   // tecla Esc
+      el.addEventListener('click', (e) => { if (e.target === el) fechar(); });               // clique fora
+      el.showModal();
+    }
+  });
+</script>

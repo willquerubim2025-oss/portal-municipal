@@ -5,14 +5,36 @@ import { destaques, eventos, menu, noticias } from '../lib/consultas';
 import { moduloAtivo } from '../lib/municipio';
 import { urlImagem, srcsetImagem } from '../lib/imagens';
 import { diaMes, hora } from '../lib/formato';
+import { equipe, servicosHome } from '../lib/consultas';
+import Destaque from '../components/vitrine/Destaque.astro';
+import NoticiasVitrine from '../components/vitrine/Noticias.astro';
+import ServicosVitrine from '../components/vitrine/Servicos.astro';
+import EquipeVitrine from '../components/vitrine/Equipe.astro';
+import type { BlocoHome } from '../lib/municipio';
 
 const { municipio: m, dominioPrincipal } = Astro.locals.contexto;
-const [banners, ultimas, proximos, atalhosMenu] = await Promise.all([
+// Layout vitrine (D-39): a página inicial é montada pelos blocos de config.home, nessa ordem.
+const blocos: BlocoHome[] = m.tema.layout === 'vitrine' ? (m.config.home?.blocos ?? []) : [];
+const tem = (b: BlocoHome) => blocos.includes(b);
+const [banners, ultimas, proximos, atalhosMenu, cards, pessoas] = await Promise.all([
   moduloAtivo(m, 'destaques') ? destaques(m.id).then((d) => d.filter((x) => x.tipo === 'banner' && x.imagem)) : Promise.resolve([]),
   noticias(m.id, { limite: 7 }),
   moduloAtivo(m, 'agenda') ? eventos(m.id, { limite: 4 }) : Promise.resolve(null),
   menu(m.id, 'atalhos'),
+  tem('servicos') ? servicosHome(m.id) : Promise.resolve([]),
+  tem('equipe') && moduloAtivo(m, 'equipe_gestora') ? equipe(m.id) : Promise.resolve([]),
 ]);
+const titulos = { noticias: 'Notícias', servicos: 'Serviços', agenda: 'Agenda', equipe: 'Equipe gestora', atalhos: 'Acesso rápido', ...(m.config.home?.titulos ?? {}) };
+const nCores = m.tema.cores_vivas?.length ?? 0;
+// Seções de largura total alternam branco e os tons claros das cores vivas.
+const vazio = (b: BlocoHome) =>
+  (b === 'servicos' && cards.length === 0) || (b === 'equipe' && pessoas.length === 0) ||
+  (b === 'agenda' && !proximos?.itens.length) || b === 'destaque';
+const secoes = blocos.filter((b) => !vazio(b));
+const fundo = (b: BlocoHome) => {
+  const i = secoes.indexOf(b);
+  return i % 2 === 0 ? 'v-fundo-branco' : `v-fundo-tom v-tom-${nCores ? Math.floor(i / 2) % nCores : 0}`;
+};
 
 // Acesso rápido: menu "atalhos" do município; sem ele, os serviços mais procurados em qualquer prefeitura.
 const atalhos = atalhosMenu.length
@@ -33,6 +55,48 @@ const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: m.n
 ---
 <Base jsonLd={siteLd}>
   <h1 class="sr-only">{m.nome}</h1>
+  {blocos.length > 0 ? (
+    <>
+      {blocos.map((b) => {
+        if (b === 'destaque') return <Destaque banners={banners} titulo={m.nome} slogan={m.config.slogan} />;
+        if (vazio(b)) return null;
+        return (
+          <section class={`v-secao ${fundo(b)}`} aria-labelledby={`titulo-${b}`}>
+            <div class="v-miolo">
+              {b === 'noticias' && <NoticiasVitrine noticias={ultimas.itens} titulo={titulos.noticias} />}
+              {b === 'servicos' && <ServicosVitrine servicos={cards} titulo={titulos.servicos} cores={nCores} />}
+              {b === 'equipe' && <EquipeVitrine pessoas={pessoas} titulo={titulos.equipe} />}
+              {b === 'agenda' && proximos && (
+                <>
+                  <div class="v-secao-titulo"><h2 id="titulo-agenda">{titulos.agenda}</h2><a href="/eventos" class="v-link-seta">Agenda completa</a></div>
+                  <ul class="v-agenda">
+                    {proximos.itens.map((e) => {
+                      const d = diaMes(e.inicio_em);
+                      return (
+                        <li>
+                          <span class="v-agenda-data" aria-hidden="true"><strong>{d.dia}</strong>{d.mes}</span>
+                          <div>
+                            <h3><a href={`/eventos/${e.slug}`}>{e.titulo}</a></h3>
+                            <p class="meta"><time datetime={e.inicio_em}>{new Date(e.inicio_em).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })}{!e.dia_inteiro && `, ${hora(e.inicio_em)}`}</time>{e.local && ` · ${e.local}`}</p>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </>
+              )}
+              {b === 'atalhos' && (
+                <>
+                  <div class="v-secao-titulo"><h2 id="titulo-atalhos">{titulos.atalhos}</h2></div>
+                  <ul class="v-atalhos">{atalhos.map((a) => <li><a href={a.href} target={a.novaAba ? '_blank' : undefined} rel={a.novaAba ? 'noopener' : undefined}>{a.rotulo}</a></li>)}</ul>
+                </>
+              )}
+            </div>
+          </section>
+        );
+      })}
+    </>
+  ) : (
   <div class="container">
     {banners.length > 0 && (
       <section aria-label="Destaques" class="home-destaques">
@@ -93,4 +157,5 @@ const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: m.n
       </section>
     )}
   </div>
+  )}
 </Base>

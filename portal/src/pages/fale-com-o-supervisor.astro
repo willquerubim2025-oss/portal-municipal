@@ -1,0 +1,58 @@
+---
+// Busca da unidade (escola) pelo nome, sigla ou bairro, com o supervisor responsável
+// (buscar_unidade, 0019). Formulário comum (GET): funciona sem JavaScript.
+// Sem unidades cadastradas, a página explica que a lista está sendo montada.
+import Base from '../layouts/Base.astro';
+import { buscarUnidade } from '../lib/consultas';
+import { supabase } from '../lib/supabase';
+
+const { municipio: m } = Astro.locals.contexto;
+const { count } = await supabase().from('unidades').select('id', { count: 'exact', head: true }).eq('municipio_id', m.id);
+const semUnidades = !count;
+const termo = (Astro.url.searchParams.get('escola') ?? '').trim().slice(0, 80);
+const resultados = !semUnidades && termo.length >= 2 ? await buscarUnidade(m.id, termo) : null;
+Astro.response.headers.set('Cache-Control', termo ? 'no-store' : 'public, max-age=60');
+---
+<Base titulo="Fale com o supervisor" descricao="Encontre a escola do seu filho e o supervisor de ensino responsável por ela." migalhas={[{ nome: 'Fale com o supervisor' }]} noindex={!!termo}>
+  <div class="container">
+    <header class="cabecalho-pagina">
+      <h1>Fale com o supervisor</h1>
+      <p>Digite o nome da escola ou o bairro para ver o supervisor de ensino responsável e o contato.</p>
+    </header>
+    {semUnidades ? (
+      <p role="status">A lista de escolas e supervisores está sendo cadastrada. Enquanto isso, fale com a Secretaria pelos contatos do rodapé.</p>
+    ) : (
+    <form class="v-busca-escola" method="get" role="search">
+      <label for="escola" class="sr-only">Nome da escola ou bairro</label>
+      <input id="escola" name="escola" type="search" value={termo} placeholder="Nome da escola ou bairro" minlength="2" required />
+      <button type="submit" class="v-botao">Buscar</button>
+    </form>
+    )}
+
+    {resultados && (
+      resultados.length === 0
+        ? <p role="status">Nenhuma escola encontrada para “{termo}”. Confira a grafia ou tente pelo bairro.</p>
+        : <>
+            <p role="status">{resultados.length === 1 ? '1 escola encontrada' : `${resultados.length} escolas encontradas`} para “{termo}”.</p>
+            <ul class="v-escolas">
+              {resultados.map((u) => (
+                <li class="v-escola">
+                  <h2>{u.nome}</h2>
+                  {(u.endereco || u.bairro) && <p>{[u.endereco, u.bairro].filter(Boolean).join(' · ')}</p>}
+                  {u.telefone && <p>Telefone da escola: {u.telefone}</p>}
+                  <div class="v-escola-supervisor">
+                    {u.supervisor_nome ? (
+                      <>
+                        <p><strong>{u.supervisor_nome}</strong>{u.supervisor_cargo && <> · {u.supervisor_cargo}</>}</p>
+                        {u.supervisor_email && <p>E-mail: <a href={`mailto:${u.supervisor_email}`}>{u.supervisor_email}</a></p>}
+                        {u.supervisor_telefone && <p>Telefone: {u.supervisor_telefone}</p>}
+                      </>
+                    ) : <p>Supervisor ainda não informado. Fale com a Secretaria pelos contatos do rodapé.</p>}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
+    )}
+  </div>
+</Base>

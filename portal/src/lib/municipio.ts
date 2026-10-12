@@ -5,8 +5,28 @@ export interface Tema {
   cor_primaria?: string;      // cabeçalho, links, botões
   cor_secundaria?: string;    // destaques, barra do rodapé
   brasao_path?: string;       // caminho no bucket midias
+  /** Endereço absoluto do brasão, quando ainda não foi enviado ao Storage. brasao_path tem preferência. */
+  brasao_url?: string;
   logo_path?: string;
+  // ---- Tema ampliado (D-17, D-39). Sem `layout: 'vitrine'`, nada abaixo muda o portal.
+  /** 'classico' (padrão): container centralizado. 'vitrine': seções de largura total, home por blocos. */
+  layout?: 'classico' | 'vitrine';
+  /** Versão escura da cor secundária, para botões e links com texto branco (contraste ≥ 4,5). */
+  cor_secundaria_escura?: string;
+  /** Chamadas de ação (botão do destaque, faixa de aviso informativo). Texto em cor_primaria. */
+  cor_acento?: string;
+  /** Cores vivas das seções e dos cards: `forte` aceita texto branco; `claro` é fundo de seção. */
+  cores_vivas?: { nome: string; forte: string; claro: string }[];
+  /** Famílias auto-hospedadas pelo portal (FONTES_DISPONIVEIS); outra família cai na fonte do sistema. */
+  fonte_titulos?: string;
+  fonte_texto?: string;
 }
+
+/** Fontes empacotadas no portal (@fontsource): sem chamada a terceiros (LGPD, D-17). */
+export const FONTES_DISPONIVEIS = ['Montserrat', 'Source Sans 3'] as const;
+
+/** Blocos da página inicial no layout vitrine, na ordem em que aparecem. */
+export type BlocoHome = 'destaque' | 'noticias' | 'servicos' | 'agenda' | 'equipe' | 'atalhos';
 
 /** Dados institucionais e chaves de comportamento (municipios.config). */
 export interface Config {
@@ -22,11 +42,17 @@ export interface Config {
   legislacao_categorias?: string[];    // slugs das categorias de documento listadas em /legislacao
   seo?: { google_site_verification?: string; imagem_compartilhamento_path?: string };
   radar_transparencia?: boolean;      // botão do Radar da Transparência no rodapé (PNTP 2.9); padrão: mostra
+  /** Texto da marca no cabeçalho. Padrão: "Prefeitura de" + nome curto. */
+  marca?: { linha1?: string; linha2?: string };
+  /** Site do ente ao qual a organização pertence (ex.: a Prefeitura de uma secretaria): barra "Voltar ao site". */
+  site_prefeitura?: string;
+  /** Layout vitrine: blocos da página inicial e textos das seções. */
+  home?: { blocos?: BlocoHome[]; titulos?: Partial<Record<BlocoHome, string>> };
 }
 
 export type Modulo =
   | 'estrutura_organizacional' | 'perguntas_frequentes' | 'agenda' | 'galeria'
-  | 'destaques' | 'legislacao' | 'carta_servicos';
+  | 'destaques' | 'legislacao' | 'carta_servicos' | 'equipe_gestora';
 
 export interface Municipio {
   id: string;

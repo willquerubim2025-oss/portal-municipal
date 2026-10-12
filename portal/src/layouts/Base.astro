@@ -3,10 +3,21 @@
 // identidade visual do município (municipios.tema / config). Nada de prefeitura
 // específica aqui (D-10).
 import '../styles/global.css';
+// Tema ampliado (D-17, D-39): fontes auto-hospedadas (só o subconjunto latino) e estilos do
+// layout vitrine. Os @font-face só baixam a fonte se uma página usá-la.
+import '@fontsource/montserrat/latin-600.css';
+import '@fontsource/montserrat/latin-700.css';
+import '@fontsource/montserrat/latin-800.css';
+import '@fontsource/source-sans-3/latin-400.css';
+import '@fontsource/source-sans-3/latin-400-italic.css';
+import '@fontsource/source-sans-3/latin-600.css';
+import '@fontsource/source-sans-3/latin-700.css';
+import '../styles/vitrine.css';
 import { destaques, menu, type ItemMenu } from '../lib/consultas';
-import { moduloAtivo, nomeCurto } from '../lib/municipio';
+import { FONTES_DISPONIVEIS, moduloAtivo, nomeCurto } from '../lib/municipio';
 import { urlMidia } from '../lib/supabase';
 import MenuItens from '../components/MenuItens.astro';
+import Avisos from '../components/vitrine/Avisos.astro';
 
 export interface Migalha { nome: string; href?: string }
 interface Props {
@@ -34,7 +45,8 @@ for (const p of ['categoria', 'ano', 'pagina', 'situacao']) {
 const canonico = `${origem}${Astro.url.pathname === '/' ? '' : Astro.url.pathname}${params.size ? `?${params}` : ''}`;
 const tituloCompleto = titulo ? `${titulo} — ${m.nome}` : m.nome;
 const desc = descricao || cfg.slogan || `Portal oficial da ${m.nome}: notícias, serviços, legislação e transparência.`;
-const brasao = urlMidia(tema.brasao_path);
+const brasao = urlMidia(tema.brasao_path) ?? (tema.brasao_url?.startsWith('https://') ? tema.brasao_url : null);
+const vitrine = tema.layout === 'vitrine';
 const imagemOg = imagem ?? urlMidia(cfg.seo?.imagem_compartilhamento_path) ?? brasao;
 
 const [principal, rodape, alertas] = await Promise.all([
@@ -89,14 +101,30 @@ const ld = [orgLd, ...(Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : []),
 // (Não escrever o nome da tag neste comentário: o scanner do Vite o confunde com uma tag real.)
 const ldJson = JSON.stringify(ld).replaceAll(String.fromCharCode(60), '\\u003c');
 
+// Só valores de cor e nomes de fonte conhecidos entram no style (o tema vem do banco).
+const cor = (v?: string) => (v && /^#[0-9a-f]{3,8}$/i.test(v) ? v : undefined);
+const fonte = (f?: string) => (f && (FONTES_DISPONIVEIS as readonly string[]).includes(f) ? `"${f}"` : undefined);
 const estiloTema = [
-  tema.cor_primaria && `--cor-primaria:${tema.cor_primaria}`,
-  tema.cor_secundaria && `--cor-secundaria:${tema.cor_secundaria}`,
+  cor(tema.cor_primaria) && `--cor-primaria:${tema.cor_primaria}`,
+  cor(tema.cor_secundaria) && `--cor-secundaria:${tema.cor_secundaria}`,
+  ...(vitrine ? [
+    cor(tema.cor_secundaria_escura) && `--v-secundaria-escura:${tema.cor_secundaria_escura}`,
+    cor(tema.cor_acento) && `--v-acento:${tema.cor_acento}`,
+    fonte(tema.fonte_titulos) && `--v-fonte-titulos:${fonte(tema.fonte_titulos)}`,
+    fonte(tema.fonte_texto) && `--v-fonte-texto:${fonte(tema.fonte_texto)}`,
+    ...(tema.cores_vivas ?? []).flatMap((c, i) => [
+      cor(c.forte) && `--v-cor-${i}:${c.forte}`,
+      cor(c.claro) && `--v-tom-${i}:${c.claro}`,
+    ]),
+  ] : []),
 ].filter(Boolean).join(';');
+const marca1 = cfg.marca?.linha1 ?? 'Prefeitura de';
+const marca2 = cfg.marca?.linha2 ?? nomeCurto(m);
+const sitePrefeitura = vitrine && cfg.site_prefeitura?.startsWith('https://') ? cfg.site_prefeitura : null;
 const caminhoAtual = Astro.url.pathname;
 ---
 <!doctype html>
-<html lang="pt-BR" style={estiloTema || undefined}>
+<html lang="pt-BR" class={vitrine ? 'vitrine' : undefined} style={estiloTema || undefined}>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -163,13 +191,25 @@ const caminhoAtual = Astro.url.pathname;
     </div>
   </div>
 
+  {sitePrefeitura && (
+    <div class="v-barra-ente">
+      <div class="v-miolo">
+        <span>{cfg.marca?.linha1 ?? ''}</span>
+        <a href={sitePrefeitura}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+          Voltar ao site da Prefeitura
+        </a>
+      </div>
+    </div>
+  )}
+
   <header class="cabecalho">
     <div class="container cabecalho-linha">
       <a href="/" class="marca" aria-label={`${m.nome} — página inicial`}>
         {brasao && <img src={brasao} alt="" width="64" height="64" />}
         <span class="marca-texto">
-          <span class="marca-tipo">Prefeitura de</span>
-          <span class="marca-nome">{nomeCurto(m)}</span>
+          <span class="marca-tipo">{marca1}</span>
+          <span class="marca-nome">{marca2}</span>
         </span>
       </a>
       <form class="busca" action="/busca" method="get" role="search">
@@ -186,7 +226,8 @@ const caminhoAtual = Astro.url.pathname;
     </nav>
   </header>
 
-  {alertas.length > 0 && (
+  {vitrine && <Avisos avisos={alertas} />}
+  {!vitrine && alertas.length > 0 && (
     <section class="alertas" aria-label="Alertas">
       {alertas.map((a) => (
         <div class={`alerta alerta-${a.nivel}`} role={a.nivel === 'urgente' ? 'alert' : undefined}>

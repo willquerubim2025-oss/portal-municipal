@@ -17,6 +17,13 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 | Ida ao ar (domínio, produção, treinamento, aceite) | ~10% | quase tudo depende da reunião |
 
 ## Próximos passos
+- [ ] **Portal Educação Paulínia (layout vitrine, D-39), feito em 12/10/2026 na homologação.** Pendências:
+  - publicar o portal de homologação na Cloudflare com o código novo, para ver no navegador. Até lá, testar com `DOMINIO_DEV=educacao.paulinia.teste` no `.env` do `portal/`;
+  - menu principal próprio da SMEDU (hoje usa o menu padrão de prefeitura: Legislação, Documentos...);
+  - na produção, enviar o brasão e as fotos pelo painel (Identidade visual e Mídias). Na homologação foram enviados por uma Edge Function temporária, `carga-midias-temporaria`, já desativada (responde 410) e que pode ser excluída no painel do Supabase;
+  - conteúdo da homologação: 7 notícias reais do site da Prefeitura, com crédito e link. As datas são aproximadas (o site não expõe a data de cada notícia), exceto a do uniforme (9/10). Fotos com crianças, já publicadas pela Prefeitura, precisam de revisão antes de irem ao ar (ECA);
+  - blocos ainda vazios na SMEDU: agenda (sem eventos) e equipe gestora (sem nomes); a busca do supervisor precisa da lista de escolas e supervisores;
+  - teste manual com leitor de tela do carrossel (pausa, pontos) e dos avisos (janela urgente). Na auditoria automática (axe, WCAG 2.x A/AA), as páginas novas passaram nos modos normal e alto contraste.
 - [ ] **Permissões, fase 1B (D-38):** notícias, páginas, destaques e serviços passam a usar `pode()`; os papéis antigos (admin, publicador, editor) viram papéis do sistema com as mesmas permissões; notícias ganham escopo por unidade. Os 164 testes atuais garantem que Jeriquara não muda.
 - [ ] **Painel:** telas de papéis e permissões, vínculos de usuários, unidades e equipe gestora (D-38); registro de permissões no código + script de deploy que chama `sincronizar_permissoes()` com a chave de serviço; menu montado por `minhas_permissoes()`.
 - [ ] **Provisionamento por `tipo_ente` (D-37):** o pacote padrão é de prefeitura (Lei Orgânica, licitações, PPA). Adaptar para secretaria, câmara etc. antes de publicar a Central de Transparência de uma organização que não é prefeitura.

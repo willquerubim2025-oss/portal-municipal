@@ -1,0 +1,96 @@
+---
+// Destaque da página inicial (layout vitrine): carrossel de largura total com cerca de
+// metade da altura da tela, para as notícias aparecerem sem rolar. Troca por esmaecimento
+// a cada 7,5 s; pausa com o mouse, com o foco e pelo botão (eMAG / WCAG 2.2.2). Com
+// "reduzir movimento" no aparelho, não troca sozinho. Sem banner, mostra o nome e o slogan.
+import { urlImagem, srcsetImagem } from '../../lib/imagens';
+interface Props { banners: any[]; titulo: string; slogan?: string }
+const { banners, titulo, slogan } = Astro.props;
+const varios = banners.length > 1;
+---
+<section class="v-destaque" aria-roledescription={varios ? 'carrossel' : undefined} aria-label="Destaques" data-carrossel={varios ? '' : undefined}>
+  {banners.length === 0 ? (
+    <div class="v-slide v-slide-ativo v-slide-vazio">
+      <div class="v-miolo v-slide-texto">
+        <h2>{titulo}</h2>
+        {slogan && <p>{slogan}</p>}
+      </div>
+    </div>
+  ) : banners.map((b, i) => (
+    <div class={`v-slide${i === 0 ? ' v-slide-ativo' : ''}`} role={varios ? 'group' : undefined}
+         aria-roledescription={varios ? 'slide' : undefined} aria-label={varios ? `${i + 1} de ${banners.length}` : undefined}
+         aria-hidden={i === 0 ? undefined : 'true'}>
+      <img class="v-slide-imagem" src={urlImagem(b.imagem.storage_path, 1600)}
+           srcset={srcsetImagem(b.imagem.storage_path, [640, 800, 1200, 1600])} sizes="100vw"
+           alt={b.imagem.texto_alternativo ?? ''} width="1600" height="700"
+           loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />
+      <div class="v-miolo v-slide-texto">
+        <h2>{b.titulo}</h2>
+        {b.texto && <p>{b.texto}</p>}
+        {b.url && (
+          <a class="v-botao v-botao-acento" href={b.url} target={b.nova_aba ? '_blank' : undefined} rel={b.nova_aba ? 'noopener' : undefined} tabindex={i === 0 ? undefined : -1}>
+            {b.botao_rotulo ?? 'Saiba mais'}
+            {b.nova_aba && <span class="sr-only"> (abre em nova aba)</span>}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        )}
+      </div>
+    </div>
+  ))}
+  {varios && (
+    <div class="v-miolo v-carrossel-controles">
+      <button type="button" class="v-carrossel-pausa" data-pausa aria-pressed="false">
+        <span data-rotulo>Pausar</span><span class="sr-only"> a troca automática dos destaques</span>
+      </button>
+      <div class="v-carrossel-pontos" role="group" aria-label="Escolher destaque">
+        {banners.map((b, i) => (
+          <button type="button" data-ir={i} aria-label={`Destaque ${i + 1}: ${b.titulo}`} aria-current={i === 0 ? 'true' : undefined}></button>
+        ))}
+      </div>
+    </div>
+  )}
+</section>
+
+<script>
+  const INTERVALO = 7500;
+  document.querySelectorAll<HTMLElement>('[data-carrossel]').forEach((raiz) => {
+    const slides = [...raiz.querySelectorAll<HTMLElement>('.v-slide')];
+    const pontos = [...raiz.querySelectorAll<HTMLButtonElement>('[data-ir]')];
+    const pausa = raiz.querySelector<HTMLButtonElement>('[data-pausa]');
+    const rotulo = pausa?.querySelector('[data-rotulo]');
+    const reduzir = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let atual = 0;
+    let parado = reduzir;          // pelo botão (ou movimento reduzido)
+    let suspenso = false;          // mouse ou foco dentro do carrossel
+    let relogio: number | undefined;
+
+    const mostrar = (n: number) => {
+      atual = (n + slides.length) % slides.length;
+      slides.forEach((s, i) => {
+        const ativo = i === atual;
+        s.classList.toggle('v-slide-ativo', ativo);
+        if (ativo) s.removeAttribute('aria-hidden'); else s.setAttribute('aria-hidden', 'true');
+        s.querySelectorAll<HTMLElement>('a').forEach((a) => (ativo ? a.removeAttribute('tabindex') : a.setAttribute('tabindex', '-1')));
+      });
+      pontos.forEach((p, i) => (i === atual ? p.setAttribute('aria-current', 'true') : p.removeAttribute('aria-current')));
+    };
+    const agendar = () => {
+      clearInterval(relogio);
+      if (!parado && !suspenso) relogio = window.setInterval(() => mostrar(atual + 1), INTERVALO);
+    };
+    const atualizarPausa = () => {
+      pausa?.setAttribute('aria-pressed', String(parado));
+      if (rotulo) rotulo.textContent = parado ? 'Continuar' : 'Pausar';
+    };
+
+    pontos.forEach((p, i) => p.addEventListener('click', () => { mostrar(i); agendar(); }));
+    pausa?.addEventListener('click', () => { parado = !parado; atualizarPausa(); agendar(); });
+    raiz.addEventListener('mouseenter', () => { suspenso = true; agendar(); });
+    raiz.addEventListener('mouseleave', () => { suspenso = false; agendar(); });
+    raiz.addEventListener('focusin', () => { suspenso = true; agendar(); });
+    raiz.addEventListener('focusout', (e) => { if (!raiz.contains(e.relatedTarget as Node)) { suspenso = false; agendar(); } });
+    document.addEventListener('visibilitychange', () => { suspenso = document.hidden; agendar(); });
+    atualizarPausa();
+    agendar();
+  });
+</script>

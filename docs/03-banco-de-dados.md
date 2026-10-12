@@ -132,6 +132,24 @@ Papéis padrão: Administrador (protegido), Diretor (`unidades.editar` na própr
 ```
 Tipos em `portal/src/lib/municipio.ts`.
 
+**Tema ampliado: layout vitrine (D-17, D-39).** Opcional. Sem `"layout": "vitrine"`, nada abaixo tem efeito e o portal fica no layout clássico (Jeriquara).
+```jsonc
+// tema (além dos campos acima)
+{ "layout": "vitrine",                                   // seções de largura total, home por blocos
+  "cor_secundaria_escura": "#127882",                    // botões/links com texto branco (≥ 4,5:1)
+  "cor_acento": "#f5b700",                               // botão do destaque, faixa de aviso (texto em cor_primaria)
+  "cores_vivas": [ { "nome": "turquesa", "forte": "#127882", "claro": "#e6f6f7" }, ... ],  // até 6; forte aceita texto branco, claro é fundo de seção
+  "fonte_titulos": "Montserrat", "fonte_texto": "Source Sans 3",   // só as auto-hospedadas (FONTES_DISPONIVEIS); outra cai na fonte do sistema
+  "brasao_url": "https://..." }                          // alternativa a brasao_path (este tem preferência)
+// config (além dos campos acima)
+{ "marca": { "linha1": "Prefeitura de Paulínia", "linha2": "Secretaria Municipal de Educação" },  // padrão: "Prefeitura de" + nome curto
+  "site_prefeitura": "https://www.paulinia.sp.gov.br",   // barra "Voltar ao site da Prefeitura" (só https)
+  "home": { "blocos": ["destaque", "noticias", "servicos", "agenda", "equipe"],   // também "atalhos"; na ordem da página
+            "titulos": { "servicos": "Serviços" } },
+  "modulos": { "equipe_gestora": true } }               // a seção some com false (também no RLS, 0019)
+```
+O portal só aceita cores no formato `#rgb`/`#rrggbb` e nomes de fonte da lista: o tema vem do banco e vai para o `style` do `<html>`. Blocos sem conteúdo (sem serviços na home, sem equipe visível, sem eventos) não aparecem. Rota nova: `/fale-com-o-supervisor` (busca de unidade, `buscar_unidade`).
+
 ## Provisionamento de município (D-10)
 - **`criar_municipio(slug, nome, uf, dominio)`** (só SECKE): cria o município e o domínio e aplica o pacote padrão. Retorna o `id`.
 - **`provisionar_municipio(id)`** (SECKE ou admin do município): aplica o pacote padrão. É **idempotente**: rodar de novo não duplica nem sobrescreve o que o município personalizou. Cria:

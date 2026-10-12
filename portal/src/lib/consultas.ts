@@ -54,7 +54,7 @@ export async function menu(municipioId: string, local: string): Promise<ItemMenu
 }
 
 // ---------------------------------------------------------------- notícias
-const CAMPOS_NOTICIA = 'id, tipo, titulo, slug, resumo, publicado_em, destaque, imagem:midias!publicacoes_imagem_destaque_id_municipio_id_fkey(storage_path, texto_alternativo)';
+const CAMPOS_NOTICIA = 'id, tipo, titulo, slug, resumo, publicado_em, destaque, prioridade, imagem:midias!publicacoes_imagem_destaque_id_municipio_id_fkey(storage_path, texto_alternativo)';
 
 export async function noticias(municipioId: string, opcoes: { pagina?: number; categoria?: string; limite?: number; destaque?: boolean } = {}) {
   const pagina = Math.max(1, opcoes.pagina ?? 1);
@@ -87,7 +87,7 @@ export async function noticia(municipioId: string, slug: string) {
 // ---------------------------------------------------------------- destaques e eventos
 export async function destaques(municipioId: string) {
   return erro(await supabase().from('destaques')
-    .select('id, tipo, nivel, titulo, texto, url, nova_aba, imagem:midias(storage_path, texto_alternativo)')
+    .select('id, tipo, nivel, titulo, texto, url, nova_aba, botao_rotulo, frequencia, versao, fim_em, imagem:midias(storage_path, texto_alternativo)')
     .eq('municipio_id', municipioId)
     .or(`fim_em.is.null,fim_em.gt.${agora()}`)
     .order('ordem')) as any[];
@@ -152,6 +152,34 @@ export async function servicos(municipioId: string, opcoes: { categoria?: string
   if (opcoes.categoria) q = q.eq('categoria.slug', opcoes.categoria);
   if (opcoes.termo) q = q.textSearch('busca', semAcento(opcoes.termo), { type: 'websearch', config: 'portuguese' });
   return erro(await q) as any[];
+}
+
+/** Cards da Área de Serviços da página inicial (0020): publicados e "em breve", na ordem do painel. */
+export async function servicosHome(municipioId: string) {
+  const linhas = erro(await supabase().from('servicos')
+    .select('id, titulo, slug, descricao, icone, ordem, em_breve, url_externa, sistema:sistemas_externos(url, ativo)')
+    .eq('municipio_id', municipioId).eq('na_home', true).order('ordem').order('titulo')) as any[];
+  return linhas.map((s) => ({
+    ...s,
+    href: s.em_breve ? null : s.url_externa ?? (s.sistema?.ativo ? s.sistema.url : null) ?? `/servicos/${s.slug}`,
+    externo: !s.em_breve && /^https?:/.test(s.url_externa ?? (s.sistema?.ativo ? s.sistema.url : '') ?? ''),
+  }));
+}
+
+/** Equipe gestora visível (0019): o RLS já esconde os ocultos e a seção desligada. */
+export async function equipe(municipioId: string) {
+  return erro(await supabase().from('equipe')
+    .select('id, nome, cargo, nivel, email, telefone, ordem, orgao:orgaos(nome), foto:midias!equipe_foto_id_municipio_id_fkey(storage_path, texto_alternativo)')
+    .eq('municipio_id', municipioId).order('nivel').order('ordem').order('nome')) as any[];
+}
+
+/** Escola pelo nome, sigla ou bairro, com o supervisor responsável (0019). */
+export async function buscarUnidade(municipioId: string, termo: string) {
+  return erro(await supabase().rpc('buscar_unidade', { p_municipio: municipioId, p_termo: termo, p_limite: 20 })) as {
+    id: string; nome: string; sigla: string | null; tipo: string; bairro: string | null; endereco: string | null;
+    telefone: string | null; email: string | null; supervisor_nome: string | null; supervisor_cargo: string | null;
+    supervisor_email: string | null; supervisor_telefone: string | null;
+  }[];
 }
 
 export async function servico(municipioId: string, slug: string) {

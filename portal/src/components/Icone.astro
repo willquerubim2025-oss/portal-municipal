@@ -1,0 +1,25 @@
+---
+// Ícones de traço (desenho no estilo Lucide), embutidos para não depender de terceiros.
+// O nome vem de servicos.icone; nome desconhecido usa o ícone genérico.
+interface Props { nome?: string | null; class?: string }
+const { nome, class: classe } = Astro.props;
+
+const ICONES: Record<string, string> = {
+  'school': '<path d="M4 21V10l8-5 8 5v11"/><path d="M9 21v-6h6v6"/><path d="M12 5V2h4v2h-4"/>',
+  'graduation-cap': '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/><path d="M22 9v6"/>',
+  'landmark': '<path d="M3 21h18"/><path d="M5 21V10M9.5 21V10M14.5 21V10M19 21V10"/><path d="M2 10l10-6 10 6z"/>',
+  'chart-column': '<path d="M4 20V4"/><path d="M4 20h16"/><path d="M8 16v-5M12 16V8M16 16v-3"/>',
+  'messages-square': '<path d="M4 5h11v8H8l-4 3z"/><path d="M15 9h5v8l-3-2h-6v-2"/>',
+  'megaphone': '<path d="M3 11v2l13 5V6z"/><path d="M16 9a3 3 0 0 1 0 6"/><path d="M6 13l1 6h3l-1-5"/>',
+  'calendar': '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  'book-open': '<path d="M2 5h7a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H2z"/><path d="M22 5h-7a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h8z"/>',
+  'bus': '<rect x="4" y="3" width="16" height="15" rx="3"/><path d="M4 11h16M8 18v3M16 18v3"/><circle cx="8" cy="14.5" r=".5"/><circle cx="16" cy="14.5" r=".5"/>',
+  'utensils': '<path d="M5 3v8a2 2 0 0 0 2 2v8M9 3v8M7 3v8"/><path d="M17 3c-2 0-3 2-3 5v5h3v8"/>',
+  'file-text': '<path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4M9 13h6M9 17h6"/>',
+  'users': '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/>',
+  'map-pin': '<path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+  'link': '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+};
+const corpo = ICONES[nome ?? ''] ?? ICONES['link'];
+---
+<svg class={classe} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" set:html={corpo} />

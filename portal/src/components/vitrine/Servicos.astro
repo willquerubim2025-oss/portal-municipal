@@ -1,0 +1,34 @@
+---
+// Área de Serviços (vitrine): cards grandes com ícone, título e uma linha (servicos.na_home, 0020).
+// Cada card ganha uma das cores vivas do tema, em sequência. "Em breve" não é link.
+import Icone from '../Icone.astro';
+interface Props { servicos: any[]; titulo: string; cores: number }
+const { servicos, titulo, cores } = Astro.props;
+---
+<div class="v-secao-titulo"><h2 id="titulo-servicos">{titulo}</h2></div>
+<ul class="v-servicos">
+  {servicos.map((s, i) => {
+    const cor = `v-cor-${cores ? i % cores : 0}`;
+    return (
+      <li>
+        {s.href ? (
+          <a class={`v-servico ${cor}`} href={s.href} target={s.externo ? '_blank' : undefined} rel={s.externo ? 'noopener' : undefined}>
+            <span class="v-servico-icone"><Icone nome={s.icone} /></span>
+            <h3>{s.titulo}</h3>
+            {s.descricao && <p>{s.descricao}</p>}
+            <span class="v-servico-ir">Acessar{s.externo && <span class="sr-only"> (abre em nova aba)</span>}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </a>
+        ) : (
+          <div class={`v-servico v-servico-breve ${cor}`}>
+            <span class="v-chip">Em breve</span>
+            <span class="v-servico-icone"><Icone nome={s.icone} /></span>
+            <h3>{s.titulo}</h3>
+            {s.descricao && <p>{s.descricao}</p>}
+          </div>
+        )}
+      </li>
+    );
+  })}
+</ul>
