@@ -12,8 +12,13 @@ import '@fontsource/source-sans-3/latin-400.css';
 import '@fontsource/source-sans-3/latin-400-italic.css';
 import '@fontsource/source-sans-3/latin-600.css';
 import '@fontsource/source-sans-3/latin-700.css';
+import '@fontsource/prompt/latin-400.css';
+import '@fontsource/prompt/latin-500.css';
+import '@fontsource/prompt/latin-600.css';
+import '@fontsource/prompt/latin-700.css';
 import '../styles/vitrine.css';
 import { destaques, menu, type ItemMenu } from '../lib/consultas';
+import Ferramentas from '../components/Ferramentas.astro';
 import { FONTES_DISPONIVEIS, moduloAtivo, nomeCurto } from '../lib/municipio';
 import { urlMidia } from '../lib/supabase';
 import MenuItens from '../components/MenuItens.astro';
@@ -103,6 +108,7 @@ const ldJson = JSON.stringify(ld).replaceAll(String.fromCharCode(60), '\\u003c')
 
 // Só valores de cor e nomes de fonte conhecidos entram no style (o tema vem do banco).
 const cor = (v?: string) => (v && /^#[0-9a-f]{3,8}$/i.test(v) ? v : undefined);
+const medida = (v?: string) => (v && /^\d{1,2}(\.\d)?(cm|rem)$|^\d{1,3}px$/.test(v) ? v : undefined);
 const fonte = (f?: string) => (f && (FONTES_DISPONIVEIS as readonly string[]).includes(f) ? `"${f}"` : undefined);
 const estiloTema = [
   cor(tema.cor_primaria) && `--cor-primaria:${tema.cor_primaria}`,
@@ -112,6 +118,8 @@ const estiloTema = [
     cor(tema.cor_acento) && `--v-acento:${tema.cor_acento}`,
     fonte(tema.fonte_titulos) && `--v-fonte-titulos:${fonte(tema.fonte_titulos)}`,
     fonte(tema.fonte_texto) && `--v-fonte-texto:${fonte(tema.fonte_texto)}`,
+    medida(tema.margem_destaque) && `--v-margem-destaque:${tema.margem_destaque}`,
+    medida(tema.margem_secoes) && `--v-margem-secoes:${tema.margem_secoes}`,
     ...(tema.cores_vivas ?? []).flatMap((c, i) => [
       cor(c.forte) && `--v-cor-${i}:${c.forte}`,
       cor(c.claro) && `--v-tom-${i}:${c.claro}`,
@@ -159,8 +167,10 @@ const caminhoAtual = Astro.url.pathname;
 <body>
   {homologacao && <div class="faixa-homologacao" role="note">Ambiente de homologação — conteúdo de teste, não indexado.</div>}
 
-  <!-- Barra de acessibilidade (eMAG 3.1): atalhos numéricos e alto contraste. -->
-  <div class="barra-acessibilidade">
+  <!-- Barra de acessibilidade (eMAG 3.1): atalhos numéricos e alto contraste.
+       No layout vitrine a barra vira cabeçalho único: os atalhos ficam ocultos até receberem foco
+       (Tab ou accesskey) e as ferramentas sobem para a linha da marca. -->
+  <div class={vitrine ? 'barra-acessibilidade v-pular' : 'barra-acessibilidade'}>
     <div class="container">
       <ul class="atalhos" aria-label="Atalhos de teclado">
         <li><a href="#conteudo" accesskey="1">Ir para o conteúdo <span>1</span></a></li>
@@ -168,40 +178,10 @@ const caminhoAtual = Astro.url.pathname;
         <li><a href="#busca" accesskey="3">Ir para a busca <span>3</span></a></li>
         <li><a href="#rodape" accesskey="4">Ir para o rodapé <span>4</span></a></li>
       </ul>
-      <ul class="ferramentas">
-        <li>
-          <a href="/acessibilidade" class="link-acessibilidade">
-            <svg class="simbolo-acessibilidade" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-              <circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" stroke-width="1.6" />
-              <circle cx="12" cy="6.2" r="1.6" fill="currentColor" />
-              <path d="M6.5 9.2l5.5 1 5.5-1M12 10.2v4.2m0 0l-2.6 4.6m2.6-4.6l2.6 4.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            Acessibilidade
-          </a>
-        </li>
-        <li>
-          <span class="tamanho-texto" role="group" aria-label="Tamanho do texto">
-            <button type="button" data-fonte="-1" aria-label="Diminuir o tamanho do texto">A-</button>
-            <button type="button" data-fonte="0" aria-label="Tamanho normal do texto">A</button>
-            <button type="button" data-fonte="1" aria-label="Aumentar o tamanho do texto">A+</button>
-          </span>
-        </li>
-        <li><button type="button" id="botao-contraste" aria-pressed="false">Alto contraste</button></li>
-      </ul>
+      {!vitrine && <Ferramentas />}
     </div>
   </div>
 
-  {sitePrefeitura && (
-    <div class="v-barra-ente">
-      <div class="v-miolo">
-        <span>{cfg.marca?.linha1 ?? ''}</span>
-        <a href={sitePrefeitura}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-          Voltar ao site da Prefeitura
-        </a>
-      </div>
-    </div>
-  )}
 
   <header class="cabecalho">
     <div class="container cabecalho-linha">
@@ -217,6 +197,17 @@ const caminhoAtual = Astro.url.pathname;
         <input id="busca" name="q" type="search" placeholder="O que você procura?" required />
         <button type="submit">Buscar</button>
       </form>
+      {vitrine && (
+        <div class="v-cabecalho-acoes">
+          <Ferramentas compacto />
+          {sitePrefeitura && (
+            <a class="v-link-prefeitura" href={sitePrefeitura}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+              <span>Site da Prefeitura</span>
+            </a>
+          )}
+        </div>
+      )}
     </div>
     <nav id="menu" class="menu-principal" aria-label="Menu principal">
       <details class="container menu-movel" open>

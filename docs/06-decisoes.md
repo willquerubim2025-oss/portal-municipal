@@ -297,3 +297,16 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - item de menu sem link e com submenu agora é um botão (`aria-expanded`) que abre com clique, Enter ou espaço, e fecha com Esc. Antes era um texto sem foco, e quem navega por teclado não chegava ao submenu.
 - **Páginas internas no layout vitrine:** migalhas e título numa faixa neutra de ponta a ponta (a cor primária bem clara), com o traço da cor de acento sob o título. Cartões de notícia com sombra e elevação, resumo limitado a 4 linhas e submenu no estilo da vitrine. Tudo foi verificado no axe (WCAG 2.1 AA), com e sem alto contraste, e sem violações.
 - **Ajuste de 12/10/2026, a pedido do usuário:** o aviso informativo (faixa acima do destaque) e a faixa do título das páginas internas eram amarelos e destoavam do verde logo abaixo do menu. Passaram a usar um tom neutro tirado da cor primária (6% sobre branco), com um ponto turquesa marcando o aviso. O amarelo fica só nos botões de ação e nos detalhes. Regra: **uma faixa encostada na estrutura (menu) usa o tom neutro; as cores vivas ficam nas seções do meio.**
+
+**D-41 · 12/10/2026 · Layout vitrine: cabeçalho único, margens laterais e tipografia do portal da Prefeitura (a pedido do usuário)**
+- **Cabeçalho único:** a barra fina "Prefeitura de Paulínia / Voltar ao site" e a barra de acessibilidade saíram do topo. Numa linha só ficam o brasão com o nome, a busca, as ferramentas de acessibilidade (botões redondos: acessibilidade, A−, A, A+, alto contraste) e o botão "Site da Prefeitura". Assim o destaque sobe cerca de 90 px.
+  - Os atalhos do eMAG (1 a 4, com accesskey) continuam existindo: ficam ocultos e aparecem no topo assim que recebem foco (Tab ou accesskey).
+  - O layout clássico não muda; o componente `Ferramentas.astro` atende os dois layouts.
+- **Margens (substitui a largura total de D-39):** em telas a partir de 1100 px, o destaque fica com cantos arredondados e margem lateral de 3 cm, e o cabeçalho, o menu e o aviso se alinham a ele. O conteúdo das seções, das páginas internas e do rodapé fica com margem de 6 cm, como no portal da Prefeitura; os fundos das seções continuam de ponta a ponta. Entre 800 e 1100 px as margens diminuem. As duas medidas são configuráveis (`tema.margem_destaque`, `tema.margem_secoes`).
+- **Tipografia:** a fonte do portal da Prefeitura, medida na página renderizada, é a **Prompt** (Google Fonts, aqui auto-hospedada por @fontsource). Hierarquia copiada de lá:
+  - título de seção: 20 px, peso 600, com as duas barrinhas turquesa antes;
+  - título de card: 16 px, peso 700;
+  - rótulos e "ver mais": 12–13 px em caixa alta;
+  - menu: caixa alta, 13 px, peso 600.
+  - O h1 das páginas internas fica em 28 px, peso 600, e o título do destaque em até 42 px, peso 700.
+- **Verificação:** axe (WCAG 2.1 AA), com e sem alto contraste, sem violações na home e em Notícias.

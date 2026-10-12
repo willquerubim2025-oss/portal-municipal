@@ -16,8 +16,16 @@
   --v-sombra-alta: 0 4px 8px color-mix(in srgb, var(--cor-primaria) 12%, transparent), 0 18px 36px color-mix(in srgb, var(--cor-primaria) 20%, transparent);
   --v-texto-suave: #4b5b6b;
   --largura: 1200px;
+  /* Margens laterais em telas largas (D-41): destaque, cabeçalho e menu mais largos; conteúdo das seções mais estreito. */
+  --v-margem-destaque: 3cm;
+  --v-margem-secoes: 6cm;
 }
-.vitrine body { font-family: var(--v-fonte-texto); }
+.vitrine body { font-family: var(--v-fonte-texto); font-size: 1rem; }
+/* Escala de títulos do portal da Prefeitura (medida em 12/10/2026, D-41): títulos de seção de 20px/600,
+   títulos de card de 16px/700 e rótulos de 12px em caixa alta. O h1 das páginas internas fica um passo acima. */
+.vitrine h1 { font-size: var(--v-h1, 1.75rem); font-weight: 600; }
+.vitrine h2 { font-size: var(--v-h2, 1.25rem); font-weight: 600; }
+.vitrine h3 { font-size: var(--v-h3, 1rem); font-weight: 700; }
 .vitrine h1, .vitrine h2, .vitrine h3, .vitrine h4,
 .vitrine .marca-nome, .vitrine .menu-lista a, .vitrine .menu-lista .menu-grupo, .vitrine .v-botao, .vitrine .v-rotulo { font-family: var(--v-fonte-titulos); }
 .vitrine h1, .vitrine h2, .vitrine h3 { text-wrap: balance; color: var(--cor-primaria); }
@@ -27,23 +35,45 @@
 .v-miolo { width: min(100% - 2rem, var(--largura)); margin-inline: auto; }
 .v-rotulo { font-weight: 700; font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--v-secundaria-escura); margin: 0 0 .75rem; }
 
-/* ---------------------------------------------------- barra do ente e cabeçalho */
-.v-barra-ente { background: var(--cor-primaria); color: #fff; font-size: .875rem; }
-.v-barra-ente .v-miolo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .25rem 1.5rem; padding-block: .4rem; }
-.v-barra-ente a { color: #fff; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: .35rem; }
-.v-barra-ente a:hover, .v-barra-ente a:focus { text-decoration: underline; }
-.v-barra-ente svg { width: 1em; height: 1em; }
-
+/* ---------------------------------------------------- cabeçalho único (D-41) */
+/* Atalhos do eMAG: ocultos até receberem foco (Tab ou accesskey); aí aparecem no topo da página. */
+.vitrine .v-pular { position: absolute; top: 0; left: 0; right: 0; z-index: 50; background: var(--cor-primaria); border: 0;
+  clip-path: inset(50%); height: 1px; overflow: hidden; }
+.vitrine .v-pular:focus-within { clip-path: none; height: auto; overflow: visible; }
+.vitrine .v-pular a { color: #fff; font-weight: 600; }
+.vitrine .v-pular .atalhos span { border-color: rgb(255 255 255 / .6); }
 .vitrine .cabecalho { background: #fff; color: var(--cor-primaria); }
-.vitrine .marca { color: var(--cor-primaria); gap: .9rem; }
-.vitrine .marca img { width: 68px; height: 70px; }
-.vitrine .marca-tipo { font-size: .85rem; color: var(--v-texto-suave); opacity: 1; letter-spacing: .02em; }
-.vitrine .marca-nome { font-size: clamp(1.15rem, 1rem + .6vw, 1.45rem); font-weight: 800; line-height: 1.15; max-width: 22ch; }
-.vitrine .busca input { border: 2px solid #d8e0e8; border-right: 0; border-radius: 999px 0 0 999px; padding-left: 1.1rem; }
+.vitrine .cabecalho-linha { flex-wrap: nowrap; gap: .75rem 1.5rem; padding-block: .7rem; }
+.vitrine .marca { color: var(--cor-primaria); gap: .85rem; flex: none; }
+.vitrine .marca img { width: 66px; height: 66px; }
+.vitrine .marca-tipo { font-size: .8rem; color: var(--v-texto-suave); opacity: 1; letter-spacing: .02em; }
+.vitrine .marca-nome { font-size: clamp(1.05rem, .95rem + .45vw, 1.3rem); font-weight: 700; line-height: 1.15; max-width: 22ch; }
+.vitrine .busca { margin-left: auto; flex: 1 1 260px; max-width: 400px; }
+.vitrine .busca input { border: 2px solid #d8e0e8; border-right: 0; border-radius: 999px 0 0 999px; padding: .5rem 1rem; }
 .vitrine .busca input:focus { border-color: var(--cor-secundaria); }
-.vitrine .busca button { border-radius: 0 999px 999px 0; background: var(--cor-primaria); color: #fff; padding-inline: 1.2rem; }
+.vitrine .busca button { border-radius: 0 999px 999px 0; background: var(--cor-primaria); color: #fff; padding: .5rem 1.1rem; }
+.v-cabecalho-acoes { flex: none; display: flex; align-items: center; gap: .9rem; }
+.v-ferramentas { list-style: none; display: flex; gap: .3rem; margin: 0; padding: 0; }
+.v-ferramentas .v-ferramenta { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; border: 1px solid #d3dede;
+  background: #fff; color: var(--cor-primaria); font: 600 .8rem/1 var(--v-fonte-titulos); cursor: pointer; text-decoration: none; transition: background .2s, color .2s; }
+.v-ferramentas .v-ferramenta:hover, .v-ferramentas .v-ferramenta:focus-visible { background: var(--v-faixa-neutra, #eef4f4); }
+.v-ferramentas .v-ferramenta[aria-pressed="true"] { background: var(--cor-primaria); color: #fff; }
+.v-ferramenta .simbolo-acessibilidade { width: 20px; height: 20px; }
+.v-link-prefeitura { display: inline-flex; align-items: center; gap: .4rem; padding: .45rem .9rem; border-radius: 999px; background: var(--cor-primaria);
+  color: #fff; font: 600 .8rem/1.2 var(--v-fonte-titulos); text-decoration: none; white-space: nowrap; }
+.v-link-prefeitura:hover, .v-link-prefeitura:focus-visible { background: var(--v-secundaria-escura); }
+.v-link-prefeitura svg { width: 1em; height: 1em; }
+@media (max-width: 1100px) { .v-link-prefeitura span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } .v-link-prefeitura { padding: .55rem; } }
+@media (max-width: 800px) {
+  .vitrine .cabecalho-linha { flex-wrap: wrap; }
+  .vitrine .marca img { width: 50px; height: 50px; }
+  .v-cabecalho-acoes { order: 2; margin-left: auto; gap: .5rem; }
+  .vitrine .busca { order: 3; flex-basis: 100%; max-width: none; margin-left: 0; }
+}
+@media (max-width: 480px) { .v-ferramentas li:nth-child(3) { display: none; } .v-ferramentas .v-ferramenta { width: 2rem; height: 2rem; } }
+
 .vitrine .menu-principal { background: var(--cor-primaria); border-top: 4px solid var(--cor-secundaria); }
-.vitrine .menu-lista a, .vitrine .menu-lista .menu-grupo { font-weight: 600; font-size: .95rem; }
+.vitrine .menu-lista a, .vitrine .menu-lista .menu-grupo { font-weight: 600; font-size: .8125rem; letter-spacing: .03em; text-transform: uppercase; }
 .vitrine .menu-lista a:hover, .vitrine .menu-lista a:focus, .vitrine .menu-lista a[aria-current="page"] { background: rgb(255 255 255 / .12); text-decoration: none; box-shadow: inset 0 -3px 0 var(--cor-secundaria); }
 .vitrine .menu-movel > summary { color: #fff; }
 
@@ -56,7 +86,7 @@
 .v-botao-acento { --b: var(--v-acento); color: var(--cor-primaria); }
 .v-botao-contorno { background: transparent; color: var(--cor-primaria); }
 .v-botao-contorno:hover { background: var(--cor-primaria); color: #fff; }
-.v-link-seta { font-weight: 700; color: var(--v-secundaria-escura); text-decoration: none; }
+.v-link-seta { font-family: var(--v-fonte-titulos); font-weight: 600; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--v-secundaria-escura); text-decoration: none; }
 .v-link-seta::after { content: " →"; display: inline-block; transition: transform .2s; }
 .v-link-seta:hover::after { transform: translateX(3px); }
 .v-link-seta:hover { text-decoration: underline; }
@@ -69,7 +99,7 @@
 .v-slide::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, color-mix(in srgb, var(--cor-primaria) 92%, transparent) 0%, color-mix(in srgb, var(--cor-primaria) 70%, transparent) 45%, transparent 85%), linear-gradient(0deg, color-mix(in srgb, var(--cor-primaria) 60%, transparent), transparent 50%); }
 .v-slide-vazio::after { background: radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--cor-secundaria) 55%, transparent) 0 22%, transparent 23%), radial-gradient(circle at 70% 95%, color-mix(in srgb, var(--v-acento) 85%, transparent) 0 14%, transparent 15%); }
 .v-slide-texto { display: grid; gap: 1rem; padding-block: 3rem 4.5rem; justify-items: start; }
-.v-slide-texto h2 { color: #fff; margin: 0; font-weight: 800; font-size: clamp(1.8rem, 1.2rem + 2.6vw, 3.1rem); max-width: 20ch; line-height: 1.1; }
+.v-slide-texto h2 { color: #fff; margin: 0; font-weight: 700; font-size: clamp(1.6rem, 1.1rem + 2vw, 2.6rem); max-width: 22ch; line-height: 1.15; }
 .v-slide-texto p { margin: 0; max-width: 52ch; font-size: 1.125rem; color: #e8f1f1; }
 .v-carrossel-controles { position: absolute; inset: auto 0 1.1rem; display: flex; align-items: center; gap: 1rem; z-index: 2; }
 .v-carrossel-pontos { display: flex; gap: .5rem; }
@@ -106,7 +136,8 @@
 .v-tom-2 { background: var(--v-tom-2, var(--v-tom-0)); } .v-tom-3 { background: var(--v-tom-3, var(--v-tom-0)); }
 .v-tom-4 { background: var(--v-tom-4, var(--v-tom-0)); } .v-tom-5 { background: var(--v-tom-5, var(--v-tom-0)); }
 .v-secao-titulo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .5rem 1.5rem; margin-bottom: 1.5rem; }
-.v-secao-titulo h2 { margin: 0; font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); font-weight: 800; }
+.v-secao-titulo h2 { margin: 0; font-size: var(--v-h2, 1.25rem); font-weight: 600; display: flex; align-items: center; gap: .6rem; }
+.v-secao-titulo h2::before { content: ""; width: 4px; height: 1.1em; border-radius: 2px; background: var(--cor-secundaria); box-shadow: 7px 0 0 var(--cor-secundaria); margin-right: 7px; }
 
 /* ---------------------------------------------------- notícias */
 .v-noticias { display: grid; gap: 1.25rem; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); align-items: start; }
@@ -117,8 +148,8 @@
 .v-noticia-manchete img { aspect-ratio: 16 / 9; }
 .v-noticia-texto { padding: 1rem 1.25rem 1.25rem; display: grid; gap: .35rem; min-width: 0; }
 .v-noticia time { font-size: .85rem; color: var(--v-texto-suave); }
-.v-noticia h3 { margin: 0; font-size: 1.05rem; line-height: 1.3; }
-.v-noticia-manchete h3 { font-size: clamp(1.25rem, 1.05rem + .8vw, 1.6rem); }
+.v-noticia h3 { margin: 0; font-size: var(--v-h3, 1rem); font-weight: 700; line-height: 1.4; }
+.v-noticia-manchete h3 { font-size: var(--v-h2, 1.25rem); font-weight: 600; }
 .v-noticia h3 a { color: var(--cor-primaria); text-decoration: none; }
 .v-noticia h3 a::after { content: ""; position: absolute; inset: 0; }   /* card inteiro clicável */
 .v-noticia h3 a:hover { text-decoration: underline; }
@@ -136,7 +167,7 @@ a.v-servico:hover, a.v-servico:focus-visible { transform: translateY(-6px); box-
 .v-servico-icone { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; background: var(--claro); color: var(--forte); transition: transform .3s ease, background .25s ease, color .25s ease; }
 .v-servico-icone svg { width: 28px; height: 28px; }
 a.v-servico:hover .v-servico-icone, a.v-servico:focus-visible .v-servico-icone { transform: rotate(-6deg) scale(1.06); background: var(--forte); color: #fff; }
-.v-servico h3 { margin: 0; font-size: 1.15rem; color: var(--cor-primaria); }
+.v-servico h3 { margin: 0; font-size: var(--v-h3, 1rem); font-weight: 700; color: var(--cor-primaria); }
 .v-servico p { margin: 0; color: var(--v-texto-suave); font-size: .98rem; }
 .v-servico-ir { font-family: var(--v-fonte-titulos); font-weight: 700; font-size: .9rem; color: var(--forte); display: inline-flex; align-items: center; gap: .35rem; }
 .v-servico-ir svg { width: 1em; height: 1em; transition: transform .2s; }
@@ -153,7 +184,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 /* ---------------------------------------------------- agenda e atalhos */
 .v-agenda { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); }
 .v-agenda li { display: flex; gap: 1rem; background: #fff; border-radius: var(--v-raio); padding: 1rem; box-shadow: var(--v-sombra); }
-.v-agenda h3 { margin: 0 0 .2rem; font-size: 1.05rem; }
+.v-agenda h3 { margin: 0 0 .2rem; }
 .v-agenda-data { flex: none; width: 4rem; text-align: center; background: var(--cor-primaria); color: #fff; border-radius: 12px; padding: .45rem 0; line-height: 1.1; text-transform: uppercase; font-size: .8rem; font-family: var(--v-fonte-titulos); }
 .v-agenda-data strong { display: block; font-size: 1.6rem; }
 .v-atalhos { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
@@ -187,7 +218,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .v-busca-escola input:focus { border-color: var(--cor-secundaria); outline: none; }
 .v-escolas { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
 .v-escola { background: #fff; border: 1px solid #d8e0e8; border-radius: var(--v-raio); padding: 1.2rem; display: grid; gap: .4rem; }
-.v-escola h2 { margin: 0; font-size: 1.15rem; }
+.v-escola h2 { margin: 0; font-size: 1.05rem; font-weight: 700; }
 .v-escola p { margin: 0; }
 .v-escola-supervisor { margin-top: .5rem; padding: .8rem 1rem; border-radius: 10px; background: var(--v-tom-0); }
 
@@ -201,10 +232,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
   .v-noticias { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {
-  .v-barra-ente span { display: none; }
-  .v-barra-ente .v-miolo { justify-content: flex-end; }
   .v-noticia-pequena { grid-template-columns: 110px minmax(0, 1fr); }
-  .vitrine .marca img { width: 54px; height: 56px; }
   .v-slide-texto { padding-block: 2.5rem 4.5rem; }
 }
 
@@ -223,7 +251,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .vitrine .cartao-titulo a { color: var(--cor-primaria); }
 .vitrine .cartao-corpo > p:last-child:not(.cartao-meta) { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden; }
 .vitrine .submenu { border: 0; border-top: 3px solid var(--cor-secundaria); border-radius: 0 0 10px 10px; box-shadow: var(--v-sombra-alta); padding: .4rem 0; }
-.vitrine .submenu a { font-family: var(--v-fonte-texto); font-weight: 600; font-size: 1rem; color: var(--cor-primaria); }
+.vitrine .submenu a { font-family: var(--v-fonte-texto); font-weight: 500; font-size: .95rem; letter-spacing: normal; text-transform: none; color: var(--cor-primaria); }
 .vitrine .submenu a:hover, .vitrine .submenu a:focus { background: var(--v-tom-0); box-shadow: inset 4px 0 0 var(--cor-secundaria); }
 @media (max-width: 800px) {
   .vitrine .submenu { border-top: 0; box-shadow: none; }
@@ -232,7 +260,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 }
 
 /* ---------------------------------------------------- alto contraste e movimento */
-:root.contraste.vitrine .cabecalho, :root.contraste.vitrine .v-barra-ente, :root.contraste.vitrine .v-secao,
+:root.contraste.vitrine .cabecalho, :root.contraste.vitrine .v-ferramenta, :root.contraste.vitrine .v-link-prefeitura, :root.contraste.vitrine .v-secao,
 :root.contraste.vitrine .v-destaque, :root.contraste.vitrine .v-noticia, :root.contraste.vitrine .v-servico,
 :root.contraste.vitrine .v-pessoa, :root.contraste.vitrine .v-agenda li, :root.contraste.vitrine .v-escola,
 :root.contraste.vitrine .migalhas, :root.contraste.vitrine .cabecalho-pagina, :root.contraste.vitrine .cartao, :root.contraste.vitrine .submenu { background: #000; color: #fff; border-color: #fff; }
@@ -241,7 +269,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 :root.contraste.vitrine .v-slide::after, :root.contraste.vitrine .v-slide-imagem { display: none; }
 :root.contraste.vitrine .marca-tipo, :root.contraste.vitrine .v-noticia time, :root.contraste.vitrine .v-noticia p,
 :root.contraste.vitrine .v-servico p, :root.contraste.vitrine .v-pessoa-cargo, :root.contraste.vitrine .meta,
-:root.contraste.vitrine .v-slide-texto p, :root.contraste.vitrine .v-barra-ente span { color: #fff; }
+:root.contraste.vitrine .v-slide-texto p { color: #fff; }
 :root.contraste.vitrine a, :root.contraste.vitrine .v-link-seta, :root.contraste.vitrine .v-servico-ir,
 :root.contraste.vitrine .v-rotulo { color: #ff0; }
 :root.contraste.vitrine .busca button, :root.contraste.vitrine .v-carrossel-pausa { background: #ff0; color: #000; border-color: #ff0; }
@@ -249,8 +277,29 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 :root.contraste.vitrine .v-agenda-data { background: #000; color: #ff0; border: 1px solid #ff0; box-shadow: none; }
 :root.contraste.vitrine .menu-principal, :root.contraste.vitrine .rodape, :root.contraste.vitrine .rodape-base { background: #000; }
 :root.contraste.vitrine .v-botao, :root.contraste.vitrine .v-aviso { background: #ff0; color: #000; border-color: #ff0; }
+:root.contraste.vitrine .v-aviso a, :root.contraste.vitrine .v-aviso-fechar { color: #000; }
+:root.contraste.vitrine .v-ferramentas .v-ferramenta { background: #000; color: #fff; border-color: #fff; }
+:root.contraste.vitrine .v-ferramentas .v-ferramenta[aria-pressed="true"] { background: #ff0; color: #000; }
+:root.contraste.vitrine .v-link-prefeitura { background: #000; color: #ff0; border: 1px solid #ff0; }
 @media (prefers-reduced-motion: reduce) {
   .v-slide, .v-slide-ativo { transition: none; }
   .vitrine .cartao { transition: none; }
 }
 :root.contraste.vitrine .migalhas, :root.contraste.vitrine .cabecalho-pagina { box-shadow: 0 0 0 100vmax #000; }
+
+/* ---------------------------------------------------- larguras (D-41) */
+/* Telas largas: destaque com cantos arredondados e margem lateral (padrão 3 cm); cabeçalho, menu e aviso
+   alinhados a ele; conteúdo das seções e do rodapé mais estreito (padrão 6 cm). Os fundos das seções
+   continuam de ponta a ponta. Abaixo de 1100 px as margens diminuem para não espremer o conteúdo. */
+@media (min-width: 1100px) {
+  .vitrine .cabecalho .container, .vitrine .menu-principal .container, .vitrine .v-avisos .v-miolo, .vitrine .v-destaque {
+    width: calc(100% - 2 * var(--v-margem-destaque)); max-width: none; }
+  .vitrine .v-destaque { margin: 1.25rem auto 0; border-radius: var(--v-raio); }
+  .vitrine .v-secao > .v-miolo, .vitrine main > .container, .vitrine .migalhas.container, .vitrine .rodape .container {
+    width: calc(100% - 2 * var(--v-margem-secoes)); max-width: none; }
+}
+@media (min-width: 800px) and (max-width: 1099.98px) {
+  .vitrine .v-destaque { width: calc(100% - 3rem); margin: 1rem auto 0; border-radius: var(--v-raio); }
+  .vitrine .v-secao > .v-miolo, .vitrine main > .container, .vitrine .migalhas.container, .vitrine .rodape .container { width: calc(100% - 6rem); max-width: none; }
+}
+.vitrine .v-destaque .v-miolo { width: calc(100% - 2 * clamp(1rem, 4vw, 3.5rem)); }

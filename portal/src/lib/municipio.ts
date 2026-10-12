@@ -20,10 +20,13 @@ export interface Tema {
   /** Famílias auto-hospedadas pelo portal (FONTES_DISPONIVEIS); outra família cai na fonte do sistema. */
   fonte_titulos?: string;
   fonte_texto?: string;
+  /** Layout vitrine em telas largas: margem lateral do destaque e do conteúdo das seções (ex.: '3cm', '6cm', '120px'). */
+  margem_destaque?: string;
+  margem_secoes?: string;
 }
 
 /** Fontes empacotadas no portal (@fontsource): sem chamada a terceiros (LGPD, D-17). */
-export const FONTES_DISPONIVEIS = ['Montserrat', 'Source Sans 3'] as const;
+export const FONTES_DISPONIVEIS = ['Montserrat', 'Source Sans 3', 'Prompt'] as const;
 
 /** Blocos da página inicial no layout vitrine, na ordem em que aparecem. */
 export type BlocoHome = 'destaque' | 'noticias' | 'servicos' | 'agenda' | 'equipe' | 'atalhos';

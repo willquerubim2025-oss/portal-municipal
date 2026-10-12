@@ -139,7 +139,8 @@ Tipos em `portal/src/lib/municipio.ts`.
   "cor_secundaria_escura": "#127882",                    // botões/links com texto branco (≥ 4,5:1)
   "cor_acento": "#f5b700",                               // botão do destaque, faixa de aviso (texto em cor_primaria)
   "cores_vivas": [ { "nome": "turquesa", "forte": "#127882", "claro": "#e6f6f7" }, ... ],  // até 6; forte aceita texto branco, claro é fundo de seção
-  "fonte_titulos": "Montserrat", "fonte_texto": "Source Sans 3",   // só as auto-hospedadas (FONTES_DISPONIVEIS); outra cai na fonte do sistema
+  "fonte_titulos": "Prompt", "fonte_texto": "Prompt",   // só as auto-hospedadas (FONTES_DISPONIVEIS: Montserrat, Source Sans 3, Prompt); outra cai na fonte do sistema
+  "margem_destaque": "3cm", "margem_secoes": "6cm",   // telas a partir de 1100 px: margem lateral do destaque/cabeçalho e do conteúdo das seções (cm, rem ou px)
   "brasao_url": "https://..." }                          // alternativa a brasao_path (este tem preferência)
 // config (além dos campos acima)
 { "marca": { "linha1": "Prefeitura de Paulínia", "linha2": "Secretaria Municipal de Educação" },  // padrão: "Prefeitura de" + nome curto
