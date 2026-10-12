@@ -272,3 +272,20 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **Corrigido:** `registrar_auditoria()` e `interno.marcar_cache_pendente()` impediam excluir uma organização (gravavam linhas apagadas em cascata com FK para a organização já excluída).
 - **Testes:** 164 verificações, 0 falhas.
 
+**D-39 · 12/10/2026 · O Portal Educação Paulínia é uma configuração deste portal (tema ampliado), não um site à parte**
+- **Decisão:** o portal da SMEDU usa o mesmo portal Astro (`portal/`). As exigências de layout dele viram componentes e opções **genéricos** do tema ampliado (D-17), configuráveis por organização em `municipios.tema` e `municipios.config`:
+  - seções de largura total com fundos alternados;
+  - destaque (hero) em carrossel com cerca de metade da altura da tela;
+  - avisos em faixa e em modal, uma vez por visitante (campos da 0020);
+  - cards de serviço vivos com "em breve";
+  - equipe gestora;
+  - busca do supervisor por escola.
+- **Motivo:** "configuração, não código" (D-10). O portal já resolve SEO, acessibilidade, cache, imagens e 301, e a meta de vários portais públicos exige que cada novo portal saia de dados.
+- **Alternativa descartada:** um site React + Vite separado para a SMEDU. Duplicaria o que o portal resolve, seria SPA (vetado em D-16) e não se replicaria.
+- **Identidade da SMEDU (proposta em aprovação):**
+  - estrutura nas cores do site da Prefeitura de Paulínia (marinho `#113567`, turquesa `#24a9b3`, azul `#325497`, azul-céu `#2996cc`, fonte Montserrat);
+  - quatro cores vivas da Educação (amarelo `#f5b700`, coral `#e8604c`/`#c2412d`, verde `#2e9e5b`/`#1e7a44`, lilás `#7356c4`);
+  - textos em Source Sans 3;
+  - contrastes medidos pelo eMAG/WCAG.
+  - Amostra: `docs/design/sistema-visual.html` no repositório `Portais-Publicos`.
+
