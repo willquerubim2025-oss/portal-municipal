@@ -8,7 +8,8 @@ const { servicos, titulo, cores } = Astro.props;
 <div class="v-secao-titulo"><h2 id="titulo-servicos">{titulo}</h2></div>
 <ul class="v-servicos">
   {servicos.map((s, i) => {
-    const cor = `v-cor-${cores ? i % cores : 0}`;
+    // A cor 0 é a do fundo da seção: os cards usam as demais, para se destacarem dele (D-51).
+    const cor = `v-cor-${cores > 1 ? 1 + (i % (cores - 1)) : 0}`;
     return (
       <li>
         {s.href ? (

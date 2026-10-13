@@ -386,3 +386,10 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - Notícias: "Ver todas as notícias →";
   - Serviços: "Ver todos os serviços →";
   - Agenda: "Ver a agenda completa →".
+
+**D-51 · 13/10/2026 · Cards de Serviços com fundo colorido claro, menores e mais espaçados (a pedido do usuário)**
+- **Fundo:** cada card usa o tom **claro** da sua cor viva, com borda da cor forte a 25%. O ícone fica num quadrado branco.
+- **Cores:** os cards pulam a cor 0, que é a do fundo da seção, e alternam entre as demais (na SMEDU: salmão, coral e verde).
+- **"Em breve":** o mesmo tom, mais lavado, com borda tracejada.
+- **Tamanho e espaçamento:** cards menores (largura mínima de 250 px, padding e fontes reduzidos, ícone de 46 px), com espaço de 1,75 a 2 rem entre eles. A grade fica limitada a 1000 px de largura.
+- **Verificação:** axe sem violações, com e sem alto contraste.
