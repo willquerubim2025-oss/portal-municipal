@@ -289,6 +289,60 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .v-pessoa-grande .v-pessoa-cargo { font-family: var(--v-fonte-titulos); font-size: .75rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--v-secundaria-escura); }
 @media (prefers-reduced-motion: reduce) { .v-pessoa { transition: none; } .v-pessoa:hover { transform: none; } }
 
+/* Eventos: calendário + painel do evento (D-53). Fundo cinza médio de ponta a ponta. */
+.v-fundo-cinza { background: var(--v-fundo-eventos, #dde3e2); }
+.v-cal { position: relative; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 1.5rem; align-items: stretch; }
+.v-cal-calendario, .v-cal-painel { background: #fff; border-radius: 20px; box-shadow: var(--v-sombra); }
+.v-cal-calendario { padding: 1.25rem 1.4rem 1rem; display: grid; align-content: start; gap: .75rem; }
+.v-cal-topo { display: flex; align-items: center; gap: .5rem; }
+.v-cal-mes { flex: 1; margin: 0; text-align: center; font-family: var(--v-fonte-titulos); font-weight: 600; font-size: 1.1rem; color: var(--cor-primaria); text-transform: capitalize; }
+.v-cal-nav { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--cor-primaria) 25%, transparent); background: #fff; color: var(--cor-primaria); cursor: pointer; }
+.v-cal-nav svg { width: 18px; height: 18px; }
+.v-cal-nav:hover:not(:disabled), .v-cal-nav:focus-visible { background: var(--v-regua, #d5ede6); }
+.v-cal-nav:disabled { opacity: .35; cursor: default; }
+.v-cal-hoje { font: 600 .8rem/1 var(--v-fonte-titulos); padding: .55rem .9rem; border-radius: 999px; border: 0; background: var(--cor-primaria); color: #fff; cursor: pointer; }
+.v-cal-grade { display: grid; grid-template-columns: repeat(7, 1fr); gap: .3rem; }
+.v-cal-semana { text-align: center; font: 600 .75rem/2 var(--v-fonte-titulos); color: var(--v-secundaria-escura); text-decoration: none; border-bottom: 1px solid #e3e9e9; }
+.v-cal-dias { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(7, 1fr); gap: .3rem; }
+.v-cal-dia { display: grid; place-items: center; aspect-ratio: 1; max-width: 3rem; width: 100%; margin-inline: auto; border-radius: 50%; font-size: .92rem; color: var(--cor-texto); text-decoration: none; position: relative; }
+.v-cal-dia[aria-current="date"] { box-shadow: inset 0 0 0 2px var(--cor-secundaria); font-weight: 700; }
+.v-cal-tem { background: var(--v-regua, #d5ede6); color: var(--cor-primaria); font-weight: 700; transition: background .2s, color .2s, transform .2s; }
+.v-cal-tem::after { content: ""; position: absolute; bottom: 14%; width: 5px; height: 5px; border-radius: 50%; background: var(--v-acento); }
+.v-cal-tem:hover, .v-cal-tem:focus-visible { background: var(--cor-secundaria); color: #fff; transform: scale(1.08); }
+.v-cal-tem.v-cal-escolhido { background: var(--cor-primaria); color: #fff; }
+.v-cal-legenda { margin: .25rem 0 0; font-size: .8rem; color: var(--v-texto-suave); display: flex; align-items: center; gap: .45rem; }
+.v-cal-marca { width: 14px; height: 14px; border-radius: 50%; background: var(--v-regua, #d5ede6); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cor-primaria) 20%, transparent); flex: none; }
+.v-cal-painel { overflow: hidden; display: grid; }
+.v-cal-evento { display: grid; grid-template-rows: auto 1fr; height: 100%; }
+.v-cal-entrando { animation: v-cal-entra .35s ease; }
+@keyframes v-cal-entra { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+.v-cal-encarte { position: relative; height: clamp(200px, 20vw, 270px); background: var(--v-faixa-neutra); }
+.v-cal-encarte img { width: 100%; height: 100%; object-fit: cover; }
+.v-cal-encarte-vazio { display: grid; place-content: center; text-align: center; height: 100%; color: #fff; font: 600 1.1rem/1.1 var(--v-fonte-titulos); text-transform: uppercase;
+  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria)); }
+.v-cal-encarte-vazio strong { font-size: 4rem; }
+.v-cal-selo { position: absolute; left: 1rem; top: 1rem; display: grid; text-align: center; min-width: 3.6rem; padding: .35rem .5rem; border-radius: 14px; background: #fff; color: var(--cor-primaria);
+  font: 600 .72rem/1.1 var(--v-fonte-titulos); text-transform: uppercase; box-shadow: var(--v-sombra); }
+.v-cal-selo strong { font-size: 1.5rem; }
+.v-cal-info { display: grid; align-content: start; justify-items: start; gap: .6rem; padding: 1.25rem 1.5rem 1.5rem; }
+.v-cal-info h3 { margin: 0; font-size: 1.2rem; font-weight: 600; }
+.v-cal-info p { margin: 0; color: var(--v-texto-suave); font-size: .92rem; }
+.v-cal-dados { list-style: none; margin: 0; padding: 0; display: grid; gap: .2rem; font-size: .88rem; color: var(--cor-texto); }
+.v-cal-dados li:first-child { font-weight: 600; color: var(--v-secundaria-escura); }
+.v-cal-dados li:first-child::first-letter { text-transform: uppercase; }
+.v-cal-nada { margin: auto; padding: 2rem; color: var(--v-texto-suave); }
+.v-cal-dica { position: absolute; z-index: 5; display: grid; gap: .15rem; max-width: 260px; padding: .55rem .8rem; border-radius: 12px; background: var(--cor-primaria); color: #fff;
+  font-size: .82rem; line-height: 1.35; box-shadow: var(--v-sombra-alta); pointer-events: none; }
+.v-cal-dica strong { font-family: var(--v-fonte-titulos); font-weight: 600; font-size: .88rem; }
+.v-cal-dica span { opacity: .9; }
+.v-cal-dica[hidden] { display: none; }
+@media (max-width: 900px) { .v-cal { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .v-cal-entrando { animation: none; } .v-cal-tem { transition: none; } .v-cal-tem:hover { transform: none; } }
+:root.contraste.vitrine .v-cal-calendario, :root.contraste.vitrine .v-cal-painel, :root.contraste.vitrine .v-fundo-cinza { background: #000; color: #fff; border: 1px solid #fff; }
+:root.contraste.vitrine .v-cal-dia, :root.contraste.vitrine .v-cal-legenda, :root.contraste.vitrine .v-cal-info p, :root.contraste.vitrine .v-cal-dados, :root.contraste.vitrine .v-cal-mes, :root.contraste.vitrine .v-cal-dados li:first-child { color: #fff; }
+:root.contraste.vitrine .v-cal-tem { background: #ff0; color: #000; }
+:root.contraste.vitrine .v-cal-nav, :root.contraste.vitrine .v-cal-hoje { background: #000; color: #ff0; border: 1px solid #ff0; }
+
 /* Em foco (D-44): cards grandes, alternando foto em cima e embaixo e com alturas diferentes. */
 .v-fundo-foco { background: linear-gradient(180deg, #fff 0, var(--v-faixa-neutra) 100%); }
 .v-foco { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.5rem; }

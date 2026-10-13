@@ -406,3 +406,16 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Sem `cores_cards`, os cards voltam às cores vivas do tema (D-51).
 - **Tamanho e espaçamento:** cards ainda menores (largura mínima de 220 px, grade de até 860 px, ícone de 42 px, título de 15 px, texto de 13,6 px) e mais espaçados (2,25 a 2,5 rem).
 - **Verificação:** axe sem violações no computador, no celular e em alto contraste.
+
+**D-53 · 13/10/2026 · Bloco "Eventos": calendário e painel do evento (a pedido do usuário, inspirado no portal de Sumaré)**
+- **Bloco novo `calendario`** (título padrão "Eventos"), depois de Serviços. A seção tem fundo cinza médio (`#dde3e2`) de ponta a ponta e fica fora da alternância de fundos.
+- **Calendário à esquerda:** mês com navegação (anterior, seguinte e "Hoje"), limitado aos meses carregados, do mês anterior ao atual até 3 meses à frente. Os dias com evento ficam marcados em verde-água com um ponto salmão, e o dia de hoje tem um contorno turquesa. Mouse ou foco num dia com evento mostram uma caixinha com nome, horário e local. O clique abre o evento no painel.
+- **Painel à direita:** encarte ou foto do evento (`eventos.imagem_id`) com selo de data, título, quando, horário, local, quem realiza (`eventos.orgao_id`), resumo e o botão "Ver detalhes do evento". Sem imagem, aparece um bloco em degradê com a data grande. Ao abrir a página, o painel mostra o próximo evento.
+- **Sem JavaScript:** cada dia com evento é um link para a página do evento.
+- **Acessibilidade:**
+  - o nome acessível de cada dia inclui a data e os eventos;
+  - a caixinha é `role="tooltip"` ligada por `aria-describedby` e fecha com Esc;
+  - o painel é `aria-live="polite"`;
+  - "reduzir movimento" desliga as animações.
+- **Dados:** consulta `eventosCalendario` (eventos publicados no intervalo, pela RLS) e fuso America/Sao_Paulo. O bloco "agenda" (lista) continua disponível; na SMEDU, foi substituído pelo calendário.
+- **Homologação:** 7 eventos. Só a prova do Vestibulinho (18/10) é real; os outros 6, e os 4 órgãos que aparecem como realizadores, são fictícios (`legado.ficticio = true`).

@@ -1,0 +1,176 @@
+---
+// Bloco "Eventos" (vitrine, D-53): calendário à esquerda e painel do evento à direita.
+//  - dias com evento ficam marcados; mouse ou foco no dia mostram uma caixinha com o nome do evento;
+//  - clique no dia abre o evento no painel (encarte/foto, data, horário, local, quem realiza e resumo);
+//  - sem JavaScript, o dia é um link para a página do evento e o painel mostra o próximo evento.
+// Datas sempre no fuso de São Paulo. O calendário recebe os eventos do mês anterior aos próximos 3 meses.
+import { urlImagem } from '../../lib/imagens';
+interface Props { eventos: any[]; titulo: string }
+const { eventos, titulo } = Astro.props;
+const FUSO = 'America/Sao_Paulo';
+const diaISO = (d: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: FUSO, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+const hora = (d: Date) => new Intl.DateTimeFormat('pt-BR', { timeZone: FUSO, hour: '2-digit', minute: '2-digit' }).format(d);
+const dataLonga = (d: Date) => new Intl.DateTimeFormat('pt-BR', { timeZone: FUSO, weekday: 'long', day: 'numeric', month: 'long' }).format(d);
+
+// Eventos já no formato do painel (o mesmo JSON alimenta o script).
+const lista = eventos.map((e) => {
+  const ini = new Date(e.inicio_em); const fim = e.fim_em ? new Date(e.fim_em) : ini;
+  const dias: string[] = [];
+  for (let d = new Date(ini); diaISO(d) <= diaISO(fim) && dias.length < 62; d = new Date(d.getTime() + 86400000)) dias.push(diaISO(d));
+  if (!dias.includes(diaISO(fim))) dias.push(diaISO(fim));
+  const varios = dias.length > 1;
+  return {
+    titulo: e.titulo as string, href: `/eventos/${e.slug}`, resumo: e.resumo as string | null, local: e.local as string | null,
+    realizacao: e.orgao?.nome as string | undefined, dias,
+    quando: varios ? `De ${dataLonga(ini)} a ${dataLonga(fim)}` : dataLonga(ini),
+    horario: e.dia_inteiro ? 'Dia inteiro' : `${hora(ini)}${e.fim_em && !varios ? ` às ${hora(fim)}` : ''}`,
+    dia: new Intl.DateTimeFormat('pt-BR', { timeZone: FUSO, day: 'numeric' }).format(ini),
+    mes: new Intl.DateTimeFormat('pt-BR', { timeZone: FUSO, month: 'short' }).format(ini).replace('.', ''),
+    imagem: e.imagem ? urlImagem(e.imagem.storage_path, 800) : null, alt: e.imagem?.texto_alternativo ?? '',
+    fimISO: diaISO(fim),
+  };
+});
+const hoje = diaISO(new Date());
+const inicial = lista.find((e) => e.fimISO >= hoje) ?? lista[0];
+const [ano, mes] = hoje.split('-').map(Number);
+const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+const SEMANA = [['D', 'domingo'], ['S', 'segunda'], ['T', 'terça'], ['Q', 'quarta'], ['Q', 'quinta'], ['S', 'sexta'], ['S', 'sábado']];
+// Mês inicial renderizado no servidor (o script redesenha ao navegar).
+const primeiro = new Date(Date.UTC(ano, mes - 1, 1)).getUTCDay();
+const nDias = new Date(Date.UTC(ano, mes, 0)).getUTCDate();
+const iso = (d: number) => `${ano}-${String(mes).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+const doDia = (d: string) => lista.filter((e) => e.dias.includes(d));
+---
+<div class="v-secao-titulo"><h2 id="titulo-calendario">{titulo}</h2></div>
+<div class="v-cal" data-calendario data-hoje={hoje} data-ano={ano} data-mes={mes}>
+  <div class="v-cal-calendario">
+    <div class="v-cal-topo">
+      <button type="button" class="v-cal-nav" data-mes-anterior aria-label="Mês anterior">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+      <p class="v-cal-mes" aria-live="polite"><span data-mes-nome>{MESES[mes - 1]}</span> <span data-ano-nome>{ano}</span></p>
+      <button type="button" class="v-cal-nav" data-mes-seguinte aria-label="Próximo mês">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+      <button type="button" class="v-cal-hoje" data-mes-hoje>Hoje</button>
+    </div>
+    <div class="v-cal-grade" role="group" aria-label="Dias do mês">
+      {SEMANA.map(([l, nome]) => <abbr class="v-cal-semana" title={nome}>{l}</abbr>)}
+      <div class="v-cal-dias" data-dias>
+        {Array.from({ length: primeiro }, () => <span class="v-cal-dia v-cal-vazio" aria-hidden="true"></span>)}
+        {Array.from({ length: nDias }, (_, k) => {
+          const d = iso(k + 1); const evs = doDia(d);
+          return evs.length
+            ? <a class="v-cal-dia v-cal-tem" href={evs[0].href} data-dia={d} aria-current={d === hoje ? 'date' : undefined}
+                aria-label={`${k + 1} de ${MESES[mes - 1]}: ${evs.map((e) => e.titulo).join('; ')}`}>{k + 1}</a>
+            : <span class="v-cal-dia" aria-current={d === hoje ? 'date' : undefined}>{k + 1}</span>;
+        })}
+      </div>
+    </div>
+    <p class="v-cal-legenda"><span class="v-cal-marca" aria-hidden="true"></span> Dias com evento. Passe o mouse para ver o nome; clique para abrir.</p>
+  </div>
+
+  <div class="v-cal-painel" data-painel-evento aria-live="polite">
+    {inicial ? (
+      <article class="v-cal-evento">
+        <div class="v-cal-encarte">
+          {inicial.imagem
+            ? <img src={inicial.imagem} alt={inicial.alt} width="800" height="533" loading="lazy" decoding="async" />
+            : <span class="v-cal-encarte-vazio" aria-hidden="true"><strong>{inicial.dia}</strong>{inicial.mes}</span>}
+          <span class="v-cal-selo" aria-hidden="true"><strong>{inicial.dia}</strong>{inicial.mes}</span>
+        </div>
+        <div class="v-cal-info">
+          <h3>{inicial.titulo}</h3>
+          <ul class="v-cal-dados">
+            <li><span class="sr-only">Quando: </span>{inicial.quando} · {inicial.horario}</li>
+            {inicial.local && <li><span class="sr-only">Local: </span>{inicial.local}</li>}
+            {inicial.realizacao && <li>Realização: {inicial.realizacao}</li>}
+          </ul>
+          {inicial.resumo && <p>{inicial.resumo}</p>}
+          <a class="v-botao" href={inicial.href}>Ver detalhes do evento</a>
+        </div>
+      </article>
+    ) : <p class="v-cal-nada">Nenhum evento programado por enquanto.</p>}
+  </div>
+  <div class="v-cal-dica" role="tooltip" id="v-cal-dica" hidden></div>
+  <script type="application/json" data-eventos set:html={JSON.stringify(lista).replaceAll('<', '\\u003c')} />
+</div>
+
+<script>
+  const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  document.querySelectorAll<HTMLElement>('[data-calendario]').forEach((cal) => {
+    const lista: any[] = JSON.parse(cal.querySelector('[data-eventos]')!.textContent || '[]');
+    const hoje = cal.dataset.hoje!;
+    let ano = Number(cal.dataset.ano), mes = Number(cal.dataset.mes);
+    const diasEl = cal.querySelector<HTMLElement>('[data-dias]')!;
+    const painel = cal.querySelector<HTMLElement>('[data-painel-evento]')!;
+    const dica = cal.querySelector<HTMLElement>('.v-cal-dica')!;
+    const esc = (t: string) => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
+    const doDia = (d: string) => lista.filter((e) => e.dias.includes(d));
+    // Limites da navegação: só os meses que têm dados carregados (do anterior ao atual + 3).
+    const [a0, m0] = hoje.split('-').map(Number);
+    const idx = (a: number, m: number) => a * 12 + m - 1;
+    const min = idx(a0, m0) - 1, max = idx(a0, m0) + 3;
+
+    const desenhar = () => {
+      const primeiro = new Date(Date.UTC(ano, mes - 1, 1)).getUTCDay();
+      const n = new Date(Date.UTC(ano, mes, 0)).getUTCDate();
+      let h = '<span class="v-cal-dia v-cal-vazio" aria-hidden="true"></span>'.repeat(primeiro);
+      for (let k = 1; k <= n; k++) {
+        const d = `${ano}-${String(mes).padStart(2, '0')}-${String(k).padStart(2, '0')}`;
+        const evs = doDia(d); const atual = d === hoje ? ' aria-current="date"' : '';
+        h += evs.length
+          ? `<a class="v-cal-dia v-cal-tem" href="${evs[0].href}" data-dia="${d}"${atual} aria-label="${k} de ${MESES[mes - 1]}: ${esc(evs.map((e) => e.titulo).join('; '))}">${k}</a>`
+          : `<span class="v-cal-dia"${atual}>${k}</span>`;
+      }
+      diasEl.innerHTML = h;
+      cal.querySelector('[data-mes-nome]')!.textContent = MESES[mes - 1];
+      cal.querySelector('[data-ano-nome]')!.textContent = String(ano);
+      cal.querySelector<HTMLButtonElement>('[data-mes-anterior]')!.disabled = idx(ano, mes) <= min;
+      cal.querySelector<HTMLButtonElement>('[data-mes-seguinte]')!.disabled = idx(ano, mes) >= max;
+      ligar();
+    };
+    const mostrar = (e: any, alvo?: HTMLElement) => {
+      cal.querySelectorAll('.v-cal-escolhido').forEach((x) => x.classList.remove('v-cal-escolhido'));
+      alvo?.classList.add('v-cal-escolhido');
+      const encarte = e.imagem ? `<img src="${e.imagem}" alt="${esc(e.alt)}" width="800" height="533" decoding="async">`
+        : `<span class="v-cal-encarte-vazio" aria-hidden="true"><strong>${e.dia}</strong>${e.mes}</span>`;
+      painel.innerHTML = `<article class="v-cal-evento v-cal-entrando">
+        <div class="v-cal-encarte">${encarte}<span class="v-cal-selo" aria-hidden="true"><strong>${e.dia}</strong>${e.mes}</span></div>
+        <div class="v-cal-info"><h3>${esc(e.titulo)}</h3><ul class="v-cal-dados">
+          <li><span class="sr-only">Quando: </span>${esc(e.quando)} · ${esc(e.horario)}</li>
+          ${e.local ? `<li><span class="sr-only">Local: </span>${esc(e.local)}</li>` : ''}
+          ${e.realizacao ? `<li>Realização: ${esc(e.realizacao)}</li>` : ''}</ul>
+          ${e.resumo ? `<p>${esc(e.resumo)}</p>` : ''}
+          <a class="v-botao" href="${e.href}">Ver detalhes do evento</a></div></article>`;
+    };
+    const posicionar = (el: HTMLElement) => {
+      const evs = doDia(el.dataset.dia!);
+      dica.innerHTML = evs.map((e) => `<strong>${esc(e.titulo)}</strong><span>${esc(e.horario)}${e.local ? ' · ' + esc(e.local) : ''}</span>`).join('');
+      dica.hidden = false;
+      const r = el.getBoundingClientRect(), c = cal.getBoundingClientRect();
+      dica.style.left = `${Math.min(r.right - c.left + 8, c.width - dica.offsetWidth - 8)}px`;
+      dica.style.top = `${r.top - c.top}px`;
+      el.setAttribute('aria-describedby', 'v-cal-dica');
+    };
+    const esconder = () => { dica.hidden = true; };
+    function ligar() {
+      diasEl.querySelectorAll<HTMLAnchorElement>('.v-cal-tem').forEach((el) => {
+        el.addEventListener('mouseenter', () => posicionar(el));
+        el.addEventListener('focus', () => posicionar(el));
+        el.addEventListener('mouseleave', esconder);
+        el.addEventListener('blur', esconder);
+        el.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          const evs = doDia(el.dataset.dia!);
+          if (evs.length) mostrar(evs[0], el);
+        });
+      });
+    }
+    cal.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') esconder(); });
+    cal.querySelector('[data-mes-anterior]')!.addEventListener('click', () => { if (idx(ano, mes) > min) { mes--; if (mes < 1) { mes = 12; ano--; } desenhar(); } });
+    cal.querySelector('[data-mes-seguinte]')!.addEventListener('click', () => { if (idx(ano, mes) < max) { mes++; if (mes > 12) { mes = 1; ano++; } desenhar(); } });
+    cal.querySelector('[data-mes-hoje]')!.addEventListener('click', () => { ano = a0; mes = m0; desenhar(); });
+    desenhar();
+  });
+</script>

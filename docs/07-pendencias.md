@@ -32,6 +32,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
     - 10 pessoas na `equipe` (resumo começa com "FICTÍCIO");
     - as fotos `carga/ficticio-*.jpg` (midias com `legado.ficticio = true`);
     - as imagens de banco `carga/foco-*.jpg` (Unsplash).
+    - 6 eventos e 4 órgãos fictícios do calendário (`legado.ficticio = true`). Só a prova do Vestibulinho, em 18/10, é real.
     William vai enviar o material real (equipe, fotos e textos). A página "Bolsa de Estudo" (/servicos/bolsa-de-estudo) só tem a descrição genérica: faltam regras, prazos e documentos do programa;
   - o item de menu "Equipe gestora" (`/#titulo-equipe`) leva ao topo da home enquanto a equipe estiver vazia (o bloco fica oculto). Resolver quando os nomes chegarem;
   - a ferramenta `execute_sql` do MCP do Supabase trava (60 s) ao gravar HTML com listas de documentos pessoais (RG, CPF...) em texto puro. Contorno: enviar o HTML em base64 e decodificar com `convert_from(decode(...,'base64'),'UTF8')`;

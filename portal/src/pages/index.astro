@@ -5,37 +5,44 @@ import { destaques, eventos, menu, noticias } from '../lib/consultas';
 import { moduloAtivo } from '../lib/municipio';
 import { urlImagem, srcsetImagem } from '../lib/imagens';
 import { diaMes, hora } from '../lib/formato';
-import { equipe, servicosHome } from '../lib/consultas';
+import { equipe, eventosCalendario, servicosHome } from '../lib/consultas';
 import Destaque from '../components/vitrine/Destaque.astro';
 import NoticiasVitrine from '../components/vitrine/Noticias.astro';
 import ServicosVitrine from '../components/vitrine/Servicos.astro';
 import EquipeVitrine from '../components/vitrine/Equipe.astro';
 import FocoVitrine from '../components/vitrine/Foco.astro';
+import CalendarioVitrine from '../components/vitrine/Calendario.astro';
 import type { BlocoHome } from '../lib/municipio';
 
 const { municipio: m, dominioPrincipal } = Astro.locals.contexto;
 // Layout vitrine (D-39): a página inicial é montada pelos blocos de config.home, nessa ordem.
 const blocos: BlocoHome[] = m.tema.layout === 'vitrine' ? (m.config.home?.blocos ?? []) : [];
 const tem = (b: BlocoHome) => blocos.includes(b);
-const [banners, ultimas, proximos, atalhosMenu, cards, pessoas] = await Promise.all([
+// Calendário de eventos (D-53): do 1º dia do mês anterior ao fim do 3º mês seguinte.
+const agoraSP = new Date();
+const desdeCal = new Date(Date.UTC(agoraSP.getUTCFullYear(), agoraSP.getUTCMonth() - 1, 1));
+const ateCal = new Date(Date.UTC(agoraSP.getUTCFullYear(), agoraSP.getUTCMonth() + 4, 1));
+const [banners, ultimas, proximos, atalhosMenu, cards, pessoas, eventosCal] = await Promise.all([
   moduloAtivo(m, 'destaques') ? destaques(m.id).then((d) => d.filter((x) => x.tipo === 'banner' && x.imagem)) : Promise.resolve([]),
   noticias(m.id, { limite: 7 }),
   moduloAtivo(m, 'agenda') ? eventos(m.id, { limite: 4 }) : Promise.resolve(null),
   menu(m.id, 'atalhos'),
   tem('servicos') ? servicosHome(m.id) : Promise.resolve([]),
   tem('equipe') && moduloAtivo(m, 'equipe_gestora') ? equipe(m.id) : Promise.resolve([]),
+  tem('calendario') && moduloAtivo(m, 'agenda') ? eventosCalendario(m.id, desdeCal, ateCal) : Promise.resolve([]),
 ]);
 const foco = (m.config.home?.foco ?? []).filter((f) => f?.titulo);
-const titulos = { noticias: 'Notícias', foco: 'Em foco', servicos: 'Serviços', agenda: 'Agenda', equipe: 'Equipe gestora', atalhos: 'Acesso rápido', ...(m.config.home?.titulos ?? {}) };
+const titulos = { noticias: 'Notícias', foco: 'Em foco', calendario: 'Eventos', servicos: 'Serviços', agenda: 'Agenda', equipe: 'Equipe gestora', atalhos: 'Acesso rápido', ...(m.config.home?.titulos ?? {}) };
 const nCores = m.tema.cores_vivas?.length ?? 0;
 // Seções de largura total alternam branco e os tons claros das cores vivas.
 const vazio = (b: BlocoHome) =>
   (b === 'servicos' && cards.length === 0) || (b === 'equipe' && pessoas.length === 0) ||
-  (b === 'agenda' && !proximos?.itens.length) || (b === 'foco' && foco.length === 0) || b === 'destaque';
-// "Em foco" tem fundo próprio e fica fora da alternância.
-const secoes = blocos.filter((b) => !vazio(b) && b !== 'foco');
+  (b === 'agenda' && !proximos?.itens.length) || (b === 'foco' && foco.length === 0) || (b === 'calendario' && !moduloAtivo(m, 'agenda')) || b === 'destaque';
+// "Em foco" e o calendário têm fundo próprio e ficam fora da alternância.
+const secoes = blocos.filter((b) => !vazio(b) && b !== 'foco' && b !== 'calendario');
 const fundo = (b: BlocoHome) => {
   if (b === 'foco') return 'v-fundo-foco';
+  if (b === 'calendario') return 'v-fundo-cinza';
   const i = secoes.indexOf(b);
   return i % 2 === 0 ? 'v-fundo-branco' : `v-fundo-tom v-tom-${nCores ? Math.floor(i / 2) % nCores : 0}`;
 };
@@ -69,6 +76,7 @@ const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: m.n
             <div class="v-miolo">
               {b === 'noticias' && <NoticiasVitrine noticias={ultimas.itens} titulo={titulos.noticias} />}
               {b === 'foco' && <FocoVitrine itens={foco} titulo={titulos.foco} cores={nCores} />}
+              {b === 'calendario' && <CalendarioVitrine eventos={eventosCal} titulo={titulos.calendario} />}
               {b === 'servicos' && <ServicosVitrine servicos={cards} titulo={titulos.servicos} cores={nCores} paleta={m.tema.cores_cards} />}
               {b === 'equipe' && <EquipeVitrine pessoas={pessoas} titulo={titulos.equipe} />}
               {b === 'agenda' && proximos && (

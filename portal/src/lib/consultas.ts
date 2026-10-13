@@ -93,6 +93,15 @@ export async function destaques(municipioId: string) {
     .order('ordem')) as any[];
 }
 
+/** Eventos de um intervalo, para o calendário da home (D-53): com imagem (encarte) e quem realiza. */
+export async function eventosCalendario(municipioId: string, desde: Date, ate: Date) {
+  return erro(await supabase().from('eventos')
+    .select('id, titulo, slug, resumo, inicio_em, fim_em, dia_inteiro, local, orgao:orgaos(nome), imagem:midias!eventos_imagem_id_municipio_id_fkey(storage_path, texto_alternativo)')
+    .eq('municipio_id', municipioId).eq('tipo', 'evento')
+    .lte('inicio_em', ate.toISOString()).or(`fim_em.gte.${desde.toISOString()},and(fim_em.is.null,inicio_em.gte.${desde.toISOString()})`)
+    .order('inicio_em').limit(200)) as any[];
+}
+
 export async function eventos(municipioId: string, opcoes: { pagina?: number; passados?: boolean; limite?: number; categoria?: string } = {}) {
   const pagina = Math.max(1, opcoes.pagina ?? 1);
   let q = supabase().from('eventos')
