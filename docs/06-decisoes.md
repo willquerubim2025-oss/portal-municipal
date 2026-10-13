@@ -426,3 +426,12 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - texto branco: contraste de **3,05:1**, abaixo do mínimo de 4,5:1 do eMAG/WCAG AA para o menu e a busca. O axe aponta 2 falhas na tela 1 e 8 na tela 2;
   - texto verde-escuro `#002a2d`: contraste de 5,0:1, **sem falhas**.
 - **Na homologação** fica a versão acessível, com fundo `#00A693` e texto `#002a2d`, até a decisão do usuário. As duas prévias estão em `docs/previa/` do repositório Portais-Publicos.
+
+**D-55 · 14/10/2026 · Notícias em duas fileiras, fundo cinza, botões brancos; cabeçalho de volta ao petróleo (a pedido do usuário)**
+- **Notícias:**
+  - **1ª fileira:** cinco cards menores, com foto em cima, data, título e resumo de até 3 linhas;
+  - **2ª fileira:** dois cards grandes lado a lado, com a manchete (prioridade 'principal') e a notícia seguinte;
+  - **telas menores:** a 1ª fileira passa a 3, 2 e 1 colunas, e os grandes ficam um abaixo do outro.
+- **Fundo cinza configurável:** `config.home.fundo_cinza` (lista de blocos; padrão: só o calendário). Na SMEDU, Notícias e Eventos. Esses blocos ficam fora da alternância de fundos.
+- **Botões de ação** (`.v-botao-acento`, como o do destaque): fundo branco com texto petróleo, no lugar do salmão.
+- **Cabeçalho:** o teste com `#00A693` (D-54) foi descartado e o tema voltou ao fundo petróleo com texto branco. Os campos `cor_cabecalho` e `cor_cabecalho_texto` continuam disponíveis para outros órgãos.

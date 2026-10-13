@@ -39,10 +39,12 @@ const vazio = (b: BlocoHome) =>
   (b === 'servicos' && cards.length === 0) || (b === 'equipe' && pessoas.length === 0) ||
   (b === 'agenda' && !proximos?.itens.length) || (b === 'foco' && foco.length === 0) || (b === 'calendario' && !moduloAtivo(m, 'agenda')) || b === 'destaque';
 // "Em foco" e o calendário têm fundo próprio e ficam fora da alternância.
-const secoes = blocos.filter((b) => !vazio(b) && b !== 'foco' && b !== 'calendario');
+// Blocos com fundo cinza (config.home.fundo_cinza; padrão: só o calendário) também ficam fora (D-55).
+const cinza = new Set<BlocoHome>(m.config.home?.fundo_cinza ?? ['calendario']);
+const secoes = blocos.filter((b) => !vazio(b) && b !== 'foco' && !cinza.has(b));
 const fundo = (b: BlocoHome) => {
   if (b === 'foco') return 'v-fundo-foco';
-  if (b === 'calendario') return 'v-fundo-cinza';
+  if (cinza.has(b)) return 'v-fundo-cinza';
   const i = secoes.indexOf(b);
   return i % 2 === 0 ? 'v-fundo-branco' : `v-fundo-tom v-tom-${nCores ? Math.floor(i / 2) % nCores : 0}`;
 };

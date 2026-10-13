@@ -1,40 +1,47 @@
 ---
-// Notícias da página inicial (vitrine): a manchete (prioridade 'principal', 0020; sem ela,
-// a mais recente) ocupa o espaço maior; as demais ficam ao lado, sempre com foto quando houver.
+// Notícias da página inicial (vitrine, D-55): uma linha de cards menores (foto em cima e resumo) e,
+// abaixo, dois cards grandes lado a lado. Os dois grandes são a manchete (prioridade 'principal', 0020;
+// sem ela, a mais recente) e a notícia seguinte; a linha de cima recebe as demais (até 5).
 import { urlImagem, srcsetImagem } from '../../lib/imagens';
 import { data } from '../../lib/formato';
 interface Props { noticias: any[]; titulo: string }
 const { noticias, titulo } = Astro.props;
 const indice = Math.max(0, noticias.findIndex((n) => n.prioridade === 'principal'));
-const manchete = noticias[indice];
-const demais = noticias.filter((_, i) => i !== indice).slice(0, 4);
+const resto = noticias.filter((_, i) => i !== indice);
+const grandes = noticias.length ? [noticias[indice], ...resto.slice(0, 1)] : [];
+const pequenas = resto.slice(1, 6);
 ---
 <div class="v-secao-titulo"><h2 id="titulo-noticias">{titulo}</h2></div>
-{!manchete ? <p>Nenhuma notícia publicada ainda.</p> : (
+{!grandes.length ? <p>Nenhuma notícia publicada ainda.</p> : (
   <div class="v-noticias">
-    <article class="v-noticia v-noticia-manchete">
-      {manchete.imagem && <img src={urlImagem(manchete.imagem.storage_path, 800)} srcset={srcsetImagem(manchete.imagem.storage_path, [480, 800, 1200])} sizes="(max-width: 900px) 100vw, 60vw" alt={manchete.imagem.texto_alternativo ?? ''} width="800" height="450" decoding="async" />}
-      <div class="v-noticia-texto">
-        <time datetime={manchete.publicado_em}>{data(manchete.publicado_em)}</time>
-        <h3><a href={`/noticias/${manchete.slug}`}>{manchete.titulo}</a></h3>
-        {manchete.resumo && <p>{manchete.resumo}</p>}
-      </div>
-    </article>
-    {demais.length > 0 && (
-      <div class="v-noticias-lista">
-        {demais.map((n) => (
-          <article class="v-noticia v-noticia-pequena">
+    {pequenas.length > 0 && (
+      <div class="v-noticias-linha">
+        {pequenas.map((n) => (
+          <article class="v-noticia v-noticia-card">
             {n.imagem
-              ? <img src={urlImagem(n.imagem.storage_path, 320)} srcset={srcsetImagem(n.imagem.storage_path, [320, 480])} sizes="160px" alt={n.imagem.texto_alternativo ?? ''} width="160" height="120" loading="lazy" decoding="async" />
+              ? <img src={urlImagem(n.imagem.storage_path, 480)} srcset={srcsetImagem(n.imagem.storage_path, [320, 480])} sizes="(max-width: 700px) 100vw, 240px" alt={n.imagem.texto_alternativo ?? ''} width="480" height="300" loading="lazy" decoding="async" />
               : <span class="v-noticia-sem-foto" aria-hidden="true"></span>}
             <div class="v-noticia-texto">
               <time datetime={n.publicado_em}>{data(n.publicado_em)}</time>
               <h3><a href={`/noticias/${n.slug}`}>{n.titulo}</a></h3>
+              {n.resumo && <p>{n.resumo}</p>}
             </div>
           </article>
         ))}
       </div>
     )}
+    <div class="v-noticias-grandes">
+      {grandes.map((n) => (
+        <article class="v-noticia v-noticia-manchete">
+          {n.imagem && <img src={urlImagem(n.imagem.storage_path, 800)} srcset={srcsetImagem(n.imagem.storage_path, [480, 800, 1200])} sizes="(max-width: 900px) 100vw, 50vw" alt={n.imagem.texto_alternativo ?? ''} width="800" height="450" decoding="async" />}
+          <div class="v-noticia-texto">
+            <time datetime={n.publicado_em}>{data(n.publicado_em)}</time>
+            <h3><a href={`/noticias/${n.slug}`}>{n.titulo}</a></h3>
+            {n.resumo && <p>{n.resumo}</p>}
+          </div>
+        </article>
+      ))}
+    </div>
   </div>
 )}
-{manchete && <p class="v-ver-todas"><a href="/noticias">Ver todas as notícias</a></p>}
+{grandes.length > 0 && <p class="v-ver-todas"><a href="/noticias">Ver todas as notícias</a></p>}

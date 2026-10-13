@@ -73,7 +73,7 @@ export interface Config {
   /** Layout vitrine: blocos da página inicial e textos das seções. */
   /** Cabeçalho do layout vitrine em carrossel (D-47): ligado por padrão; tempos em segundos. */
   cabecalho?: { carrossel?: boolean; intervalo_s?: number; transicao_s?: number };
-  home?: { blocos?: BlocoHome[]; titulos?: Partial<Record<BlocoHome, string>>; foco?: ItemFoco[] };
+  home?: { blocos?: BlocoHome[]; titulos?: Partial<Record<BlocoHome, string>>; foco?: ItemFoco[]; fundo_cinza?: BlocoHome[] };
 }
 
 export type Modulo =
