@@ -9,10 +9,7 @@ const indice = Math.max(0, noticias.findIndex((n) => n.prioridade === 'principal
 const manchete = noticias[indice];
 const demais = noticias.filter((_, i) => i !== indice).slice(0, 4);
 ---
-<div class="v-secao-titulo">
-  <h2 id="titulo-noticias">{titulo}</h2>
-  <a href="/noticias" class="v-link-seta">Todas as notícias</a>
-</div>
+<div class="v-secao-titulo"><h2 id="titulo-noticias">{titulo}</h2></div>
 {!manchete ? <p>Nenhuma notícia publicada ainda.</p> : (
   <div class="v-noticias">
     <article class="v-noticia v-noticia-manchete">
@@ -40,3 +37,4 @@ const demais = noticias.filter((_, i) => i !== indice).slice(0, 4);
     )}
   </div>
 )}
+{manchete && <p class="v-ver-todas"><a href="/noticias">Ver todas as notícias</a></p>}

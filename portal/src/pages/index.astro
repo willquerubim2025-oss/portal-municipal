@@ -73,7 +73,7 @@ const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: m.n
               {b === 'equipe' && <EquipeVitrine pessoas={pessoas} titulo={titulos.equipe} />}
               {b === 'agenda' && proximos && (
                 <>
-                  <div class="v-secao-titulo"><h2 id="titulo-agenda">{titulos.agenda}</h2><a href="/eventos" class="v-link-seta">Agenda completa</a></div>
+                  <div class="v-secao-titulo"><h2 id="titulo-agenda">{titulos.agenda}</h2></div>
                   <ul class="v-agenda">
                     {proximos.itens.map((e) => {
                       const d = diaMes(e.inicio_em);
@@ -88,6 +88,7 @@ const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: m.n
                       );
                     })}
                   </ul>
+                  <p class="v-ver-todas"><a href="/eventos">Ver a agenda completa</a></p>
                 </>
               )}
               {b === 'atalhos' && (

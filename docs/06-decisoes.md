@@ -379,3 +379,10 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 **D-49 · 13/10/2026 · Destaque sem película verde (teste) e brasão na tela do menu (a pedido do usuário)**
 - **Película do destaque:** a película verde sobre as fotos foi trocada por uma neutra, que só escurece o lado do texto: preto a 62% → 38% → transparente, mais um escurecimento leve embaixo e sombra no texto. A foto mantém as cores reais. A opção fica no tema (`tema.filtro_destaque`: `'cor'`, o padrão, ou `'neutro'`), para comparar e voltar sem mexer no código.
 - **Brasão na tela 2 do cabeçalho:** a tela do menu passou a mostrar o brasão (sem o nome) na ponta esquerda, como link para a página inicial. Ele fica fora da ordem de tabulação, para não repetir o link da marca.
+
+**D-50 · 13/10/2026 · Régua com título centralizado e "Ver todas…" ao fim da seção (a pedido do usuário; ajusta D-43 e D-46)**
+- A régua das seções ficou só com o título, centralizado. Saíram o link e o botão redondo com a seta.
+- O acesso à lista completa virou um link simples e centralizado no fim da seção:
+  - Notícias: "Ver todas as notícias →";
+  - Serviços: "Ver todos os serviços →";
+  - Agenda: "Ver a agenda completa →".
