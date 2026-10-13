@@ -64,6 +64,8 @@ export interface Config {
   /** Site do ente ao qual a organização pertence (ex.: a Prefeitura de uma secretaria): barra "Voltar ao site". */
   site_prefeitura?: string;
   /** Layout vitrine: blocos da página inicial e textos das seções. */
+  /** Cabeçalho do layout vitrine em carrossel (D-47): ligado por padrão; tempos em segundos. */
+  cabecalho?: { carrossel?: boolean; intervalo_s?: number; transicao_s?: number };
   home?: { blocos?: BlocoHome[]; titulos?: Partial<Record<BlocoHome, string>>; foco?: ItemFoco[] };
 }
 

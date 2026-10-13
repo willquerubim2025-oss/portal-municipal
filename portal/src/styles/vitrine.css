@@ -52,7 +52,7 @@
 .v-cab-brasao img { width: 46px; height: 46px; object-fit: contain; }
 .vitrine .v-cab .marca-tipo { font-size: .7rem; color: rgb(255 255 255 / .8); letter-spacing: .03em; }
 .vitrine .v-cab .marca-nome { font-size: .98rem; font-weight: 600; line-height: 1.15; max-width: 15ch; color: #fff; }
-.vitrine .v-cab .menu-principal { flex: 1 1 auto; min-width: 0; background: none; border: 0; }
+.vitrine .v-cab .menu-principal { min-width: 0; background: none; border: 0; }
 .vitrine .v-cab .menu-lista { flex-wrap: nowrap; justify-content: center; }
 .vitrine .menu-lista a, .vitrine .menu-lista .menu-grupo { font-weight: 600; font-size: .78rem; letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; }
 .vitrine .v-cab .menu-lista > li > a, .vitrine .v-cab .menu-lista > li > .menu-grupo { padding: 1.75rem .55rem; color: #fff; }
@@ -86,10 +86,38 @@
 .v-link-prefeitura:hover, .v-link-prefeitura:focus-visible { background: var(--v-secundaria-escura); }
 .v-link-prefeitura svg { width: 1em; height: 1em; }
 
+/* Carrossel do cabeçalho (D-47). Sem a classe .v-cab-animado (tela estreita, sem JavaScript ou com
+   "reduzir movimento") as duas telas aparecem uma abaixo da outra. */
+.v-cab-janela { flex: 1 1 auto; min-width: 0; overflow-x: clip; overflow-y: visible; }
+.v-cab-pista { display: flex; flex-wrap: wrap; }
+.v-cab-tela { flex: 1 1 100%; display: flex; align-items: center; gap: .75rem 2rem; min-height: 80px; }
+.v-cab-clone { display: none; }
+.v-cab-tela-1 .busca { flex: 1 1 260px; max-width: 560px; margin-left: auto; }
+.v-cab-tela-1 .busca input { border-color: transparent; background: #fff; }
+.v-cab-tela-1 .busca button { background: var(--v-secundaria-escura); }
+.v-cab-tela-2 .menu-principal { flex: 1 1 auto; }
+.v-cab-animado .v-cab-pista { flex-wrap: nowrap; transition: transform var(--v-cab-transicao, 2s) cubic-bezier(.65, 0, .35, 1); will-change: transform; }
+.v-cab-animado .v-cab-tela { flex: 0 0 100%; padding-inline: 6px; }   /* folga para a borda da tela vizinha não vazar no recorte */
+.v-cab-animado .v-cab-clone { display: flex; }
+.v-cab-animado .v-cab-tela-2 .menu-lista { justify-content: center; }
+.vitrine .v-cab-animado .v-cab-tela-2 .menu-lista > li > a, .vitrine .v-cab-animado .v-cab-tela-2 .menu-lista > li > .menu-grupo { font-size: .92rem; padding: 1.9rem .9rem; }
+.v-cab-controles { display: flex; align-items: center; gap: .1rem; margin-right: .35rem; }
+.v-cab:not(.v-cab-animado) .v-cab-controles { display: none; }
+.v-cab-ponto { display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border: 0; background: none; cursor: pointer; }
+.v-cab-ponto::before { content: ""; width: 10px; height: 10px; border-radius: 50%; border: 2px solid #fff; transition: background .3s, width .3s; }
+.v-cab-ponto[aria-pressed="true"]::before { background: #fff; width: 22px; border-radius: 6px; }
+.v-cab-pausa { width: 2rem; height: 2rem; margin-left: .25rem; }
+.v-cab-pausa svg { width: 14px; height: 14px; }
+.v-cab-pausa[aria-pressed="true"] { background: #fff; color: var(--cor-primaria); }
+:root.contraste.vitrine .v-cab-tela-1 .busca input { background: #000; color: #fff; border-color: #fff; }
+
 /* Até 1180 px o menu não cabe na linha: vira o botão "Menu", aberto abaixo da marca. */
 @media (max-width: 1180px) {
-  .v-cab-linha { flex-wrap: wrap; min-height: 0; }
-  .v-cab-acoes { margin-left: auto; }
+  .v-cab-linha { position: relative; flex-wrap: wrap; min-height: 0; }
+  .v-cab-acoes { position: absolute; top: .9rem; right: 0; }
+  .v-cab-tela { min-height: 0; gap: .6rem 1rem; flex-wrap: wrap; }
+  .v-cab-tela-1 { padding-right: 3rem; }
+  .v-cab-tela-1 .busca { flex-basis: 100%; max-width: none; margin: 0 -3rem .75rem 0; }
   .vitrine .v-cab .menu-principal { order: 3; flex-basis: 100%; }
   .vitrine .v-cab .menu-movel > summary { display: block; padding: .6rem 0; border-top: 1px solid rgb(255 255 255 / .2); }
   .vitrine .v-cab .menu-lista { flex-direction: column; flex-wrap: wrap; padding-bottom: .5rem; }

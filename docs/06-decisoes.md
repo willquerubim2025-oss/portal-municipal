@@ -348,3 +348,19 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 **D-46 · 12/10/2026 · Régua das seções em verde-água claro (a pedido do usuário; ajusta D-43)**
 - **Fundo da régua:** verde-água claro `#d5ede6` (`tema.cor_regua`, configurável). Sem esse campo, usa a cor secundária a 18% sobre branco. É o mesmo em todas as seções, sem sombra.
 - **Hierarquia:** título em petróleo (contraste 9,0), link "Todas as…" em petróleo com um toque de turquesa e peso 600 (6,3), botão redondo petróleo com seta branca e marcador vertical em degradê petróleo → turquesa. O salmão (acento) fica só nos botões de ação, porque sobre o verde ele quase some (1,3).
+
+**D-47 · 13/10/2026 · Cabeçalho do layout vitrine em carrossel de duas telas (experimento a pedido do usuário)**
+- **Decisão:** em telas a partir de 1181 px, o cabeçalho tem duas telas que deslizam da direita para a esquerda, com transição de 2 s:
+  - tela 1: brasão, nome da Secretaria e campo de busca já aberto;
+  - tela 2: o menu, com fonte maior (≈15 px).
+  - Para a volta também andar para a esquerda, a tela 1 é clonada no fim da pista; o clone fica oculto a leitores de tela e inerte.
+  - À direita, fixos, ficam os pontos para escolher a tela, o botão de pausa e o botão de acessibilidade.
+- **Configuração:** `config.cabecalho` = `{ carrossel, intervalo_s, transicao_s }`. Ligado por padrão no vitrine, com 7 s parado em cada tela e 2 s de transição, dentro de limites seguros.
+- **Acessibilidade (WCAG 2.2.2, Pausar, parar, ocultar):**
+  - o carrossel para com o mouse em cima ou o foco do teclado dentro dele;
+  - para de vez ao digitar na busca, ao usar os pontos ou o botão de pausa;
+  - o foco numa tela a mostra na hora;
+  - os atalhos do eMAG 2 (menu) e 3 (busca) levam à tela certa;
+  - com "reduzir movimento", sem JavaScript ou em telas menores, as duas telas aparecem uma abaixo da outra, sem animação.
+- **Risco a avaliar com a SMEDU:** o menu fica visível só metade do tempo. Se atrapalhar a navegação, basta `carrossel: false`.
+- **Verificação:** axe sem violações em 1366 px, no celular e com "reduzir movimento".

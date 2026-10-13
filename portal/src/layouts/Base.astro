@@ -129,6 +129,11 @@ const estiloTema = [
 ].filter(Boolean).join(';');
 const marca1 = cfg.marca?.linha1 ?? 'Prefeitura de';
 const marca2 = cfg.marca?.linha2 ?? nomeCurto(m);
+// Cabeçalho em carrossel (D-47): config.cabecalho.carrossel (padrão: ligado no vitrine); tempos em segundos, com limites.
+const cfgCab = cfg.cabecalho ?? {};
+const limitar = (v: unknown, min: number, max: number, padrao: number) => (typeof v === 'number' && v >= min && v <= max ? v : padrao);
+const carrosselCab = vitrine && cfgCab.carrossel !== false
+  ? { intervalo: limitar(cfgCab.intervalo_s, 4, 20, 7), transicao: limitar(cfgCab.transicao_s, 0.3, 3, 2) } : null;
 const sitePrefeitura = vitrine && cfg.site_prefeitura?.startsWith('https://') ? cfg.site_prefeitura : null;
 const caminhoAtual = Astro.url.pathname;
 ---
@@ -185,37 +190,53 @@ const caminhoAtual = Astro.url.pathname;
   </div>
 
 
-  <!-- Layout vitrine (D-42): cabeçalho em linha única no verde da Prefeitura: marca, menu, busca e acessibilidade.
-       Busca e acessibilidade abrem painéis; sem JavaScript os painéis ficam sempre visíveis. -->
+  <!-- Layout vitrine (D-42, D-47): cabeçalho no verde da Prefeitura. Em telas largas é um carrossel de duas telas
+       (1: marca + busca; 2: menu) que desliza da direita para a esquerda. Pausa com o mouse ou o foco em cima e
+       tem botão de pausa (WCAG 2.2.2); com "reduzir movimento" ou sem JavaScript, as duas telas ficam visíveis. -->
   {vitrine ? (
-  <header class="cabecalho v-cab">
+  <header class="cabecalho v-cab" data-cab-carrossel={carrosselCab ? '' : undefined}
+      data-intervalo={carrosselCab?.intervalo} data-transicao={carrosselCab?.transicao}>
       <div class="v-cab-linha">
-        <a href="/" class="marca" aria-label={`${m.nome} — página inicial`}>
-          {brasao && <span class="v-cab-brasao"><img src={brasao} alt="" width="64" height="64" /></span>}
-          <span class="marca-texto">
-            <span class="marca-tipo">{marca1}</span>
-            <span class="marca-nome">{marca2}</span>
-          </span>
-        </a>
-        <nav id="menu" class="menu-principal" aria-label="Menu principal">
-          <details class="menu-movel" open>
-            <summary>Menu</summary>
-            <MenuItens itens={itensMenu} atual={caminhoAtual} />
-          </details>
-        </nav>
+        <div class="v-cab-janela">
+          <div class="v-cab-pista">
+            <div class="v-cab-tela v-cab-tela-1" data-tela="0">
+              <a href="/" class="marca" aria-label={`${m.nome} — página inicial`}>
+                {brasao && <span class="v-cab-brasao"><img src={brasao} alt="" width="64" height="64" /></span>}
+                <span class="marca-texto">
+                  <span class="marca-tipo">{marca1}</span>
+                  <span class="marca-nome">{marca2}</span>
+                </span>
+              </a>
+              <form class="busca" action="/busca" method="get" role="search">
+                <label for="busca" class="sr-only">Buscar no portal</label>
+                <input id="busca" name="q" type="search" placeholder="O que você procura?" required />
+                <button type="submit">Buscar</button>
+              </form>
+            </div>
+            <div class="v-cab-tela v-cab-tela-2" data-tela="1">
+              <nav id="menu" class="menu-principal" aria-label="Menu principal">
+                <details class="menu-movel" open>
+                  <summary>Menu</summary>
+                  <MenuItens itens={itensMenu} atual={caminhoAtual} />
+                </details>
+              </nav>
+            </div>
+          </div>
+        </div>
         <div class="v-cab-acoes">
-          <button type="button" class="v-cab-botao" data-painel="v-painel-busca" aria-expanded="false" aria-controls="v-painel-busca" aria-label="Abrir a busca" title="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+          {carrosselCab && (
+            <div class="v-cab-controles" role="group" aria-label="Telas do cabeçalho">
+              <button type="button" class="v-cab-ponto" data-ir="0" aria-label="Mostrar a busca" aria-pressed="true"></button>
+              <button type="button" class="v-cab-ponto" data-ir="1" aria-label="Mostrar o menu" aria-pressed="false"></button>
+              <button type="button" class="v-cab-botao v-cab-pausa" data-pausa aria-pressed="false" aria-label="Pausar o cabeçalho" title="Pausar">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/></svg>
+              </button>
+            </div>
+          )}
           <button type="button" class="v-cab-botao" data-painel="v-painel-acessibilidade" aria-expanded="false" aria-controls="v-painel-acessibilidade" aria-label="Recursos de acessibilidade" title="Acessibilidade">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="6.2" r="1.6" fill="currentColor"/><path d="M6.5 9.2l5.5 1 5.5-1M12 10.2v4.2m0 0l-2.6 4.6m2.6-4.6l2.6 4.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
-      </div>
-      <div class="v-cab-painel" id="v-painel-busca">
-        <form class="busca" action="/busca" method="get" role="search">
-          <label for="busca" class="sr-only">Buscar no portal</label>
-          <input id="busca" name="q" type="search" placeholder="O que você procura?" required />
-          <button type="submit">Buscar</button>
-        </form>
       </div>
       <div class="v-cab-painel" id="v-painel-acessibilidade">
         <Ferramentas compacto />
@@ -357,11 +378,54 @@ const caminhoAtual = Astro.url.pathname;
       b.addEventListener('click', () => abrirPainel(b, b.getAttribute('aria-expanded') !== 'true'));
       document.getElementById(b.dataset.painel!)?.addEventListener('keydown', (e) => { if (e.key === 'Escape') { abrirPainel(b, false); b.focus(); } });
     });
-    // O atalho "Ir para a busca" (accesskey 3) abre o painel da busca.
-    document.querySelectorAll<HTMLAnchorElement>('a[href="#busca"]').forEach((a) => a.addEventListener('click', (e) => {
-      const b = botoesPainel.find((o) => o.dataset.painel === 'v-painel-busca');
-      if (b) { e.preventDefault(); abrirPainel(b, true); }
-    }));
+    // Cabeçalho em carrossel (D-47): duas telas que deslizam da direita para a esquerda (a 1ª é clonada no fim,
+    // para a volta também andar para a esquerda). Pausa com mouse/foco em cima e pelo botão; o foco numa tela a mostra.
+    const cab = document.querySelector<HTMLElement>('[data-cab-carrossel]');
+    const largo = matchMedia('(min-width: 1181px)');
+    const calmo = matchMedia('(prefers-reduced-motion: reduce)');
+    if (cab) {
+      const pista = cab.querySelector<HTMLElement>('.v-cab-pista')!;
+      const telas = [...pista.querySelectorAll<HTMLElement>('.v-cab-tela')];
+      const clone = telas[0].cloneNode(true) as HTMLElement;
+      clone.querySelectorAll('[id]').forEach((e) => e.removeAttribute('id'));
+      clone.querySelectorAll('[for]').forEach((e) => e.removeAttribute('for'));
+      clone.setAttribute('aria-hidden', 'true'); clone.inert = true; clone.classList.add('v-cab-clone');
+      pista.append(clone);
+      const ms = Number(cab.dataset.transicao) * 1000, espera = Number(cab.dataset.intervalo) * 1000;
+      cab.style.setProperty('--v-cab-transicao', `${ms}ms`);
+      const pontos = [...cab.querySelectorAll<HTMLButtonElement>('[data-ir]')];
+      const pausa = cab.querySelector<HTMLButtonElement>('[data-pausa]');
+      let atual = 0, timer = 0, parado = false, emCima = false;
+      const ativo = () => largo.matches;
+      const marcar = () => pontos.forEach((p, i) => p.setAttribute('aria-pressed', String(i === atual % 2)));
+      const mover = (n: number, animar = true) => {
+        pista.style.transition = animar && !calmo.matches ? '' : 'none';
+        pista.style.transform = `translateX(${-100 * n}%)`;
+        atual = n; marcar();
+        if (n === 2) setTimeout(() => mover(0, false), animar && !calmo.matches ? ms : 0);
+      };
+      const agendar = () => { clearTimeout(timer); if (ativo() && !parado && !emCima && !calmo.matches) timer = window.setTimeout(() => { mover(atual + 1); agendar(); }, espera + ms); };
+      const ir = (n: number) => { if (atual !== n % 2) mover(n % 2); agendar(); };
+      pontos.forEach((p) => p.addEventListener('click', () => { parado = true; atualizarPausa(); ir(Number(p.dataset.ir)); }));
+      const atualizarPausa = () => { pausa?.setAttribute('aria-pressed', String(parado)); pausa?.setAttribute('aria-label', parado ? 'Retomar o cabeçalho' : 'Pausar o cabeçalho'); agendar(); };
+      pausa?.addEventListener('click', () => { parado = !parado; atualizarPausa(); });
+      cab.addEventListener('mouseenter', () => { emCima = true; clearTimeout(timer); });
+      cab.addEventListener('mouseleave', () => { emCima = false; agendar(); });
+      telas.forEach((t, i) => t.addEventListener('focusin', () => { emCima = true; clearTimeout(timer); if (ativo() && atual % 2 !== i) mover(i, false); }));
+      cab.addEventListener('focusout', (e) => { if (!cab.contains(e.relatedTarget as Node)) { emCima = false; agendar(); } });
+      cab.querySelector('#busca')?.addEventListener('input', () => { parado = true; atualizarPausa(); });
+      const reiniciar = () => { mover(0, false); cab.classList.toggle('v-cab-animado', ativo() && !calmo.matches); agendar(); };
+      largo.addEventListener('change', reiniciar); calmo.addEventListener('change', reiniciar);
+      // Atalhos do eMAG: "Ir para o menu" (2) e "Ir para a busca" (3) mostram a tela certa e levam o foco a ela.
+      document.querySelectorAll<HTMLAnchorElement>('a[href="#menu"], a[href="#busca"]').forEach((a) => a.addEventListener('click', (e) => {
+        if (!ativo()) return;
+        e.preventDefault();
+        const menu = a.getAttribute('href') === '#menu';
+        mover(menu ? 1 : 0, false);
+        (menu ? telas[1].querySelector<HTMLElement>('a, button') : cab.querySelector<HTMLElement>('#busca'))?.focus();
+      }));
+      reiniciar();
+    }
     // Grupos do menu (item com submenu e sem link próprio): abrem com clique, Enter ou espaço; Esc fecha.
     document.querySelectorAll<HTMLButtonElement>('[data-submenu]').forEach((b) => {
       const fechar = () => b.setAttribute('aria-expanded', 'false');
