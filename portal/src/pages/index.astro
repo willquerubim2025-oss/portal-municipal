@@ -69,7 +69,7 @@ const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: m.n
             <div class="v-miolo">
               {b === 'noticias' && <NoticiasVitrine noticias={ultimas.itens} titulo={titulos.noticias} />}
               {b === 'foco' && <FocoVitrine itens={foco} titulo={titulos.foco} cores={nCores} />}
-              {b === 'servicos' && <ServicosVitrine servicos={cards} titulo={titulos.servicos} cores={nCores} />}
+              {b === 'servicos' && <ServicosVitrine servicos={cards} titulo={titulos.servicos} cores={nCores} paleta={m.tema.cores_cards} />}
               {b === 'equipe' && <EquipeVitrine pessoas={pessoas} titulo={titulos.equipe} />}
               {b === 'agenda' && proximos && (
                 <>

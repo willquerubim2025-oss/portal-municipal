@@ -393,3 +393,16 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **"Em breve":** o mesmo tom, mais lavado, com borda tracejada.
 - **Tamanho e espaçamento:** cards menores (largura mínima de 250 px, padding e fontes reduzidos, ícone de 46 px), com espaço de 1,75 a 2 rem entre eles. A grade fica limitada a 1000 px de largura.
 - **Verificação:** axe sem violações, com e sem alto contraste.
+
+**D-52 · 13/10/2026 · Paleta própria e mais colorida para os cards de Serviços (a pedido do usuário; ajusta D-51)**
+- **Paleta:** os cards de Serviços passaram a usar uma paleta própria, `tema.cores_cards` (`{ nome, forte, claro }` em `#rrggbb`), separada das cores vivas do restante do portal. Os fundos são tons claros um pouco mais saturados, para dar cor à seção. Na SMEDU, em sequência:
+  - azul `#cfe0f7`/`#2c5aa0`;
+  - abóbora `#fbd6b8`/`#8f400c`;
+  - roxo `#e0d4f5`/`#6a44b0`;
+  - verde `#cdebd9`/`#22694a`;
+  - rosa `#f8d0dc`/`#a3304f`;
+  - turquesa `#c9ecee`/`#13707a`.
+  - Contrastes: título petróleo de 7,9 a 8,8; texto cinza de 5,0 a 5,6; "Acessar" na cor forte de 4,6 a 5,2.
+- Sem `cores_cards`, os cards voltam às cores vivas do tema (D-51).
+- **Tamanho e espaçamento:** cards ainda menores (largura mínima de 220 px, grade de até 860 px, ícone de 42 px, título de 15 px, texto de 13,6 px) e mais espaçados (2,25 a 2,5 rem).
+- **Verificação:** axe sem violações no computador, no celular e em alto contraste.

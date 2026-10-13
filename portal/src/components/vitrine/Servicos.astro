@@ -2,8 +2,12 @@
 // Área de Serviços (vitrine): cards grandes com ícone, título e uma linha (servicos.na_home, 0020).
 // Cada card ganha uma das cores vivas do tema, em sequência. "Em breve" não é link.
 import Icone from '../Icone.astro';
-interface Props { servicos: any[]; titulo: string; cores: number }
-const { servicos, titulo, cores } = Astro.props;
+interface Props { servicos: any[]; titulo: string; cores: number; paleta?: { forte: string; claro: string }[] }
+const { servicos, titulo, cores, paleta = [] } = Astro.props;
+// Paleta própria dos cards (tema.cores_cards, D-52); sem ela, as cores vivas do tema.
+const hex = (v: unknown) => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v);
+const cartoes = paleta.filter((c) => hex(c?.forte) && hex(c?.claro));
+const estilo = (i: number) => cartoes.length ? `--forte:${cartoes[i % cartoes.length].forte};--claro:${cartoes[i % cartoes.length].claro}` : undefined;
 ---
 <div class="v-secao-titulo"><h2 id="titulo-servicos">{titulo}</h2></div>
 <ul class="v-servicos">
@@ -13,7 +17,7 @@ const { servicos, titulo, cores } = Astro.props;
     return (
       <li>
         {s.href ? (
-          <a class={`v-servico ${cor}`} href={s.href} target={s.externo ? '_blank' : undefined} rel={s.externo ? 'noopener' : undefined}>
+          <a class={`v-servico ${cor}`} style={estilo(i)} href={s.href} target={s.externo ? '_blank' : undefined} rel={s.externo ? 'noopener' : undefined}>
             <span class="v-servico-icone"><Icone nome={s.icone} /></span>
             <h3>{s.titulo}</h3>
             {s.descricao && <p>{s.descricao}</p>}
@@ -22,7 +26,7 @@ const { servicos, titulo, cores } = Astro.props;
             </span>
           </a>
         ) : (
-          <div class={`v-servico v-servico-breve ${cor}`}>
+          <div class={`v-servico v-servico-breve ${cor}`} style={estilo(i)}>
             <span class="v-chip">Em breve</span>
             <span class="v-servico-icone"><Icone nome={s.icone} /></span>
             <h3>{s.titulo}</h3>

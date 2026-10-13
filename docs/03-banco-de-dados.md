@@ -140,6 +140,8 @@ Tipos em `portal/src/lib/municipio.ts`.
   "cor_acento": "#f5b700",                               // botão do destaque, faixa de aviso (texto em cor_primaria)
   "cores_vivas": [ { "nome": "turquesa", "forte": "#127882", "claro": "#e6f6f7" }, ... ],  // até 6; forte aceita texto branco, claro é fundo de seção
   "fonte_titulos": "Prompt", "fonte_texto": "Prompt",   // só as auto-hospedadas (FONTES_DISPONIVEIS: Montserrat, Source Sans 3, Prompt); outra cai na fonte do sistema
+  "cores_cards": [ { "nome": "azul", "forte": "#2c5aa0", "claro": "#cfe0f7" }, ... ],   // paleta própria dos cards de Serviços (D-52)
+  "filtro_destaque": "neutro",   // película do destaque: "cor" (padrão) ou "neutro" (D-49)
   "cor_regua": "#d5ede6",   // fundo da régua de título das seções (D-46)
   "margem_destaque": "3cm", "margem_secoes": "6cm",   // telas a partir de 1100 px: margem lateral do destaque/cabeçalho e do conteúdo das seções (cm, rem ou px)
   "brasao_url": "https://..." }                          // alternativa a brasao_path (este tem preferência)
