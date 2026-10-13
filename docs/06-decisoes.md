@@ -419,3 +419,10 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - "reduzir movimento" desliga as animações.
 - **Dados:** consulta `eventosCalendario` (eventos publicados no intervalo, pela RLS) e fuso America/Sao_Paulo. O bloco "agenda" (lista) continua disponível; na SMEDU, foi substituído pelo calendário.
 - **Homologação:** 7 eventos. Só a prova do Vestibulinho (18/10) é real; os outros 6, e os 4 órgãos que aparecem como realizadores, são fictícios (`legado.ficticio = true`).
+
+**D-54 · 14/10/2026 · Cor do cabeçalho configurável; teste com `#00A693` (a pedido do usuário)**
+- **Configuração:** dois campos novos no tema, `tema.cor_cabecalho` (fundo do cabeçalho vitrine) e `tema.cor_cabecalho_texto` (texto, ícones, pontos e bordas do cabeçalho). Sem eles, valem a cor primária e o branco. O destaque do item de menu atual passou a clarear o fundo, em vez de escurecer, para funcionar com qualquer cor de texto.
+- **Teste com `#00A693` (verde-turquesa médio):**
+  - texto branco: contraste de **3,05:1**, abaixo do mínimo de 4,5:1 do eMAG/WCAG AA para o menu e a busca. O axe aponta 2 falhas na tela 1 e 8 na tela 2;
+  - texto verde-escuro `#002a2d`: contraste de 5,0:1, **sem falhas**.
+- **Na homologação** fica a versão acessível, com fundo `#00A693` e texto `#002a2d`, até a decisão do usuário. As duas prévias estão em `docs/previa/` do repositório Portais-Publicos.

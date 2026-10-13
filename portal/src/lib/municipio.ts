@@ -17,6 +17,9 @@ export interface Tema {
   cor_acento?: string;
   /** Fundo da régua de título das seções (D-46); padrão: a cor secundária bem clara. */
   cor_regua?: string;
+  /** Cabeçalho do vitrine (D-54): fundo e cor do texto; padrão: cor primária com texto branco. */
+  cor_cabecalho?: string;
+  cor_cabecalho_texto?: string;
   /** Paleta própria dos cards de Serviços (D-52): { forte, claro } em #rrggbb; sem ela, as cores vivas. */
   cores_cards?: { nome?: string; forte: string; claro: string }[];
   /** Película sobre as fotos do destaque (D-49): 'cor' (cor primária, padrão) ou 'neutro' (escurecimento sem cor). */

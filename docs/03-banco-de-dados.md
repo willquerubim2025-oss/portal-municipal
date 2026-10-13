@@ -142,6 +142,7 @@ Tipos em `portal/src/lib/municipio.ts`.
   "fonte_titulos": "Prompt", "fonte_texto": "Prompt",   // só as auto-hospedadas (FONTES_DISPONIVEIS: Montserrat, Source Sans 3, Prompt); outra cai na fonte do sistema
   "cores_cards": [ { "nome": "azul", "forte": "#2c5aa0", "claro": "#cfe0f7" }, ... ],   // paleta própria dos cards de Serviços (D-52)
   "filtro_destaque": "neutro",   // película do destaque: "cor" (padrão) ou "neutro" (D-49)
+  "cor_cabecalho": "#00a693", "cor_cabecalho_texto": "#002a2d",   // cabeçalho vitrine (D-54); padrão: cor primária e branco
   "cor_regua": "#d5ede6",   // fundo da régua de título das seções (D-46)
   "margem_destaque": "3cm", "margem_secoes": "6cm",   // telas a partir de 1100 px: margem lateral do destaque/cabeçalho e do conteúdo das seções (cm, rem ou px)
   "brasao_url": "https://..." }                          // alternativa a brasao_path (este tem preferência)
