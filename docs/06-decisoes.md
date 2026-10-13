@@ -375,3 +375,7 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **Em foco:** os painéis passaram a usar o tom **claro** da cor do card: salmão claro na Matrícula, verde claro na Bolsa. O texto fica em petróleo e cinza-escuro, as pílulas têm contorno petróleo e o botão é petróleo com texto branco. Não há mais painel de cor forte com texto branco.
 - **Cabeçalho:** "Secretaria Municipal de Educação" fica em uma linha, entre 18 e 22 px, a partir de 1181 px de largura. Em telas menores pode quebrar a linha.
 - **Verificação:** axe sem violações em 1920, 1366 e 390 px, e em alto contraste.
+
+**D-49 · 13/10/2026 · Destaque sem película verde (teste) e brasão na tela do menu (a pedido do usuário)**
+- **Película do destaque:** a película verde sobre as fotos foi trocada por uma neutra, que só escurece o lado do texto: preto a 62% → 38% → transparente, mais um escurecimento leve embaixo e sombra no texto. A foto mantém as cores reais. A opção fica no tema (`tema.filtro_destaque`: `'cor'`, o padrão, ou `'neutro'`), para comparar e voltar sem mexer no código.
+- **Brasão na tela 2 do cabeçalho:** a tela do menu passou a mostrar o brasão (sem o nome) na ponta esquerda, como link para a página inicial. Ele fica fora da ordem de tabulação, para não repetir o link da marca.

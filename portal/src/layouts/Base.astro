@@ -138,7 +138,7 @@ const sitePrefeitura = vitrine && cfg.site_prefeitura?.startsWith('https://') ? 
 const caminhoAtual = Astro.url.pathname;
 ---
 <!doctype html>
-<html lang="pt-BR" class={vitrine ? 'vitrine' : undefined} style={estiloTema || undefined}>
+<html lang="pt-BR" class={vitrine ? (tema.filtro_destaque === 'neutro' ? 'vitrine v-filtro-neutro' : 'vitrine') : undefined} style={estiloTema || undefined}>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -214,6 +214,7 @@ const caminhoAtual = Astro.url.pathname;
               </form>
             </div>
             <div class="v-cab-tela v-cab-tela-2" data-tela="1">
+              {brasao && <a href="/" class="v-cab-brasao v-cab-brasao-menu" aria-label="Página inicial" tabindex="-1"><img src={brasao} alt="" width="64" height="64" /></a>}
               <nav id="menu" class="menu-principal" aria-label="Menu principal">
                 <details class="menu-movel" open>
                   <summary>Menu</summary>

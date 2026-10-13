@@ -97,6 +97,8 @@
 .v-cab-tela-1 .busca input { border-color: transparent; background: #fff; }
 .v-cab-tela-1 .busca button { background: var(--v-secundaria-escura); }
 .v-cab-tela-2 .menu-principal { flex: 1 1 auto; }
+.v-cab-brasao-menu { flex: none; }
+.v-cab:not(.v-cab-animado) .v-cab-brasao-menu { display: none; }
 .v-cab-animado .v-cab-pista { flex-wrap: nowrap; transition: transform var(--v-cab-transicao, 2s) cubic-bezier(.65, 0, .35, 1); will-change: transform; }
 .v-cab-animado .v-cab-tela { flex: 0 0 100%; padding-inline: 6px; }   /* folga para a borda da tela vizinha não vazar no recorte */
 .v-cab-animado .v-cab-clone { display: flex; }
@@ -153,6 +155,9 @@
 .v-slide-ativo { opacity: 1; visibility: visible; transition: opacity 1.1s ease; }
 .v-slide-imagem { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; z-index: -1; }
 .v-slide::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, color-mix(in srgb, var(--cor-primaria) 92%, transparent) 0%, color-mix(in srgb, var(--cor-primaria) 70%, transparent) 45%, transparent 85%), linear-gradient(0deg, color-mix(in srgb, var(--cor-primaria) 60%, transparent), transparent 50%); }
+/* Película neutra (tema.filtro_destaque = 'neutro', D-49): só escurece o lado do texto, sem tingir a foto. */
+.v-filtro-neutro .v-slide::after { background: linear-gradient(90deg, rgb(0 0 0 / .62) 0%, rgb(0 0 0 / .38) 45%, transparent 80%), linear-gradient(0deg, rgb(0 0 0 / .35), transparent 45%); }
+.v-filtro-neutro .v-slide-texto h2, .v-filtro-neutro .v-slide-texto p { text-shadow: 0 1px 12px rgb(0 0 0 / .45); }
 .v-slide-vazio::after { background: radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--cor-secundaria) 55%, transparent) 0 22%, transparent 23%), radial-gradient(circle at 70% 95%, color-mix(in srgb, var(--v-acento) 85%, transparent) 0 14%, transparent 15%); }
 .v-slide-texto { display: grid; gap: 1rem; padding-block: 3rem 4.5rem; justify-items: start; }
 .v-slide-texto h2 { color: #fff; margin: 0; font-weight: 700; font-size: clamp(1.6rem, 1.1rem + 2vw, 2.6rem); max-width: 22ch; line-height: 1.15; }
