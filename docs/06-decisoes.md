@@ -435,3 +435,7 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **Fundo cinza configurável:** `config.home.fundo_cinza` (lista de blocos; padrão: só o calendário). Na SMEDU, Notícias e Eventos. Esses blocos ficam fora da alternância de fundos.
 - **Botões de ação** (`.v-botao-acento`, como o do destaque): fundo branco com texto petróleo, no lugar do salmão.
 - **Cabeçalho:** o teste com `#00A693` (D-54) foi descartado e o tema voltou ao fundo petróleo com texto branco. Os campos `cor_cabecalho` e `cor_cabecalho_texto` continuam disponíveis para outros órgãos.
+
+**D-56 · 14/10/2026 · Régua das seções de ponta a ponta; Eventos antes de Serviços (a pedido do usuário)**
+- A faixa verde-água com o título da seção passou a ir até as bordas da tela. O fundo é estendido com `box-shadow` e `clip-path`, sem criar rolagem horizontal, e o título continua centralizado no miolo. Saíram os cantos arredondados.
+- **Ordem dos blocos na SMEDU:** destaque, Notícias, Em foco, Eventos, Serviços, Equipe gestora.
