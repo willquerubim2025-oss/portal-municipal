@@ -364,3 +364,14 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - com "reduzir movimento", sem JavaScript ou em telas menores, as duas telas aparecem uma abaixo da outra, sem animação.
 - **Risco a avaliar com a SMEDU:** o menu fica visível só metade do tempo. Se atrapalhar a navegação, basta `carrossel: false`.
 - **Verificação:** axe sem violações em 1366 px, no celular e com "reduzir movimento".
+
+**D-48 · 13/10/2026 · Cores vivas suavizadas e nome da Secretaria em uma linha (a pedido do usuário; ajusta D-39 e D-45)**
+- **Paleta "viva" da SMEDU:** o lilás e o anil destoavam do restante e saíram. A paleta passou a ser:
+  - areia `#8a5a3c`/`#f7efe6`;
+  - salmão `#a8482a`/`#fbe3d6`;
+  - coral `#c2412d`/`#fdebe7`;
+  - verde `#286b4f`/`#dcefe6`.
+  - Contrastes: branco sobre o forte, de 5,3 a 6,4; forte sobre o claro, de 4,7 a 5,3; petróleo sobre o claro, cerca de 9.
+- **Em foco:** os painéis passaram a usar o tom **claro** da cor do card: salmão claro na Matrícula, verde claro na Bolsa. O texto fica em petróleo e cinza-escuro, as pílulas têm contorno petróleo e o botão é petróleo com texto branco. Não há mais painel de cor forte com texto branco.
+- **Cabeçalho:** "Secretaria Municipal de Educação" fica em uma linha, entre 18 e 22 px, a partir de 1181 px de largura. Em telas menores pode quebrar a linha.
+- **Verificação:** axe sem violações em 1920, 1366 e 390 px, e em alto contraste.

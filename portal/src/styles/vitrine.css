@@ -51,7 +51,8 @@
 .v-cab-brasao { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 12px; background: #fff; flex: none; }
 .v-cab-brasao img { width: 46px; height: 46px; object-fit: contain; }
 .vitrine .v-cab .marca-tipo { font-size: .7rem; color: rgb(255 255 255 / .8); letter-spacing: .03em; }
-.vitrine .v-cab .marca-nome { font-size: .98rem; font-weight: 600; line-height: 1.15; max-width: 15ch; color: #fff; }
+.vitrine .v-cab .marca-nome { font-size: clamp(1.1rem, .9rem + .55vw, 1.4rem); font-weight: 600; line-height: 1.15; color: #fff; }
+@media (min-width: 1181px) { .vitrine .v-cab .marca-nome { white-space: nowrap; max-width: none; } }
 .vitrine .v-cab .menu-principal { min-width: 0; background: none; border: 0; }
 .vitrine .v-cab .menu-lista { flex-wrap: nowrap; justify-content: center; }
 .vitrine .menu-lista a, .vitrine .menu-lista .menu-grupo { font-weight: 600; font-size: .78rem; letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; }
@@ -280,21 +281,24 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 /* Em foco (D-44): cards grandes, alternando foto em cima e embaixo e com alturas diferentes. */
 .v-fundo-foco { background: linear-gradient(180deg, #fff 0, var(--v-faixa-neutra) 100%); }
 .v-foco { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.5rem; }
-.v-foco-item { display: grid; grid-template-columns: 5fr 7fr; min-height: 320px; border-radius: 22px; overflow: hidden; background: var(--forte, var(--cor-primaria)); color: #fff; box-shadow: var(--v-sombra); }
+.v-foco-item { display: grid; grid-template-columns: 5fr 7fr; min-height: 320px; border-radius: 22px; overflow: hidden; background: var(--claro, var(--v-faixa-neutra)); color: var(--cor-texto); box-shadow: var(--v-sombra); }
 .v-foco-invertido { grid-template-columns: 7fr 5fr; }
 .v-foco-invertido .v-foco-foto { order: 2; }
 .v-foco-foto { width: 100%; height: 100%; min-height: 240px; object-fit: cover; }
 .v-foco-painel { position: relative; overflow: hidden; display: grid; gap: .8rem; justify-items: start; align-content: center; padding: clamp(1.5rem, 3vw, 2.5rem); }
-.v-foco-painel::before { content: ""; position: absolute; right: -40px; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: rgb(255 255 255 / .08); pointer-events: none; }
-.v-foco-chamada { margin: 0; font-family: var(--v-fonte-titulos); font-size: .75rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: rgb(255 255 255 / .9); }
-.v-foco-painel h3 { margin: 0; color: #fff; font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem); font-weight: 700; line-height: 1.15; }
-.v-foco-painel > p { margin: 0; max-width: 46ch; color: rgb(255 255 255 / .95); }
+.v-foco-painel::before { content: ""; position: absolute; right: -40px; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: color-mix(in srgb, var(--forte, var(--cor-primaria)) 10%, transparent); pointer-events: none; }
+.v-foco-chamada { margin: 0; font-family: var(--v-fonte-titulos); font-size: .75rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--forte, var(--v-secundaria-escura)); }
+.v-foco-painel h3 { margin: 0; color: var(--cor-primaria); font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem); font-weight: 700; line-height: 1.15; }
+.v-foco-painel > p { margin: 0; max-width: 52ch; color: var(--cor-texto); }
 .v-foco-links { list-style: none; display: flex; flex-wrap: wrap; gap: .5rem; margin: .2rem 0 .4rem; padding: 0; }
-.v-foco-links a { display: inline-block; padding: .4rem .85rem; border-radius: 999px; border: 1px solid rgb(255 255 255 / .6); color: #fff; text-decoration: none; font-size: .85rem; font-weight: 500; }
-.v-foco-links a:hover, .v-foco-links a:focus-visible { background: #fff; color: var(--forte); }
+.v-foco-links a { display: inline-block; padding: .4rem .85rem; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--cor-primaria) 35%, transparent); background: rgb(255 255 255 / .6); color: var(--cor-primaria); text-decoration: none; font-size: .85rem; font-weight: 500; }
+.v-foco-links a:hover, .v-foco-links a:focus-visible { background: var(--cor-primaria); border-color: var(--cor-primaria); color: #fff; }
+.v-foco-item .v-botao-acento { --b: var(--cor-primaria); color: #fff; }
 .v-foco-item .v-botao-acento svg { width: 1.1em; height: 1.1em; }
 @media (max-width: 860px) { .v-foco-item, .v-foco-invertido { grid-template-columns: 1fr; } .v-foco-invertido .v-foco-foto { order: 0; } .v-foco-foto { height: 220px; min-height: 0; } }
 :root.contraste.vitrine .v-foco-item { background: #000; border: 1px solid #fff; }
+:root.contraste.vitrine .v-foco-painel > p, :root.contraste.vitrine .v-foco-chamada { color: #fff; }
+:root.contraste.vitrine .v-foco-links a { background: #000; }
 :root.contraste.vitrine .v-foco-painel h3, :root.contraste.vitrine .v-foco-links a { color: #ff0; border-color: #ff0; }
 
 /* ---------------------------------------------------- busca de escola */
