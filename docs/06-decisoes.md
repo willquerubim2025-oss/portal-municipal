@@ -544,3 +544,14 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - Fora do compacto, segue o esmaecimento de antes.
 - **Botão do cabeçalho:** o texto proposto para a SMEDU passa a ser **"Fale com a Educação"** (`config.cabecalho.botao.rotulo`). O link continua `/fale-com-o-supervisor` até a SMEDU definir um canal de contato geral.
 - Verificação: posições medidas no meio e no fim da transição, nos dois sentidos; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste; `astro build` passando.
+
+**D-67 · 14/10/2026 · Serviços no estilo do modelo (PBH): fundo cinza claro e cards brancos centralizados (a pedido do usuário; ajusta D-51/D-52 no cabeçalho claro)**
+- **Fundo da seção de Serviços:** cinza bem claro, **#f5f7f9**, medido nos pixels do print do modelo. Vale só nessa seção; as outras seguem brancas (D-61). Variável `--v-fundo-servicos`.
+- **Cards:** brancos, com raio de 16 px, sombra suave e conteúdo centralizado:
+  - ícone num quadrado claro da cor secundária (turquesa a 28%) com o ícone em petróleo, no lugar do azul da PBH;
+  - título em negrito, em petróleo;
+  - descrição curta;
+  - sem o "Acessar →" visível (fica só para leitor de tela), porque o card inteiro é o link, como no modelo.
+- **Interação e "Em breve":** ao passar o mouse, o card sobe e o ícone fica petróleo com o desenho branco. Os cards "Em breve" têm borda tracejada e ícone em cinza.
+- A paleta colorida dos cards (`tema.cores_cards`, D-52) deixa de ser usada no cabeçalho claro; segue valendo no layout anterior.
+- Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.

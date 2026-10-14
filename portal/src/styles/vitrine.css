@@ -675,3 +675,23 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .v-destaque-compacto .v-slide-sai-esq { transform: translateX(-100%); visibility: hidden; }
 .v-destaque-compacto .v-slide-sai-dir { transform: translateX(100%); visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { .v-destaque-compacto .v-slide, .v-destaque-compacto .v-slide-ativo { transition: none; } }
+
+/* D-67: Serviços no estilo do modelo (PBH), no cabeçalho claro: seção com fundo cinza bem claro (#f5f7f9, medido no
+   print do modelo), cards brancos com conteúdo centralizado, ícone num quadrado claro da cor secundária, título em
+   negrito e descrição curta; o card inteiro é o link ("Acessar" some da vista, como no modelo). */
+.vitrine.v-claro .v-bloco-servicos { background: var(--v-fundo-servicos, #f5f7f9); }
+.v-claro .v-servicos { gap: 1rem; }
+.vitrine.v-claro .v-servico { --forte: var(--cor-primaria); background: #fff; border: 0; border-radius: 16px; box-shadow: 0 1px 2px rgb(0 0 0 / .06), 0 4px 14px rgb(0 0 0 / .07);
+  justify-items: center; text-align: center; align-content: center; gap: .45rem; padding: 1.75rem 1.5rem; min-height: 190px; }
+.vitrine.v-claro a.v-servico:hover, .vitrine.v-claro a.v-servico:focus-visible { transform: translateY(-4px); box-shadow: 0 2px 4px rgb(0 0 0 / .06), 0 12px 28px rgb(0 0 0 / .12); }
+.vitrine.v-claro .v-servico-icone { width: 46px; height: 46px; border-radius: 10px; margin-bottom: .35rem;
+  background: color-mix(in srgb, var(--cor-secundaria) 28%, #fff); color: var(--cor-primaria); }
+.vitrine.v-claro .v-servico-icone svg { width: 24px; height: 24px; }
+.vitrine.v-claro a.v-servico:hover .v-servico-icone, .vitrine.v-claro a.v-servico:focus-visible .v-servico-icone { transform: scale(1.06); background: var(--cor-primaria); color: #fff; }
+.vitrine.v-claro .v-servico h3 { font-size: 1.05rem; font-weight: 700; color: var(--cor-primaria); }
+.vitrine.v-claro .v-servico p { font-size: .9rem; color: #3d4a4f; max-width: 30ch; }
+.vitrine.v-claro .v-servico-ir { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.vitrine.v-claro .v-servico-breve { background: #fff; border: 1px dashed color-mix(in srgb, var(--cor-primaria) 25%, #fff); box-shadow: none; }
+.vitrine.v-claro .v-servico-breve .v-servico-icone { background: #eef1f2; color: #5b6b70; }
+.vitrine.v-claro .v-chip { background: #eef1f2; color: #3d4a4f; border-color: #d5dcde; }
+:root.contraste.vitrine.v-claro .v-bloco-servicos, :root.contraste.vitrine.v-claro .v-servico { background: #000; }
