@@ -4,7 +4,8 @@
 // a cada 7,5 s; pausa com o mouse, com o foco e pelo botão (eMAG / WCAG 2.2.2). Com
 // "reduzir movimento" no aparelho, não troca sozinho. Sem banner, mostra o nome e o slogan.
 // Compacto (cabeçalho claro, D-57): mais baixo, alinhado ao cabeçalho, com setas laterais,
-// pausa redonda no canto e indicadores numerados.
+// pausa redonda no canto e indicadores numerados. No compacto os slides deslizam (D-66): avançar entra pela
+// direita e sai pela esquerda; voltar (seta da esquerda ou ponto anterior), o contrário.
 import { urlImagem, srcsetImagem } from '../../lib/imagens';
 interface Props { banners: any[]; titulo: string; slogan?: string; compacto?: boolean }
 const { banners, titulo, slogan, compacto = false } = Astro.props;
@@ -80,8 +81,21 @@ const varios = banners.length > 1;
     let suspenso = false;          // mouse ou foco dentro do carrossel
     let relogio: number | undefined;
 
-    const mostrar = (n: number) => {
+    const deslizar = raiz.classList.contains('v-destaque-compacto') && !reduzir;
+    const mostrar = (n: number, sentido = 1) => {
+      const anterior = atual;
       atual = (n + slides.length) % slides.length;
+      if (deslizar && atual !== anterior) {
+        // O que sai vai para o lado oposto ao de onde o novo entra; o novo parte do lado certo, sem animação.
+        slides.forEach((s) => s.classList.remove('v-slide-sai-esq', 'v-slide-sai-dir'));
+        slides[anterior].classList.add(sentido > 0 ? 'v-slide-sai-esq' : 'v-slide-sai-dir');
+        const novo = slides[atual];
+        novo.style.transition = 'none';
+        novo.style.transform = `translateX(${sentido > 0 ? 100 : -100}%)`;
+        void novo.offsetWidth;
+        novo.style.transition = '';
+        novo.style.transform = '';
+      }
       slides.forEach((s, i) => {
         const ativo = i === atual;
         s.classList.toggle('v-slide-ativo', ativo);
@@ -99,8 +113,8 @@ const varios = banners.length > 1;
       if (rotulo) rotulo.textContent = parado ? 'Continuar' : 'Pausar';
     };
 
-    pontos.forEach((p, i) => p.addEventListener('click', () => { mostrar(i); agendar(); }));
-    raiz.querySelectorAll<HTMLButtonElement>('[data-passo]').forEach((b) => b.addEventListener('click', () => { mostrar(atual + Number(b.dataset.passo)); agendar(); }));
+    pontos.forEach((p, i) => p.addEventListener('click', () => { mostrar(i, i < atual ? -1 : 1); agendar(); }));
+    raiz.querySelectorAll<HTMLButtonElement>('[data-passo]').forEach((b) => b.addEventListener('click', () => { const passo = Number(b.dataset.passo); mostrar(atual + passo, passo); agendar(); }));
     pausa?.addEventListener('click', () => { parado = !parado; atualizarPausa(); agendar(); });
     raiz.addEventListener('mouseenter', () => { suspenso = true; agendar(); });
     raiz.addEventListener('mouseleave', () => { suspenso = false; agendar(); });

@@ -535,3 +535,12 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - O "Ver todas…" segue centralizado no fim da seção (D-50).
 - No alto contraste, o título fica em amarelo sobre preto.
 - Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.
+
+**D-66 · 14/10/2026 · Destaque compacto desliza da direita para a esquerda; botão "Fale com a Educação" (a pedido do usuário)**
+- **Carrossel:** no destaque compacto (cabeçalho claro), os slides deslizam (0,9 s) em vez de esmaecer:
+  - ao avançar (automático, seta da direita ou ponto seguinte), o slide atual sai pela esquerda e o novo entra pela direita;
+  - ao voltar (seta da esquerda ou ponto anterior), o sentido se inverte.
+  - Com "reduzir movimento", troca sem animação e sem passar sozinho.
+  - Fora do compacto, segue o esmaecimento de antes.
+- **Botão do cabeçalho:** o texto proposto para a SMEDU passa a ser **"Fale com a Educação"** (`config.cabecalho.botao.rotulo`). O link continua `/fale-com-o-supervisor` até a SMEDU definir um canal de contato geral.
+- Verificação: posições medidas no meio e no fim da transição, nos dois sentidos; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste; `astro build` passando.

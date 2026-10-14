@@ -666,3 +666,12 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .vitrine.v-claro .v-secao-titulo h2::before { display: none; }
 :root.contraste.vitrine.v-claro .v-secao-titulo { background: none; border: 0; }
 :root.contraste.vitrine.v-claro .v-secao-titulo h2 { color: #ff0; }
+
+/* D-66: no destaque compacto os slides deslizam da direita para a esquerda (avançar) em vez de esmaecer.
+   Parados fora de cena ficam à direita, ocultos e sem transição; o script põe o novo no lado de entrada. */
+.v-destaque-compacto .v-slide { opacity: 1; visibility: hidden; transform: translateX(100%); transition: none; }
+.v-destaque-compacto .v-slide-ativo { visibility: visible; transform: none; transition: transform .9s cubic-bezier(.65, 0, .35, 1); }
+.v-destaque-compacto .v-slide-sai-esq, .v-destaque-compacto .v-slide-sai-dir { visibility: visible; transition: transform .9s cubic-bezier(.65, 0, .35, 1), visibility 0s linear .9s; }
+.v-destaque-compacto .v-slide-sai-esq { transform: translateX(-100%); visibility: hidden; }
+.v-destaque-compacto .v-slide-sai-dir { transform: translateX(100%); visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .v-destaque-compacto .v-slide, .v-destaque-compacto .v-slide-ativo { transition: none; } }
