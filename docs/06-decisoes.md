@@ -507,3 +507,13 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - no celular, nome com 1,05 rem.
 - **A ligar na homologação junto com o D-57:** `tema.fonte_cabecalho = 'Raleway'`.
 - Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.
+
+**D-63 · 14/10/2026 · Cabeçalho claro em uma linha só, como no modelo; largura útil de 1360 px (a pedido do usuário; ajusta D-57 e D-58)**
+- O menu fica **entre a marca e a lupa/botão, na mesma linha**, como no portal da PBH. Para os 8 itens da SMEDU caberem:
+  - menu com 0,78 rem (≈ 12,5 px) e menos espaço entre os itens;
+  - brasão de 66 px; nome com até 1,22 rem e caixa limitada a 10,5 em. Antes, a caixa tinha 21ch e sobrava espaço vazio ao lado do nome;
+  - "Prefeitura de Paulínia" com espaçamento entre letras menor;
+  - botão mais compacto.
+- **Largura útil** de 1290 para **1360 px** (novo padrão de `tema.largura_topo`; ≈ 7,4 cm de margem em tela de 1920 px). Vale para todo o conteúdo (D-60).
+- **Resultado:** uma linha só a partir de 1366 px de tela, com altura de 105 px. Abaixo disso, o script de D-57 leva o menu para a segunda linha, e no tablet e no celular continua o botão "Menu". Com um menu maior (outro órgão), vale o mesmo recuo automático.
+- Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste; alinhamento conferido a 1920 e 1440 px.
