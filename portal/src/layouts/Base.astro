@@ -134,13 +134,22 @@ const marca2 = cfg.marca?.linha2 ?? nomeCurto(m);
 // Cabeçalho em carrossel (D-47): config.cabecalho.carrossel (padrão: ligado no vitrine); tempos em segundos, com limites.
 const cfgCab = cfg.cabecalho ?? {};
 const limitar = (v: unknown, min: number, max: number, padrao: number) => (typeof v === 'number' && v >= min && v <= max ? v : padrao);
-const carrosselCab = vitrine && cfgCab.carrossel !== false
+// Cabeçalho claro (D-57): barra de acessibilidade na cor do cabeçalho + cabeçalho branco; sem carrossel.
+const claro = vitrine && cfgCab.estilo === 'claro';
+const carrosselCab = vitrine && !claro && cfgCab.carrossel !== false
   ? { intervalo: limitar(cfgCab.intervalo_s, 4, 20, 7), transicao: limitar(cfgCab.transicao_s, 0.3, 3, 2) } : null;
 const sitePrefeitura = vitrine && cfg.site_prefeitura?.startsWith('https://') ? cfg.site_prefeitura : null;
+const botaoCab = claro && cfgCab.botao?.rotulo && /^(\/|https:\/\/)/.test(cfgCab.botao.url ?? '') ? cfgCab.botao : null;
+// Faixa colorida sob a barra (D-57): segmentos iguais; sem tema.cores_faixa, cores do próprio tema.
+const coresFaixa = (tema.cores_faixa ?? []).filter((c) => cor(c));
+const faixaCores = coresFaixa.length
+  ? `linear-gradient(90deg, ${coresFaixa.map((c, i) => `${c} ${(100 * i) / coresFaixa.length}% ${(100 * (i + 1)) / coresFaixa.length}%`).join(', ')})`
+  : undefined;
+const classeHtml = vitrine ? ['vitrine', tema.filtro_destaque === 'neutro' && 'v-filtro-neutro', claro && 'v-claro'].filter(Boolean).join(' ') : undefined;
 const caminhoAtual = Astro.url.pathname;
 ---
 <!doctype html>
-<html lang="pt-BR" class={vitrine ? (tema.filtro_destaque === 'neutro' ? 'vitrine v-filtro-neutro' : 'vitrine') : undefined} style={estiloTema || undefined}>
+<html lang="pt-BR" class={classeHtml} style={estiloTema || undefined}>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -178,8 +187,9 @@ const caminhoAtual = Astro.url.pathname;
 
   <!-- Barra de acessibilidade (eMAG 3.1): atalhos numéricos e alto contraste.
        No layout vitrine a barra vira cabeçalho único: os atalhos ficam ocultos até receberem foco
-       (Tab ou accesskey) e as ferramentas sobem para a linha da marca. -->
-  <div class={vitrine ? 'barra-acessibilidade v-pular' : 'barra-acessibilidade'}>
+       (Tab ou accesskey) e as ferramentas sobem para a linha da marca. No cabeçalho claro (D-57) a barra
+       fica visível, estreita e na cor do cabeçalho, com uma faixa colorida embaixo. -->
+  <div class={vitrine ? (claro ? 'barra-acessibilidade v-topo' : 'barra-acessibilidade v-pular') : 'barra-acessibilidade'}>
     <div class="container">
       <ul class="atalhos" aria-label="Atalhos de teclado">
         <li><a href="#conteudo" accesskey="1">Ir para o conteúdo <span>1</span></a></li>
@@ -187,15 +197,63 @@ const caminhoAtual = Astro.url.pathname;
         <li><a href="#busca" accesskey="3">Ir para a busca <span>3</span></a></li>
         <li><a href="#rodape" accesskey="4">Ir para o rodapé <span>4</span></a></li>
       </ul>
-      {!vitrine && <Ferramentas />}
+      {(!vitrine || claro) && (
+        <div class="v-topo-direita">
+          <Ferramentas />
+          {sitePrefeitura && (
+            <a class="v-topo-prefeitura" href={sitePrefeitura}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+              Site da Prefeitura
+            </a>
+          )}
+        </div>
+      )}
     </div>
   </div>
+  {claro && <div class="v-topo-cores" aria-hidden="true" style={faixaCores ? `background:${faixaCores}` : undefined}></div>}
 
 
   <!-- Layout vitrine (D-42, D-47): cabeçalho no verde da Prefeitura. Em telas largas é um carrossel de duas telas
        (1: marca + busca; 2: menu) que desliza da direita para a esquerda. Pausa com o mouse ou o foco em cima e
        tem botão de pausa (WCAG 2.2.2); com "reduzir movimento" ou sem JavaScript, as duas telas ficam visíveis. -->
-  {vitrine ? (
+  <!-- Cabeçalho claro (D-57): fundo branco, brasão em cores, menu ao centro, lupa (abre a busca) e botão de ação. -->
+  {claro ? (
+  <header class="cabecalho v-cab v-cab-claro">
+      <div class="v-cab-linha">
+        <a href="/" class="marca" aria-label={`${m.nome} — página inicial`}>
+          {brasao && <img class="v-cab-claro-brasao" src={brasao} alt="" width="80" height="80" />}
+          <span class="marca-texto">
+            <span class="marca-tipo">{marca1}</span>
+            <span class="marca-nome">{marca2}</span>
+          </span>
+        </a>
+        <nav id="menu" class="menu-principal" aria-label="Menu principal">
+          <details class="menu-movel" open>
+            <summary>Menu</summary>
+            <MenuItens itens={itensMenu} atual={caminhoAtual} />
+          </details>
+        </nav>
+        <div class="v-cab-acoes">
+          <button type="button" class="v-cab-lupa" data-painel="v-painel-busca" aria-expanded="false" aria-controls="v-painel-busca" aria-label="Buscar no portal" title="Buscar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
+          </button>
+          {botaoCab && (
+            <a class="v-cab-fale" href={botaoCab.url}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M19 9h1a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg>
+              <span>{botaoCab.rotulo}</span>
+            </a>
+          )}
+        </div>
+      </div>
+      <div class="v-cab-painel" id="v-painel-busca">
+        <form class="busca" action="/busca" method="get" role="search">
+          <label for="busca" class="sr-only">Buscar no portal</label>
+          <input id="busca" name="q" type="search" placeholder="O que você procura?" required />
+          <button type="submit">Buscar</button>
+        </form>
+      </div>
+    </header>
+  ) : vitrine ? (
   <header class="cabecalho v-cab" data-cab-carrossel={carrosselCab ? '' : undefined}
       data-intervalo={carrosselCab?.intervalo} data-transicao={carrosselCab?.transicao}>
       <div class="v-cab-linha">
@@ -381,6 +439,24 @@ const caminhoAtual = Astro.url.pathname;
       b.addEventListener('click', () => abrirPainel(b, b.getAttribute('aria-expanded') !== 'true'));
       document.getElementById(b.dataset.painel!)?.addEventListener('keydown', (e) => { if (e.key === 'Escape') { abrirPainel(b, false); b.focus(); } });
     });
+    // Cabeçalho claro (D-57): "Ir para a busca" (atalho 3) abre o painel da busca antes de levar o foco a ela.
+    const lupa = document.querySelector<HTMLButtonElement>('.v-cab-lupa');
+    if (lupa) document.querySelectorAll<HTMLAnchorElement>('a[href="#busca"]').forEach((a) => a.addEventListener('click', (e) => {
+      e.preventDefault();
+      abrirPainel(lupa, true);
+    }));
+    // Cabeçalho claro: o menu fica na linha da marca só se couber nela; senão desce para uma segunda linha.
+    const cabClaro = document.querySelector<HTMLElement>('.v-cab-claro');
+    if (cabClaro) {
+      const nav = cabClaro.querySelector<HTMLElement>('.menu-principal')!, lista = nav.querySelector<HTMLElement>('.menu-lista')!;
+      const medir = () => {
+        cabClaro.classList.add('v-cab-uma-linha');
+        if (!matchMedia('(min-width: 1181px)').matches || lista.scrollWidth > nav.clientWidth + 1) cabClaro.classList.remove('v-cab-uma-linha');
+      };
+      medir();
+      addEventListener('resize', medir);
+      document.fonts?.ready.then(medir);
+    }
     // Cabeçalho em carrossel (D-47): duas telas que deslizam da direita para a esquerda (a 1ª é clonada no fim,
     // para a volta também andar para a esquerda). Pausa com mouse/foco em cima e pelo botão; o foco numa tela a mostra.
     const cab = document.querySelector<HTMLElement>('[data-cab-carrossel]');

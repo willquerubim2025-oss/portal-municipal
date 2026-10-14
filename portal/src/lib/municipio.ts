@@ -20,6 +20,8 @@ export interface Tema {
   /** Cabeçalho do vitrine (D-54): fundo e cor do texto; padrão: cor primária com texto branco. */
   cor_cabecalho?: string;
   cor_cabecalho_texto?: string;
+  /** Cabeçalho claro (D-57): cores da faixa fina sob a barra de acessibilidade, em segmentos iguais. Padrão: secundária, acento e duas cores vivas. */
+  cores_faixa?: string[];
   /** Paleta própria dos cards de Serviços (D-52): { forte, claro } em #rrggbb; sem ela, as cores vivas. */
   cores_cards?: { nome?: string; forte: string; claro: string }[];
   /** Película sobre as fotos do destaque (D-49): 'cor' (cor primária, padrão) ou 'neutro' (escurecimento sem cor). */
@@ -71,8 +73,10 @@ export interface Config {
   /** Site do ente ao qual a organização pertence (ex.: a Prefeitura de uma secretaria): barra "Voltar ao site". */
   site_prefeitura?: string;
   /** Layout vitrine: blocos da página inicial e textos das seções. */
-  /** Cabeçalho do layout vitrine em carrossel (D-47): ligado por padrão; tempos em segundos. */
-  cabecalho?: { carrossel?: boolean; intervalo_s?: number; transicao_s?: number };
+  /** Cabeçalho do layout vitrine em carrossel (D-47): ligado por padrão; tempos em segundos.
+   *  estilo 'claro' (D-57): barra de acessibilidade na cor do cabeçalho, cabeçalho branco com marca, menu, lupa e
+   *  um botão de ação (`botao`), e destaque mais baixo com setas. Desliga o carrossel do cabeçalho. */
+  cabecalho?: { carrossel?: boolean; intervalo_s?: number; transicao_s?: number; estilo?: 'carrossel' | 'claro'; botao?: { rotulo: string; url: string } };
   home?: { blocos?: BlocoHome[]; titulos?: Partial<Record<BlocoHome, string>>; foco?: ItemFoco[]; fundo_cinza?: BlocoHome[] };
 }
 

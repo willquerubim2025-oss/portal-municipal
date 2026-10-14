@@ -3,12 +3,14 @@
 // metade da altura da tela, para as notícias aparecerem sem rolar. Troca por esmaecimento
 // a cada 7,5 s; pausa com o mouse, com o foco e pelo botão (eMAG / WCAG 2.2.2). Com
 // "reduzir movimento" no aparelho, não troca sozinho. Sem banner, mostra o nome e o slogan.
+// Compacto (cabeçalho claro, D-57): mais baixo, alinhado ao cabeçalho, com setas laterais,
+// pausa redonda no canto e indicadores numerados.
 import { urlImagem, srcsetImagem } from '../../lib/imagens';
-interface Props { banners: any[]; titulo: string; slogan?: string }
-const { banners, titulo, slogan } = Astro.props;
+interface Props { banners: any[]; titulo: string; slogan?: string; compacto?: boolean }
+const { banners, titulo, slogan, compacto = false } = Astro.props;
 const varios = banners.length > 1;
 ---
-<section class="v-destaque" aria-roledescription={varios ? 'carrossel' : undefined} aria-label="Destaques" data-carrossel={varios ? '' : undefined}>
+<section class={compacto ? 'v-destaque v-destaque-compacto' : 'v-destaque'} aria-roledescription={varios ? 'carrossel' : undefined} aria-label="Destaques" data-carrossel={varios ? '' : undefined}>
   {banners.length === 0 ? (
     <div class="v-slide v-slide-ativo v-slide-vazio">
       <div class="v-miolo v-slide-texto">
@@ -40,11 +42,25 @@ const varios = banners.length > 1;
   {varios && (
     <div class="v-miolo v-carrossel-controles">
       <button type="button" class="v-carrossel-pausa" data-pausa aria-pressed="false">
-        <span data-rotulo>Pausar</span><span class="sr-only"> a troca automática dos destaques</span>
+        {compacto && (
+          <svg class="v-icone-pausar" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/></svg>
+          <svg class="v-icone-continuar" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg>
+        )}
+        <span data-rotulo class={compacto ? 'sr-only' : undefined}>Pausar</span><span class="sr-only"> a troca automática dos destaques</span>
       </button>
+      {compacto && (
+        <>
+          <button type="button" class="v-carrossel-seta v-carrossel-anterior" data-passo="-1" aria-label="Destaque anterior">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <button type="button" class="v-carrossel-seta v-carrossel-proximo" data-passo="1" aria-label="Próximo destaque">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </>
+      )}
       <div class="v-carrossel-pontos" role="group" aria-label="Escolher destaque">
         {banners.map((b, i) => (
-          <button type="button" data-ir={i} aria-label={`Destaque ${i + 1}: ${b.titulo}`} aria-current={i === 0 ? 'true' : undefined}></button>
+          <button type="button" data-ir={i} aria-label={`Destaque ${i + 1}: ${b.titulo}`} aria-current={i === 0 ? 'true' : undefined}>{compacto && <span aria-hidden="true">{i + 1}</span>}</button>
         ))}
       </div>
     </div>
@@ -84,6 +100,7 @@ const varios = banners.length > 1;
     };
 
     pontos.forEach((p, i) => p.addEventListener('click', () => { mostrar(i); agendar(); }));
+    raiz.querySelectorAll<HTMLButtonElement>('[data-passo]').forEach((b) => b.addEventListener('click', () => { mostrar(atual + Number(b.dataset.passo)); agendar(); }));
     pausa?.addEventListener('click', () => { parado = !parado; atualizarPausa(); agendar(); });
     raiz.addEventListener('mouseenter', () => { suspenso = true; agendar(); });
     raiz.addEventListener('mouseleave', () => { suspenso = false; agendar(); });

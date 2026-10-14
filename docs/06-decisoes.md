@@ -439,3 +439,25 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 **D-56 · 14/10/2026 · Régua das seções de ponta a ponta; Eventos antes de Serviços (a pedido do usuário)**
 - A faixa verde-água com o título da seção passou a ir até as bordas da tela. O fundo é estendido com `box-shadow` e `clip-path`, sem criar rolagem horizontal, e o título continua centralizado no miolo. Saíram os cantos arredondados.
 - **Ordem dos blocos na SMEDU:** destaque, Notícias, Em foco, Eventos, Serviços, Equipe gestora.
+
+**D-57 · 14/10/2026 · Cabeçalho claro e destaque compacto, inspirados no portal da PBH (experimento a pedido do usuário)**
+- **Referência:** a parte de cima de https://prefeitura.pbh.gov.br/ (captura enviada pelo usuário). A barra azul da PBH ficou no verde-petróleo do cabeçalho atual.
+- **Configuração:** `config.cabecalho.estilo = 'claro'`, com o botão de ação em `config.cabecalho.botao` (`{ rotulo, url }`, URL relativa ou `https://`). Sem `estilo`, nada muda: continua o cabeçalho em carrossel (D-47). Com `'claro'`, o carrossel do cabeçalho é desligado.
+- **Barra de acessibilidade:** estreita, visível, na cor do cabeçalho (`tema.cor_cabecalho` ou a primária).
+  - À esquerda, os atalhos do eMAG separados por "|".
+  - À direita: Acessibilidade, A−/A/A+, Alto contraste e "Site da Prefeitura".
+  - Embaixo, uma faixa de 5 px em quatro cores, como a da PBH. As cores vêm de `tema.cores_faixa`; sem esse campo, usa secundária, acento e as cores vivas 1 e 3.
+  - No celular, os atalhos ficam ocultos até receberem foco.
+- **Cabeçalho branco**, mais alto (112 px):
+  - brasão em cores (76 px, sem a caixa branca) e nome da Secretaria em petróleo;
+  - menu em caixa alta;
+  - lupa que abre a busca num painel; o atalho 3 também abre esse painel;
+  - botão em pílula com ícone de conversa. Na SMEDU, a proposta é "Fale com o supervisor" → `/fale-com-o-supervisor`.
+  - **Menu:** fica na linha da marca quando cabe nela. Um script mede o espaço; sem JavaScript, ou sem espaço, o menu desce para uma segunda linha. Os 8 itens da SMEDU cabem numa linha a 1920 px e ficam em duas linhas a 1440 px. Abaixo de 1181 px, vale o botão "Menu" de sempre.
+- **Aviso informativo:** vira uma caixa com borda, alinhada ao cabeçalho, como o aviso de manutenção da PBH.
+- **Destaque compacto:**
+  - alinhado ao cabeçalho, com altura entre 300 e 400 px (cerca de 24% da largura da tela). Antes, ocupava cerca de metade da altura da tela;
+  - setas laterais redondas, pausa redonda no canto superior esquerdo (ícone, com o nome acessível mantido) e indicadores numerados embaixo, ao centro;
+  - no celular, as setas somem.
+- **Verificação:** axe (WCAG 2.1 A/AA) sem violações na barra, no cabeçalho, no aviso e no destaque, a 1440 e a 390 px, com e sem alto contraste. A lupa leva o foco ao campo de busca.
+- **Prévia:** `docs/previa/cabecalho-claro.html` no repositório Portais-Publicos. Foi montada sobre a prévia de 13/10, porque o ambiente de nuvem da sessão não alcança o Supabase. O campo ainda **não** foi ligado na homologação: o usuário decide depois de ver a prévia.
