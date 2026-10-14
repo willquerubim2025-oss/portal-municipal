@@ -31,7 +31,12 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
   - **dados fictícios na homologação da SMEDU (12/10/2026, para a apresentação):** remover antes de publicar:
     - 10 pessoas na `equipe` (resumo começa com "FICTÍCIO");
     - as fotos `carga/ficticio-*.jpg` (midias com `legado.ficticio = true`);
-    - as imagens de banco `carga/foco-*.jpg` (Unsplash).
+    - as imagens de banco `carga/foco-*.jpg` (Unsplash). **14/10/2026:** William enviou fotos novas para o "Em foco": estudantes na escadaria → Bolsa de estudo; criança chegando ao portão da escola com a família → Matrícula escolar. Os arquivos estão em `docs/design/fotos/` do repositório Portais-Publicos, e a prévia já os usa. **Falta:**
+      - enviar as fotos ao Storage pelo painel (Mídias) ou por um script com rede;
+      - trocar `config.home.foco[].imagem_path` e `imagem_alt` da SMEDU. Textos alternativos propostos:
+        - Matrícula: "Criança com mochila de rodinhas chegando ao portão da escola, acompanhada pela família e recebida por funcionárias";
+        - Bolsa: "Quatro estudantes sorrindo e conversando sentados na escadaria de um prédio, com notebook e cadernos".
+      - **Antes de publicar**, confirmar a origem e o direito de uso das duas fotos. A da matrícula mostra uma criança e adultos reconhecíveis, então precisa de autorização de imagem (ECA/LGPD). A dos estudantes parece de banco de imagens ou gerada: confirmar a licença.
     - 6 eventos e 4 órgãos fictícios do calendário (`legado.ficticio = true`). Só a prova do Vestibulinho, em 18/10, é real.
     William vai enviar o material real (equipe, fotos e textos). A página "Bolsa de Estudo" (/servicos/bolsa-de-estudo) só tem a descrição genérica: faltam regras, prazos e documentos do programa;
   - o item de menu "Equipe gestora" (`/#titulo-equipe`) leva ao topo da home enquanto a equipe estiver vazia (o bloco fica oculto). Resolver quando os nomes chegarem;
