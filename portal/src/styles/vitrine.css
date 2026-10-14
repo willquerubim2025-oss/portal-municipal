@@ -755,3 +755,9 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .vitrine .v-cab-claro .marca-tipo { font-size: .75rem; }
 .vitrine.v-claro .v-chip { font-size: .75rem; }
 .v-destaque-compacto .v-carrossel-pontos button { font-size: .8rem; }
+
+/* D-74: moldura no card de Serviço ao passar o mouse (ou com o foco do teclado), como no modelo (lá, azul-escuro;
+   aqui, a cor primária, verde-petróleo). A borda existe sempre (transparente) para o card não "pular" 1 px. */
+.vitrine.v-claro a.v-servico { border: 1.5px solid transparent; transition: transform .25s ease, box-shadow .25s ease, border-color .2s ease; }
+.vitrine.v-claro a.v-servico:hover, .vitrine.v-claro a.v-servico:focus-visible { border-color: var(--cor-primaria); }
+:root.contraste.vitrine.v-claro a.v-servico:hover, :root.contraste.vitrine.v-claro a.v-servico:focus-visible { border-color: #ff0; }

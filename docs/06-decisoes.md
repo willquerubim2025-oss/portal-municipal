@@ -596,3 +596,11 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   3. **Textos de 10,9–11,2 px** passaram para 12 px ou mais: "Prefeitura de Paulínia" no cabeçalho, o selo "Em breve", os números do carrossel e os números dos atalhos.
 - **Resultado:** 0 problemas nas cinco larguras. O cabeçalho do computador continua numa linha a partir de 1280 px.
 - **Observação:** nas capturas automáticas da página inteira, as imagens com `loading="lazy"` às vezes aparecem vazias. É efeito da captura; no navegador elas carregam (conferido rolando até elas).
+
+**D-74 · 14/10/2026 · Moldura verde nos cards de Serviços ao passar o mouse, como no modelo (a pedido do usuário)**
+- Ao passar o mouse ou com o foco do teclado, o card de Serviço ganha uma moldura de 1,5 px na cor primária (verde-petróleo `#004348`). No modelo da PBH, ela é azul-escura.
+- A borda existe sempre, transparente, para o card não mudar de tamanho.
+- Os efeitos de D-67 continuam: o card sobe levemente e o ícone fica petróleo com o desenho branco.
+- No alto contraste, a moldura fica amarela.
+- Os cards "Em breve" não são links e não têm o efeito.
+- Verificação: cor da borda medida no hover; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.
