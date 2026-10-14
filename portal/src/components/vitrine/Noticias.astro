@@ -1,25 +1,27 @@
 ---
 // Notícias da página inicial (vitrine, D-55): uma linha de cards menores (foto em cima e resumo) e,
 // abaixo, dois cards grandes lado a lado. Os dois grandes são a manchete (prioridade 'principal', 0020;
-// sem ela, a mais recente) e a notícia seguinte; a linha de cima recebe as demais (até 5).
+// sem ela, a mais recente) e a notícia seguinte; a linha de cima recebe as demais (até 5, ou
+// config.home.noticias_fileira, D-59). Com 3 ou menos, os cards da fileira ficam maiores.
 import { urlImagem, srcsetImagem } from '../../lib/imagens';
 import { data } from '../../lib/formato';
-interface Props { noticias: any[]; titulo: string }
+interface Props { noticias: any[]; titulo: string; fileira?: number }
 const { noticias, titulo } = Astro.props;
+const fileira = Number.isInteger(Astro.props.fileira) && Astro.props.fileira! >= 1 && Astro.props.fileira! <= 5 ? Astro.props.fileira! : 5;
 const indice = Math.max(0, noticias.findIndex((n) => n.prioridade === 'principal'));
 const resto = noticias.filter((_, i) => i !== indice);
 const grandes = noticias.length ? [noticias[indice], ...resto.slice(0, 1)] : [];
-const pequenas = resto.slice(1, 6);
+const pequenas = resto.slice(1, 1 + fileira);
 ---
 <div class="v-secao-titulo"><h2 id="titulo-noticias">{titulo}</h2></div>
 {!grandes.length ? <p>Nenhuma notícia publicada ainda.</p> : (
   <div class="v-noticias">
     {pequenas.length > 0 && (
-      <div class="v-noticias-linha">
+      <div class={fileira <= 3 ? 'v-noticias-linha v-noticias-linha-larga' : 'v-noticias-linha'} style={`--v-fileira:${fileira}`}>
         {pequenas.map((n) => (
           <article class="v-noticia v-noticia-card">
             {n.imagem
-              ? <img src={urlImagem(n.imagem.storage_path, 480)} srcset={srcsetImagem(n.imagem.storage_path, [320, 480])} sizes="(max-width: 700px) 100vw, 240px" alt={n.imagem.texto_alternativo ?? ''} width="480" height="300" loading="lazy" decoding="async" />
+              ? <img src={urlImagem(n.imagem.storage_path, 480)} srcset={srcsetImagem(n.imagem.storage_path, [320, 480, 800])} sizes={fileira <= 3 ? '(max-width: 700px) 100vw, 420px' : '(max-width: 700px) 100vw, 240px'} alt={n.imagem.texto_alternativo ?? ''} width="480" height="300" loading="lazy" decoding="async" />
               : <span class="v-noticia-sem-foto" aria-hidden="true"></span>}
             <div class="v-noticia-texto">
               <time datetime={n.publicado_em}>{data(n.publicado_em)}</time>

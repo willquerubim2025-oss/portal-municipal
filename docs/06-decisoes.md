@@ -467,3 +467,10 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - A altura do destaque compacto passou a `clamp(290px, 22vw, 340px)`, perto da proporção da PBH (1290 × 330 px).
 - Com 1290 px, os 8 itens do menu da SMEDU não cabem na linha da marca. Então o menu fica sempre na segunda linha do cabeçalho, pela regra de D-57.
 - Verificação: axe sem violações a 1440 e a 390 px, com e sem alto contraste.
+
+**D-59 · 14/10/2026 · Notícias: fileira de cima com 3 cards, na largura do bloco de cima (a pedido do usuário; ajusta D-55)**
+- A fileira de cards menores das Notícias passou de 5 para **3** cards na SMEDU, que dividem a largura e ficam maiores (título de 1,05 rem, resumo de 0,9 rem). Os dois cards grandes de baixo continuam.
+- **Configuração:** `config.home.noticias_fileira` (de 1 a 5; o padrão é 5, como antes). Com 3 ou menos, a fileira usa cards maiores e fica em 3 colunas até 700 px; abaixo disso, em uma coluna.
+- No cabeçalho claro (D-57), a seção de Notícias segue a mesma largura do bloco de cima (`tema.largura_topo`, 1290 px), alinhada ao destaque. As seções passaram a ter a classe `v-bloco-<bloco>`.
+- Verificação: `astro build` passando; axe sem violações a 1440 e a 390 px, com e sem alto contraste.
+- **A ligar na homologação junto com o D-57:** `config.home.noticias_fileira = 3`.

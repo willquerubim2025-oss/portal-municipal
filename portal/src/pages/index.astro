@@ -74,9 +74,9 @@ const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: m.n
         if (b === 'destaque') return <Destaque banners={banners} titulo={m.nome} slogan={m.config.slogan} compacto={m.config.cabecalho?.estilo === 'claro'} />;
         if (vazio(b)) return null;
         return (
-          <section class={`v-secao ${fundo(b)}`} aria-labelledby={`titulo-${b}`}>
+          <section class={`v-secao v-bloco-${b} ${fundo(b)}`} aria-labelledby={`titulo-${b}`}>
             <div class="v-miolo">
-              {b === 'noticias' && <NoticiasVitrine noticias={ultimas.itens} titulo={titulos.noticias} />}
+              {b === 'noticias' && <NoticiasVitrine noticias={ultimas.itens} titulo={titulos.noticias} fileira={m.config.home?.noticias_fileira} />}
               {b === 'foco' && <FocoVitrine itens={foco} titulo={titulos.foco} cores={nCores} />}
               {b === 'calendario' && <CalendarioVitrine eventos={eventosCal} titulo={titulos.calendario} />}
               {b === 'servicos' && <ServicosVitrine servicos={cards} titulo={titulos.servicos} cores={nCores} paleta={m.tema.cores_cards} />}

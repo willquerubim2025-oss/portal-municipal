@@ -79,7 +79,9 @@ export interface Config {
    *  estilo 'claro' (D-57): barra de acessibilidade na cor do cabeçalho, cabeçalho branco com marca, menu, lupa e
    *  um botão de ação (`botao`), e destaque mais baixo com setas. Desliga o carrossel do cabeçalho. */
   cabecalho?: { carrossel?: boolean; intervalo_s?: number; transicao_s?: number; estilo?: 'carrossel' | 'claro'; botao?: { rotulo: string; url: string } };
-  home?: { blocos?: BlocoHome[]; titulos?: Partial<Record<BlocoHome, string>>; foco?: ItemFoco[]; fundo_cinza?: BlocoHome[] };
+  home?: { blocos?: BlocoHome[]; titulos?: Partial<Record<BlocoHome, string>>; foco?: ItemFoco[]; fundo_cinza?: BlocoHome[];
+    /** Quantos cards na fileira de cima das Notícias (D-59): 1 a 5, padrão 5. */
+    noticias_fileira?: number };
 }
 
 export type Modulo =
