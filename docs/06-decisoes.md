@@ -570,3 +570,8 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Distância entre o "Ver todas as notícias" e o título "Em foco", em três reduções pedidas pelo usuário (cerca de 15%, 15% e 10%): de 88 para 75, 64 e **58 px** no computador; de 56 para **37 px** no celular.
 - Só o espaço de cima do "Em foco" diminuiu: `padding-top: clamp(0,55 rem, 1 vw, 0,875 rem)` no cabeçalho claro. As outras seções não mudam.
 - Verificação: medido a 1920, 1440 e 390 px; axe sem violações na página inteira, com e sem alto contraste.
+
+**D-71 · 14/10/2026 · Sem a faixa colorida sob a barra de acessibilidade (a pedido do usuário; ajusta D-57)**
+- A faixa fina de quatro cores (inspirada na PBH) saiu: ficam só a barra verde de acessibilidade e o cabeçalho branco.
+- Ela vira opcional: só aparece se o órgão cadastrar `tema.cores_faixa`. Antes, sem esse campo, usava as cores do tema. A SMEDU não cadastra.
+- Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.

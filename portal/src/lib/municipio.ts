@@ -20,7 +20,7 @@ export interface Tema {
   /** Cabeçalho do vitrine (D-54): fundo e cor do texto; padrão: cor primária com texto branco. */
   cor_cabecalho?: string;
   cor_cabecalho_texto?: string;
-  /** Cabeçalho claro (D-57): cores da faixa fina sob a barra de acessibilidade, em segmentos iguais. Padrão: secundária, acento e duas cores vivas. */
+  /** Cabeçalho claro (D-57): cores da faixa fina sob a barra de acessibilidade, em segmentos iguais. Sem elas, não há faixa (D-71). */
   cores_faixa?: string[];
   /** Cabeçalho claro (D-57/D-58): largura máxima do bloco de cima (barra, cabeçalho, aviso, destaque), ex.: '1290px'. */
   largura_topo?: string;

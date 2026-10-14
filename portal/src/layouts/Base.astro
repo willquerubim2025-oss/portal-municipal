@@ -147,7 +147,7 @@ const carrosselCab = vitrine && !claro && cfgCab.carrossel !== false
   ? { intervalo: limitar(cfgCab.intervalo_s, 4, 20, 7), transicao: limitar(cfgCab.transicao_s, 0.3, 3, 2) } : null;
 const sitePrefeitura = vitrine && cfg.site_prefeitura?.startsWith('https://') ? cfg.site_prefeitura : null;
 const botaoCab = claro && cfgCab.botao?.rotulo && /^(\/|https:\/\/)/.test(cfgCab.botao.url ?? '') ? cfgCab.botao : null;
-// Faixa colorida sob a barra (D-57): segmentos iguais; sem tema.cores_faixa, cores do próprio tema.
+// Faixa colorida sob a barra (D-57): segmentos iguais. Opcional (D-71): só aparece com tema.cores_faixa.
 const coresFaixa = (tema.cores_faixa ?? []).filter((c) => cor(c));
 const faixaCores = coresFaixa.length
   ? `linear-gradient(90deg, ${coresFaixa.map((c, i) => `${c} ${(100 * i) / coresFaixa.length}% ${(100 * (i + 1)) / coresFaixa.length}%`).join(', ')})`
@@ -219,7 +219,7 @@ const caminhoAtual = Astro.url.pathname;
       )}
     </div>
   </div>
-  {claro && <div class="v-topo-cores" aria-hidden="true" style={faixaCores ? `background:${faixaCores}` : undefined}></div>}
+  {claro && faixaCores && <div class="v-topo-cores" aria-hidden="true" style={`background:${faixaCores}`}></div>}
 
 
   <!-- Layout vitrine (D-42, D-47): cabeçalho no verde da Prefeitura. Em telas largas é um carrossel de duas telas
