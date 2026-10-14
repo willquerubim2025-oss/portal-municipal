@@ -16,6 +16,11 @@ import '@fontsource/prompt/latin-400.css';
 import '@fontsource/prompt/latin-500.css';
 import '@fontsource/prompt/latin-600.css';
 import '@fontsource/prompt/latin-700.css';
+import '@fontsource/raleway/latin-400.css';
+import '@fontsource/raleway/latin-500.css';
+import '@fontsource/raleway/latin-600.css';
+import '@fontsource/raleway/latin-700.css';
+import '@fontsource/raleway/latin-800.css';
 import '../styles/vitrine.css';
 import { destaques, menu, type ItemMenu } from '../lib/consultas';
 import Ferramentas from '../components/Ferramentas.astro';
@@ -121,6 +126,7 @@ const estiloTema = [
     cor(tema.cor_cabecalho_texto) && `--v-cab-texto:${tema.cor_cabecalho_texto}`,
     fonte(tema.fonte_titulos) && `--v-fonte-titulos:${fonte(tema.fonte_titulos)}`,
     fonte(tema.fonte_texto) && `--v-fonte-texto:${fonte(tema.fonte_texto)}`,
+    fonte(tema.fonte_cabecalho) && `--v-fonte-cab:${fonte(tema.fonte_cabecalho)}`,
     medida(tema.margem_destaque) && `--v-margem-destaque:${tema.margem_destaque}`,
     medida(tema.margem_secoes) && `--v-margem-secoes:${tema.margem_secoes}`,
     tema.largura_topo && /^\d{3,4}px$/.test(tema.largura_topo) && `--v-largura-max-topo:${tema.largura_topo}`,
@@ -146,7 +152,9 @@ const coresFaixa = (tema.cores_faixa ?? []).filter((c) => cor(c));
 const faixaCores = coresFaixa.length
   ? `linear-gradient(90deg, ${coresFaixa.map((c, i) => `${c} ${(100 * i) / coresFaixa.length}% ${(100 * (i + 1)) / coresFaixa.length}%`).join(', ')})`
   : undefined;
-const classeHtml = vitrine ? ['vitrine', tema.filtro_destaque === 'neutro' && 'v-filtro-neutro', claro && 'v-claro'].filter(Boolean).join(' ') : undefined;
+const classeHtml = vitrine
+  ? ['vitrine', tema.filtro_destaque === 'neutro' && 'v-filtro-neutro', claro && 'v-claro', claro && fonte(tema.fonte_cabecalho) && 'v-fonte-cab'].filter(Boolean).join(' ')
+  : undefined;
 const caminhoAtual = Astro.url.pathname;
 ---
 <!doctype html>

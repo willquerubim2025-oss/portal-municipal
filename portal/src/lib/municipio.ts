@@ -24,6 +24,8 @@ export interface Tema {
   cores_faixa?: string[];
   /** Cabeçalho claro (D-57/D-58): largura máxima do bloco de cima (barra, cabeçalho, aviso, destaque), ex.: '1290px'. */
   largura_topo?: string;
+  /** Cabeçalho claro (D-62): fonte só da barra de acessibilidade e do cabeçalho (uma de FONTES_DISPONIVEIS). */
+  fonte_cabecalho?: string;
   /** Paleta própria dos cards de Serviços (D-52): { forte, claro } em #rrggbb; sem ela, as cores vivas. */
   cores_cards?: { nome?: string; forte: string; claro: string }[];
   /** Película sobre as fotos do destaque (D-49): 'cor' (cor primária, padrão) ou 'neutro' (escurecimento sem cor). */
@@ -39,7 +41,7 @@ export interface Tema {
 }
 
 /** Fontes empacotadas no portal (@fontsource): sem chamada a terceiros (LGPD, D-17). */
-export const FONTES_DISPONIVEIS = ['Montserrat', 'Source Sans 3', 'Prompt'] as const;
+export const FONTES_DISPONIVEIS = ['Montserrat', 'Source Sans 3', 'Prompt', 'Raleway'] as const;
 
 /** Blocos da página inicial no layout vitrine, na ordem em que aparecem. */
 export type BlocoHome = 'destaque' | 'noticias' | 'foco' | 'servicos' | 'calendario' | 'agenda' | 'equipe' | 'atalhos';

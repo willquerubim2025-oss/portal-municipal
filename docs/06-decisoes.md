@@ -495,3 +495,15 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - No alto contraste, as seções ficam pretas e a régua ganha borda branca.
 - Sem o cabeçalho claro, nada muda.
 - Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.
+
+**D-62 · 14/10/2026 · Fonte própria do cabeçalho claro; teste com a Raleway, a do portal da PBH (a pedido do usuário)**
+- **Campo novo:** `tema.fonte_cabecalho` (uma de `FONTES_DISPONIVEIS`). Vale só no cabeçalho claro (D-57): barra de acessibilidade, marca, menu, submenu, botão e busca. O resto do portal continua com `fonte_titulos`/`fonte_texto` (Prompt, na SMEDU).
+- **Fonte:** a Raleway (OFL) foi incluída, auto-hospedada por `@fontsource/raleway` (pesos 400 a 800, só latino; D-17: sem Google Fonts).
+  - Foi identificada pelo desenho no print do usuário: "G" com esporão, maiúsculas largas e algarismos antigos.
+  - O CSS da PBH não pôde ser conferido, porque o site não abre no ambiente de nuvem. **Confirmar** pelo F12 no navegador (Computed → font-family).
+- **Ajustes com a Raleway:**
+  - menu em 700;
+  - nome da Secretaria em 800, em duas linhas equilibradas (`text-wrap: balance`, até 21ch): "Secretaria Municipal / de Educação";
+  - no celular, nome com 1,05 rem.
+- **A ligar na homologação junto com o D-57:** `tema.fonte_cabecalho = 'Raleway'`.
+- Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.

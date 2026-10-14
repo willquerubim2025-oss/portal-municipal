@@ -632,3 +632,15 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .vitrine.v-claro .v-secao-titulo { box-shadow: none; clip-path: none; border-radius: 8px; }
 :root.contraste.vitrine.v-claro .v-secao { background: #000; }
 :root.contraste.vitrine.v-claro .v-secao-titulo { box-shadow: none; border: 1px solid #fff; }
+
+/* D-62: fonte própria do cabeçalho claro (tema.fonte_cabecalho; teste com a Raleway, a fonte do portal da PBH).
+   Vale só na barra de acessibilidade e no cabeçalho; o resto do portal segue fonte_titulos/fonte_texto. */
+.v-fonte-cab .v-topo, .v-fonte-cab .v-topo button, .v-fonte-cab .v-cab-claro,
+.v-fonte-cab .v-cab-claro :is(.marca-tipo, .marca-nome, .menu-lista a, .menu-grupo, .submenu a, summary, .v-cab-fale, input, button) { font-family: var(--v-fonte-cab), sans-serif; }
+.vitrine.v-fonte-cab .v-cab-claro .menu-lista > li > a, .vitrine.v-fonte-cab .v-cab-claro .menu-lista > li > .menu-grupo { font-weight: 700; letter-spacing: 0; }
+.vitrine.v-fonte-cab .v-cab-claro .marca-nome { font-weight: 800; letter-spacing: -.005em; }
+.vitrine.v-fonte-cab .v-cab-claro .marca-tipo { font-weight: 600; }
+.v-fonte-cab .v-cab-fale { font-weight: 700; letter-spacing: 0; }
+.vitrine.v-fonte-cab .v-topo { font-weight: 500; }
+.vitrine.v-fonte-cab .v-cab-claro .marca-nome { max-width: 21ch; text-wrap: balance; }
+@media (max-width: 700px) { .vitrine.v-fonte-cab .v-cab-claro .marca-nome { font-size: 1.05rem; } }
