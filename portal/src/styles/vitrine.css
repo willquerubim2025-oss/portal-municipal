@@ -696,5 +696,5 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .vitrine.v-claro .v-chip { background: #eef1f2; color: #3d4a4f; border-color: #d5dcde; }
 :root.contraste.vitrine.v-claro .v-bloco-servicos, :root.contraste.vitrine.v-claro .v-servico { background: #000; }
 
-/* D-70: Em foco mais perto da seção anterior (distância ~15% menor: 88 → ~75 px no computador, 56 → ~48 px no celular). */
-.vitrine.v-claro .v-bloco-foco { padding-top: clamp(1.25rem, 2.2vw, 1.95rem); }
+/* D-70: Em foco mais perto da seção anterior (duas reduções de ~15%: 88 → 75 → ~64 px no computador; 56 → ~41 px no celular). */
+.vitrine.v-claro .v-bloco-foco { padding-top: clamp(.8rem, 1.4vw, 1.25rem); }

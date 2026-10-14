@@ -567,6 +567,6 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Verificação: axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste; `astro build` passando.
 
 **D-70 · 14/10/2026 · "Em foco" mais perto das Notícias (−15%) (a pedido do usuário)**
-- Distância entre o "Ver todas as notícias" e o título "Em foco": de 88 para **75 px** no computador e de 56 para 48 px no celular.
-- Só o espaço de cima do "Em foco" diminuiu: `padding-top: clamp(1,25 rem, 2,2 vw, 1,95 rem)` no cabeçalho claro. As outras seções não mudam.
+- Distância entre o "Ver todas as notícias" e o título "Em foco", em duas reduções de cerca de 15% pedidas pelo usuário: de 88 para 75 e depois **64 px** no computador; de 56 para **41 px** no celular.
+- Só o espaço de cima do "Em foco" diminuiu: `padding-top: clamp(0,8 rem, 1,4 vw, 1,25 rem)` no cabeçalho claro. As outras seções não mudam.
 - Verificação: medido a 1920, 1440 e 390 px; axe sem violações na página inteira, com e sem alto contraste.
