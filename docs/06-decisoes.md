@@ -484,3 +484,14 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - O destaque compacto também usa essa largura a partir de 800 px, para ficar alinhado no tablet.
 - **Serviços:** saiu o limite de 860 px. Os cards ocupam a largura em colunas de no mínimo 340 px: 3 por linha a 1290 px, 2 no tablet e 1 no celular.
 - Verificação: tudo alinhado (mesmo x e largura) a 1920, 1440, 1024 e 390 px; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.
+
+**D-61 · 14/10/2026 · Seções sem fundo próprio e régua de título na largura do conteúdo (a pedido do usuário; ajusta D-55 e D-56 no cabeçalho claro)**
+- No cabeçalho claro (D-57), as seções da home ficam com fundo branco:
+  - sem a alternância de tons claros;
+  - sem o cinza de `config.home.fundo_cinza`;
+  - sem o degradê do "Em foco".
+- A régua de título (verde-água) tem a mesma largura do conteúdo (1290 px), com cantos arredondados de 8 px, em vez de ir de ponta a ponta (D-56).
+- Sem as faixas de fundo separando as seções, o espaçamento vertical de cada seção diminuiu para `clamp(1,75 rem, 3 vw, 2,75 rem)`.
+- No alto contraste, as seções ficam pretas e a régua ganha borda branca.
+- Sem o cabeçalho claro, nada muda.
+- Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.

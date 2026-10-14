@@ -624,3 +624,11 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 /* Serviços ocupam a largura: colunas de no mínimo 340 px (3 por linha a 1290 px, 2 no tablet, 1 no celular). */
 .v-claro .v-servicos { max-width: none; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
 .v-claro .v-servico { padding: 1.15rem 1.25rem; }
+
+/* D-61: no cabeçalho claro, as seções da home ficam sem fundo próprio (branco, sem alternância, cinza ou degradê)
+   e a régua de título tem a mesma largura do conteúdo, em vez de ir de ponta a ponta (D-56). Sem as faixas de fundo
+   separando as seções, o espaço vertical entre elas diminui. */
+.vitrine.v-claro .v-secao { background: #fff; padding-block: clamp(1.75rem, 3vw, 2.75rem); }
+.vitrine.v-claro .v-secao-titulo { box-shadow: none; clip-path: none; border-radius: 8px; }
+:root.contraste.vitrine.v-claro .v-secao { background: #000; }
+:root.contraste.vitrine.v-claro .v-secao-titulo { box-shadow: none; border: 1px solid #fff; }
