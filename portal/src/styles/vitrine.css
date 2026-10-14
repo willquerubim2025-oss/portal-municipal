@@ -479,8 +479,9 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
    barra estreita de acessibilidade na cor do cabeçalho, faixa colorida, cabeçalho branco mais alto
    (brasão em cores, menu, lupa e botão de ação) e destaque mais baixo, com setas e números.
    ============================================================= */
-.v-claro { --v-largura-topo: min(100% - 2rem, var(--largura)); }
-@media (min-width: 1100px) { .v-claro { --v-largura-topo: calc(100% - 2 * var(--v-margem-destaque)); } }
+/* Largura do bloco de cima (barra, cabeçalho, aviso e destaque): máximo fixo, como o contêiner da PBH (1290 px,
+   cerca de 8 cm de margem em tela de 1920 px). Configurável em tema.largura_topo. */
+.v-claro { --v-largura-topo: min(100% - 2rem, var(--v-largura-max-topo, 1290px)); }
 
 /* Barra de acessibilidade */
 .vitrine .v-topo { background: var(--v-cab-fundo, var(--cor-primaria)); color: var(--v-cab-texto, #fff); border: 0; font-size: .78rem; }
@@ -562,7 +563,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .v-claro .v-aviso-linha { padding: .55rem .6rem .55rem 1rem; }
 
 /* Destaque compacto: mais baixo, com setas, pausa redonda e indicadores numerados */
-.vitrine .v-destaque-compacto { min-height: clamp(300px, 24vw, 400px); }
+.vitrine .v-destaque-compacto { min-height: clamp(290px, 22vw, 340px); }   /* ≈ 1290 × 330 px, como na PBH */
 @media (min-width: 1100px) { .vitrine .v-destaque-compacto { width: var(--v-largura-topo); } }
 .v-destaque-compacto .v-slide-texto { gap: .7rem; padding-block: 2rem 3.4rem; }
 .vitrine .v-destaque-compacto .v-miolo { width: calc(100% - 2 * clamp(1.25rem, 5.5vw, 5.5rem)); }

@@ -123,6 +123,7 @@ const estiloTema = [
     fonte(tema.fonte_texto) && `--v-fonte-texto:${fonte(tema.fonte_texto)}`,
     medida(tema.margem_destaque) && `--v-margem-destaque:${tema.margem_destaque}`,
     medida(tema.margem_secoes) && `--v-margem-secoes:${tema.margem_secoes}`,
+    tema.largura_topo && /^\d{3,4}px$/.test(tema.largura_topo) && `--v-largura-max-topo:${tema.largura_topo}`,
     ...(tema.cores_vivas ?? []).flatMap((c, i) => [
       cor(c.forte) && `--v-cor-${i}:${c.forte}`,
       cor(c.claro) && `--v-tom-${i}:${c.claro}`,

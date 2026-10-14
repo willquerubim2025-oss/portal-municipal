@@ -22,6 +22,8 @@ export interface Tema {
   cor_cabecalho_texto?: string;
   /** Cabeçalho claro (D-57): cores da faixa fina sob a barra de acessibilidade, em segmentos iguais. Padrão: secundária, acento e duas cores vivas. */
   cores_faixa?: string[];
+  /** Cabeçalho claro (D-57/D-58): largura máxima do bloco de cima (barra, cabeçalho, aviso, destaque), ex.: '1290px'. */
+  largura_topo?: string;
   /** Paleta própria dos cards de Serviços (D-52): { forte, claro } em #rrggbb; sem ela, as cores vivas. */
   cores_cards?: { nome?: string; forte: string; claro: string }[];
   /** Película sobre as fotos do destaque (D-49): 'cor' (cor primária, padrão) ou 'neutro' (escurecimento sem cor). */

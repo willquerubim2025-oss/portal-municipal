@@ -461,3 +461,9 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - no celular, as setas somem.
 - **Verificação:** axe (WCAG 2.1 A/AA) sem violações na barra, no cabeçalho, no aviso e no destaque, a 1440 e a 390 px, com e sem alto contraste. A lupa leva o foco ao campo de busca.
 - **Prévia:** `docs/previa/cabecalho-claro.html` no repositório Portais-Publicos. Foi montada sobre a prévia de 13/10, porque o ambiente de nuvem da sessão não alcança o Supabase. O campo ainda **não** foi ligado na homologação: o usuário decide depois de ver a prévia.
+
+**D-58 · 14/10/2026 · Bloco de cima mais estreito, na largura do modelo da PBH (a pedido do usuário; ajusta D-57)**
+- No cabeçalho claro, a barra, o cabeçalho, o aviso e o destaque têm largura máxima de **1290 px**, centralizados, como o contêiner da PBH. Numa tela de 1920 px, isso dá cerca de 8 cm de margem de cada lado, o que o usuário pediu. Em telas menores, as margens diminuem até 1 rem. Configurável em `tema.largura_topo` (`'NNNpx'`).
+- A altura do destaque compacto passou a `clamp(290px, 22vw, 340px)`, perto da proporção da PBH (1290 × 330 px).
+- Com 1290 px, os 8 itens do menu da SMEDU não cabem na linha da marca. Então o menu fica sempre na segunda linha do cabeçalho, pela regra de D-57.
+- Verificação: axe sem violações a 1440 e a 390 px, com e sem alto contraste.
