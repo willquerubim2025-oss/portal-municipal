@@ -698,3 +698,40 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 
 /* D-70: Em foco mais perto da seção anterior (reduções de ~15%, ~15% e ~10%: 88 → 75 → 64 → ~58 px no computador; 56 → ~37 px no celular). */
 .vitrine.v-claro .v-bloco-foco { padding-top: clamp(.55rem, 1vw, .875rem); }
+
+/* D-72: rodapé do cabeçalho claro, no estilo do portal da Prefeitura de Paulínia: fundo na cor primária, marca grande
+   à esquerda, contatos com ícones em círculos escuros, linhas finas separando os blocos, links institucionais e duas
+   faixas embaixo (mapa do site/Radar e direitos), cada uma mais escura. */
+.vitrine .v-rodape-claro { background: var(--cor-primaria); color: #e3eeee; font-size: .95rem; }
+.v-rodape-claro .container { width: var(--v-largura-topo); max-width: none; }
+.v-rodape-claro a { color: #fff; text-decoration: none; }
+.v-rodape-claro a:hover, .v-rodape-claro a:focus-visible { text-decoration: underline; }
+.v-rod-principal { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 2rem 3rem; align-items: center; padding-block: 2.75rem;
+  border-bottom: 1px solid rgb(255 255 255 / .16); }
+.v-rod-marca { display: flex; align-items: center; gap: 1rem; }
+.v-rod-marca img { width: 96px; height: 96px; object-fit: contain; flex: none; }
+.v-rod-marca p { margin: 0; display: grid; line-height: 1.1; }
+.v-rod-nome { font-family: var(--v-fonte-cab, var(--v-fonte-titulos)); font-weight: 800; font-size: clamp(1.35rem, 1.1rem + .8vw, 1.85rem); color: #fff; max-width: 12em; text-wrap: balance; }
+.v-rod-tipo { margin-top: .35rem; font-size: 1rem; letter-spacing: .08em; color: #cfe3e3; }
+.v-rod-contatos { font-style: normal; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 2rem; }
+.v-rod-item { margin: 0; display: flex; align-items: center; gap: .85rem; line-height: 1.5; }
+.v-rod-item > span:last-child { display: flex; flex-wrap: wrap; gap: .15rem .9rem; }
+.v-rod-icone { flex: none; display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 50%;
+  background: color-mix(in srgb, var(--cor-primaria) 70%, #000); color: var(--cor-secundaria); }
+.v-rod-icone svg { width: 1.1rem; height: 1.1rem; }
+.v-rod-links { padding-block: 1.25rem; border-bottom: 1px solid rgb(255 255 255 / .16); }
+.v-rod-links nav + nav { margin-top: .5rem; }
+.v-rod-links ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem 1.75rem; }
+.v-rod-links .menu-lista a { padding: 0; font-weight: 400; background: none; box-shadow: none; text-transform: none; letter-spacing: 0; font-size: .95rem; }
+.v-rod-faixa { margin-top: 2rem; background: color-mix(in srgb, var(--cor-primaria) 85%, #000); font-size: .85rem; }
+.v-rod-faixa-linha { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem 2.5rem; padding-block: .9rem; }
+.v-rod-direitos { background: color-mix(in srgb, var(--cor-primaria) 65%, #000); font-size: .82rem; text-align: center; color: #cfe3e3; }
+.v-rod-direitos .container { padding-block: 1rem; }
+@media (max-width: 900px) {
+  .v-rod-principal { grid-template-columns: 1fr; }
+  .v-rod-contatos { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) { .v-rod-marca img { width: 72px; height: 72px; } }
+:root.contraste.vitrine .v-rodape-claro, :root.contraste.vitrine .v-rod-faixa, :root.contraste.vitrine .v-rod-direitos { background: #000; color: #fff; }
+:root.contraste.vitrine .v-rodape-claro a { color: #ff0; }
+:root.contraste.vitrine .v-rod-icone { background: #000; color: #ff0; border: 1px solid #ff0; }

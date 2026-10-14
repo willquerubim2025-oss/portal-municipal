@@ -575,3 +575,15 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - A faixa fina de quatro cores (inspirada na PBH) saiu: ficam só a barra verde de acessibilidade e o cabeçalho branco.
 - Ela vira opcional: só aparece se o órgão cadastrar `tema.cores_faixa`. Antes, sem esse campo, usava as cores do tema. A SMEDU não cadastra.
 - Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.
+
+**D-72 · 14/10/2026 · Rodapé no estilo do portal da Prefeitura de Paulínia (a pedido do usuário)**
+- No cabeçalho claro, o rodapé segue o modelo do portal da Prefeitura (print do usuário), sem a newsletter:
+  - **bloco principal:** brasão (96 px) e nome da Secretaria em destaque (fonte do cabeçalho, 800), com "Prefeitura de Paulínia" embaixo. Ao lado, os contatos com ícones em círculos escuros: e-mail e telefone, endereço e horário de atendimento (`config.email`, `telefone`, `endereco`, `horario`);
+  - linhas finas separam os blocos;
+  - **links institucionais obrigatórios** (Acesso à Informação, Ouvidoria, Transparência, Privacidade, Acessibilidade), mais o menu do rodapé e as redes sociais, se houver;
+  - **faixa mais escura:** Mapa do site, Site da Prefeitura e Radar da Transparência Pública (PNTP 2.9);
+  - **faixa mais escura ainda:** "© ano + nome do órgão (+ CNPJ, se houver). Todos os direitos reservados."
+- O conteúdo segue a largura do bloco de cima (1290 px). No celular, os blocos ficam um embaixo do outro.
+- Sem o cabeçalho claro, o rodapé anterior não muda.
+- **Em aberto:** crédito do fornecedor (como "Instar Tecnologia" no modelo) e "Portal atualizado em". Não foram incluídos; decidir com o usuário.
+- Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.

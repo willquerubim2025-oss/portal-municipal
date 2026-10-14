@@ -372,46 +372,101 @@ const caminhoAtual = Astro.url.pathname;
     <slot />
   </main>
 
-  <footer id="rodape" class="rodape">
-    <div class="container rodape-grade">
-      <section>
-        <h2>{m.nome}</h2>
-        <address>
-          {cfg.endereco && <p>{cfg.endereco}</p>}
-          {cfg.telefone && <p>Telefone: <a href={`tel:${cfg.telefone.replace(/\D/g, '')}`}>{cfg.telefone}</a></p>}
-          {cfg.email && <p>E-mail: <a href={`mailto:${cfg.email}`}>{cfg.email}</a></p>}
-          {cfg.horario && <p>Atendimento: {cfg.horario}</p>}
-          {(m.cnpj ?? cfg.cnpj) && <p>CNPJ: {m.cnpj ?? cfg.cnpj}</p>}
-        </address>
-      </section>
-      <nav aria-label="Links institucionais">
-        <h2>Institucional</h2>
-        <ul>{linksObrigatorios.map((l) => <li><a href={l.href}>{l.rotulo}</a></li>)}</ul>
-      </nav>
-      {rodape.length > 0 && (
-        <nav aria-label="Links do rodapé">
-          <h2>Links úteis</h2>
-          <MenuItens itens={rodape} atual={caminhoAtual} />
-        </nav>
-      )}
+  <!-- Rodapé do cabeçalho claro (D-72), no estilo do portal da Prefeitura: marca à esquerda, contatos com ícones em
+       círculos, links institucionais e faixas de baixo (mapa do site/Radar e direitos). -->
+  {claro ? (
+  <footer id="rodape" class="rodape v-rodape-claro">
+    <div class="container v-rod-principal">
+      <div class="v-rod-marca">
+        {brasao && <img src={brasao} alt="" width="96" height="96" loading="lazy" />}
+        <p><span class="v-rod-nome">{marca2}</span><span class="v-rod-tipo">{marca1}</span></p>
+      </div>
+      <address class="v-rod-contatos">
+        {(cfg.email || cfg.telefone) && (
+          <p class="v-rod-item">
+            <span class="v-rod-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>
+            <span>
+              {cfg.email && <a href={`mailto:${cfg.email}`}>{cfg.email}</a>}
+              {cfg.telefone && <a href={`tel:${cfg.telefone.replace(/\D/g, '')}`}>{cfg.telefone}</a>}
+            </span>
+          </p>
+        )}
+        {cfg.endereco && (
+          <p class="v-rod-item">
+            <span class="v-rod-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+            <span>{cfg.endereco}</span>
+          </p>
+        )}
+        {cfg.horario && (
+          <p class="v-rod-item">
+            <span class="v-rod-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <span>Atendimento ao público: {cfg.horario}</span>
+          </p>
+        )}
+      </address>
+    </div>
+    <div class="container v-rod-links">
+      <nav aria-label="Links institucionais"><ul>{linksObrigatorios.map((l) => <li><a href={l.href}>{l.rotulo}</a></li>)}</ul></nav>
+      {rodape.length > 0 && <nav aria-label="Links do rodapé"><MenuItens itens={rodape} atual={caminhoAtual} /></nav>}
       {cfg.redes && Object.keys(cfg.redes).length > 0 && (
-        <nav aria-label="Redes sociais">
-          <h2>Redes sociais</h2>
-          <ul>{Object.entries(cfg.redes).map(([rede, url]) => <li><a href={url} rel="noopener" target="_blank">{rede.charAt(0).toUpperCase() + rede.slice(1)}<span class="sr-only"> (abre em nova aba)</span></a></li>)}</ul>
-        </nav>
+        <nav aria-label="Redes sociais"><ul>{Object.entries(cfg.redes).map(([rede, url]) => <li><a href={url} rel="noopener" target="_blank">{rede.charAt(0).toUpperCase() + rede.slice(1)}<span class="sr-only"> (abre em nova aba)</span></a></li>)}</ul></nav>
       )}
     </div>
-    <div class="rodape-base">
-      <div class="container rodape-base-linha">
+    <div class="v-rod-faixa">
+      <div class="container v-rod-faixa-linha">
         <a href="/mapa-do-site">Mapa do site</a>
+        {sitePrefeitura && <a href={sitePrefeitura}>Site da Prefeitura</a>}
         {cfg.radar_transparencia !== false && (
-          <a class="radar-transparencia" href="https://radardatransparencia.atricon.org.br/" rel="noopener" target="_blank">
-            Radar da Transparência Pública<span class="sr-only"> (abre em nova aba)</span>
-          </a>
+          <a href="https://radardatransparencia.atricon.org.br/" rel="noopener" target="_blank">Radar da Transparência Pública<span class="sr-only"> (abre em nova aba)</span></a>
         )}
       </div>
     </div>
+    <div class="v-rod-direitos">
+      <div class="container">© {new Date().getFullYear()} {m.nome}{(m.cnpj ?? cfg.cnpj) && <> · CNPJ {m.cnpj ?? cfg.cnpj}</>}. Todos os direitos reservados.</div>
+    </div>
   </footer>
+  ) : (
+  <footer id="rodape" class="rodape">
+      <div class="container rodape-grade">
+        <section>
+          <h2>{m.nome}</h2>
+          <address>
+            {cfg.endereco && <p>{cfg.endereco}</p>}
+            {cfg.telefone && <p>Telefone: <a href={`tel:${cfg.telefone.replace(/\D/g, '')}`}>{cfg.telefone}</a></p>}
+            {cfg.email && <p>E-mail: <a href={`mailto:${cfg.email}`}>{cfg.email}</a></p>}
+            {cfg.horario && <p>Atendimento: {cfg.horario}</p>}
+            {(m.cnpj ?? cfg.cnpj) && <p>CNPJ: {m.cnpj ?? cfg.cnpj}</p>}
+          </address>
+        </section>
+        <nav aria-label="Links institucionais">
+          <h2>Institucional</h2>
+          <ul>{linksObrigatorios.map((l) => <li><a href={l.href}>{l.rotulo}</a></li>)}</ul>
+        </nav>
+        {rodape.length > 0 && (
+          <nav aria-label="Links do rodapé">
+            <h2>Links úteis</h2>
+            <MenuItens itens={rodape} atual={caminhoAtual} />
+          </nav>
+        )}
+        {cfg.redes && Object.keys(cfg.redes).length > 0 && (
+          <nav aria-label="Redes sociais">
+            <h2>Redes sociais</h2>
+            <ul>{Object.entries(cfg.redes).map(([rede, url]) => <li><a href={url} rel="noopener" target="_blank">{rede.charAt(0).toUpperCase() + rede.slice(1)}<span class="sr-only"> (abre em nova aba)</span></a></li>)}</ul>
+          </nav>
+        )}
+      </div>
+      <div class="rodape-base">
+        <div class="container rodape-base-linha">
+          <a href="/mapa-do-site">Mapa do site</a>
+          {cfg.radar_transparencia !== false && (
+            <a class="radar-transparencia" href="https://radardatransparencia.atricon.org.br/" rel="noopener" target="_blank">
+              Radar da Transparência Pública<span class="sr-only"> (abre em nova aba)</span>
+            </a>
+          )}
+        </div>
+      </div>
+    </footer>
+  )}
 
   <script>
     const botao = document.getElementById('botao-contraste');
