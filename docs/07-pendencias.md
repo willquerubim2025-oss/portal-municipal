@@ -19,6 +19,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 ## Próximos passos
 - [ ] **Portal Educação Paulínia (layout vitrine, D-39), feito em 12/10/2026 na homologação.** Pendências:
   - publicar o portal de homologação na Cloudflare com o código novo, para ver no navegador. Até lá, testar com `DOMINIO_DEV=educacao.paulinia.teste` no `.env` do `portal/`;
+  - **14/10/2026 (D-64): tirar "Agenda" e "Transparência" do menu principal da SMEDU na homologação**, pelo painel (Menus) ou por SQL. Não foi possível pelo MCP nesta sessão (tempo excedido).
   - menu principal da SMEDU cadastrado na homologação em 12/10/2026 (D-40). **Confirmar com a SMEDU** os rótulos e a ordem, e se Agenda e Transparência ficam no menu. As páginas "Matrícula Escolar" e "Fale com o supervisor" ainda não têm conteúdo real (prazos, documentos, lista de escolas);
   - brasão colorido em uso desde 12/10/2026 (`<id>/carga/brasao-colorido.png`, tema.brasao_path). O arquivo recebido tem só 252 px, e serve no cabeçalho, mas **pedir à Prefeitura o brasão oficial em alta resolução (PNG transparente ou SVG)** para o compartilhamento em redes e a impressão. A função `carga-midias-temporaria` foi reativada só para esse envio e já voltou a responder 410;
   - **carga de dados públicos da SMEDU em 12/10/2026 (homologação):**

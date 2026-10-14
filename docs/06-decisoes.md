@@ -517,3 +517,12 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **Largura útil** de 1290 para **1360 px** (novo padrão de `tema.largura_topo`; ≈ 7,4 cm de margem em tela de 1920 px). Vale para todo o conteúdo (D-60).
 - **Resultado:** uma linha só a partir de 1366 px de tela, com altura de 105 px. Abaixo disso, o script de D-57 leva o menu para a segunda linha, e no tablet e no celular continua o botão "Menu". Com um menu maior (outro órgão), vale o mesmo recuo automático.
 - Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste; alinhamento conferido a 1920 e 1440 px.
+
+**D-64 · 14/10/2026 · Menu da SMEDU sem Agenda e Transparência; largura volta a 1290 px e fonte do menu volta ao tamanho de D-57 (a pedido do usuário; ajusta D-63)**
+- O usuário não queria a largura de todo o conteúdo alterada em D-63, só a do cabeçalho. Para resolver o espaço do menu de outro jeito:
+  - **Agenda** e **Transparência** saem do menu principal da SMEDU. Continuam acessíveis: os Eventos pela home e Transparência pelo rodapé (links obrigatórios);
+  - a largura útil volta a **1290 px** em tudo (`tema.largura_topo`, D-58);
+  - a fonte do menu volta a 0,88 rem, com o espaçamento de D-57.
+- Ficam de D-63 a marca e o botão compactos. Com 6 itens, o cabeçalho fica em **uma linha a partir de 1280 px** de tela (menu com 665 px em 672–711 px disponíveis).
+- **Banco (homologação): pendente.** A remoção dos dois itens (`menu_itens` 54904999… "Agenda" e e7d76019… "Transparência", menu principal da SMEDU) não pôde ser feita nesta sessão: as escritas pelo MCP do Supabase excediam o tempo. Fazer pelo painel (Menus) ou por SQL numa sessão com acesso. A prévia já está sem eles.
+- Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste; alinhamento a 1920, 1440, 1024 e 390 px.

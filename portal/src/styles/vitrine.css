@@ -481,7 +481,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
    ============================================================= */
 /* Largura do bloco de cima (barra, cabeçalho, aviso e destaque): máximo fixo, como o contêiner da PBH (1290 px,
    cerca de 8 cm de margem em tela de 1920 px). Configurável em tema.largura_topo. */
-.v-claro { --v-largura-topo: min(100% - 2rem, var(--v-largura-max-topo, 1360px)); }
+.v-claro { --v-largura-topo: min(100% - 2rem, var(--v-largura-max-topo, 1290px)); }
 
 /* Barra de acessibilidade */
 .vitrine .v-topo { background: var(--v-cab-fundo, var(--cor-primaria)); color: var(--v-cab-texto, #fff); border: 0; font-size: .78rem; }
@@ -645,15 +645,14 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .vitrine.v-fonte-cab .v-cab-claro .marca-nome { max-width: 10.5em; text-wrap: balance; }
 @media (max-width: 700px) { .vitrine.v-fonte-cab .v-cab-claro .marca-nome { font-size: 1.05rem; } }
 
-/* D-63: cabeçalho de uma linha só, como no modelo: marca · menu · lupa e botão. Menu um pouco menor e mais junto,
-   marca e botão mais compactos e largura útil de 1360 px (padrão de tema.largura_topo). Se o menu de um órgão não
-   couber, o script do Base.astro ainda o leva para a segunda linha (D-57). */
+/* D-63/D-64: cabeçalho de uma linha só, como no modelo: marca · menu · lupa e botão. Marca e botão compactos;
+   o menu mantém o tamanho de D-57 e a largura útil fica em 1290 px (D-58). Se o menu de um órgão não couber,
+   o script do Base.astro ainda o leva para a segunda linha (D-57). */
 .v-cab-claro .v-cab-linha { gap: .75rem 1.25rem; min-height: 104px; }
 .v-cab-claro-brasao { width: 66px; height: 66px; }
 .vitrine .v-cab-claro .marca { gap: .7rem; }
 .vitrine .v-cab-claro .marca-nome { font-size: clamp(1.05rem, .9rem + .35vw, 1.22rem); }
 .vitrine .v-cab-claro .marca-tipo { font-size: .68rem; letter-spacing: .02em; }
-.vitrine .v-cab-claro .menu-lista > li > a, .vitrine .v-cab-claro .menu-lista > li > .menu-grupo { font-size: .78rem; padding-inline: .38rem; }
 .v-cab-claro .v-cab-acoes { gap: .35rem; }
 .v-cab-fale { padding: .75rem 1.1rem; font-size: .78rem; }
 .vitrine .v-cab-claro.v-cab-uma-linha .menu-lista { justify-content: center; }
