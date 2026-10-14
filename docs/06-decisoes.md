@@ -565,3 +565,8 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - A linha do cabeçalho claro passou de `min-height: 104px` para **116 px**; a altura medida foi de 105 para 117 px. O brasão, a fonte e o menu não mudam; só cresce o respiro em cima e embaixo.
 - O menu continua numa linha só a partir de 1280 px de tela.
 - Verificação: axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste; `astro build` passando.
+
+**D-70 · 14/10/2026 · "Em foco" mais perto das Notícias (−15%) (a pedido do usuário)**
+- Distância entre o "Ver todas as notícias" e o título "Em foco": de 88 para **75 px** no computador e de 56 para 48 px no celular.
+- Só o espaço de cima do "Em foco" diminuiu: `padding-top: clamp(1,25 rem, 2,2 vw, 1,95 rem)` no cabeçalho claro. As outras seções não mudam.
+- Verificação: medido a 1920, 1440 e 390 px; axe sem violações na página inteira, com e sem alto contraste.
