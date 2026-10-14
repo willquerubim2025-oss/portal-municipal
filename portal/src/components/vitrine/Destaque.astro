@@ -5,13 +5,13 @@
 // "reduzir movimento" no aparelho, não troca sozinho. Sem banner, mostra o nome e o slogan.
 // Compacto (cabeçalho claro, D-57): mais baixo, alinhado ao cabeçalho, com setas laterais,
 // pausa redonda no canto e indicadores numerados. No compacto os slides deslizam (D-66): avançar entra pela
-// direita e sai pela esquerda; voltar (seta da esquerda ou ponto anterior), o contrário.
+// direita e sai pela esquerda; voltar (seta da esquerda ou ponto anterior), o contrário. Cada slide fica 6,5 s (D-68).
 import { urlImagem, srcsetImagem } from '../../lib/imagens';
 interface Props { banners: any[]; titulo: string; slogan?: string; compacto?: boolean }
 const { banners, titulo, slogan, compacto = false } = Astro.props;
 const varios = banners.length > 1;
 ---
-<section class={compacto ? 'v-destaque v-destaque-compacto' : 'v-destaque'} aria-roledescription={varios ? 'carrossel' : undefined} aria-label="Destaques" data-carrossel={varios ? '' : undefined}>
+<section class={compacto ? 'v-destaque v-destaque-compacto' : 'v-destaque'} data-intervalo={compacto ? 6500 : 7500} aria-roledescription={varios ? 'carrossel' : undefined} aria-label="Destaques" data-carrossel={varios ? '' : undefined}>
   {banners.length === 0 ? (
     <div class="v-slide v-slide-ativo v-slide-vazio">
       <div class="v-miolo v-slide-texto">
@@ -69,8 +69,9 @@ const varios = banners.length > 1;
 </section>
 
 <script>
-  const INTERVALO = 7500;
   document.querySelectorAll<HTMLElement>('[data-carrossel]').forEach((raiz) => {
+    // Tempo parado em cada slide: 7,5 s; no compacto, 6,5 s (D-68).
+    const INTERVALO = Number(raiz.dataset.intervalo) || 7500;
     const slides = [...raiz.querySelectorAll<HTMLElement>('.v-slide')];
     const pontos = [...raiz.querySelectorAll<HTMLButtonElement>('[data-ir]')];
     const pausa = raiz.querySelector<HTMLButtonElement>('[data-pausa]');

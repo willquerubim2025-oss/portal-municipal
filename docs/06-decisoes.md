@@ -555,3 +555,8 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **Interação e "Em breve":** ao passar o mouse, o card sobe e o ícone fica petróleo com o desenho branco. Os cards "Em breve" têm borda tracejada e ícone em cinza.
 - A paleta colorida dos cards (`tema.cores_cards`, D-52) deixa de ser usada no cabeçalho claro; segue valendo no layout anterior.
 - Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.
+
+**D-68 · 14/10/2026 · Destaque compacto troca de slide a cada 6,5 s (a pedido do usuário: "diminuir em um segundo")**
+- O tempo parado em cada slide do destaque compacto passou de 7,5 s para **6,5 s** (`data-intervalo` na seção; fora do compacto continua 7,5 s). A animação do deslizamento segue em 0,9 s (D-66).
+- Continua com pausa ao passar o mouse, ao receber foco e pelo botão (WCAG 2.2.2).
+- Medido na prévia: a primeira troca automática ocorre em 6,5 s.
