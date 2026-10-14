@@ -474,3 +474,13 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - No cabeçalho claro (D-57), a seção de Notícias segue a mesma largura do bloco de cima (`tema.largura_topo`, 1290 px), alinhada ao destaque. As seções passaram a ter a classe `v-bloco-<bloco>`.
 - Verificação: `astro build` passando; axe sem violações a 1440 e a 390 px, com e sem alto contraste.
 - **A ligar na homologação junto com o D-57:** `config.home.noticias_fileira = 3`.
+
+**D-60 · 14/10/2026 · Todo o conteúdo na largura do bloco de cima (a pedido do usuário; ajusta D-41 no cabeçalho claro)**
+- No cabeçalho claro (D-57), o conteúdo segue a mesma largura do bloco de cima (`tema.largura_topo`, 1290 px). Valem as mesmas regras em todas as telas, e os fundos das seções continuam de ponta a ponta. A medida vale para:
+  - todas as seções da home (Notícias, Em foco, Eventos, Serviços, Equipe gestora);
+  - as páginas internas (`main > .container`) e as migalhas;
+  - o rodapé.
+- Ela substitui as margens de D-41 (6 cm nas seções). Sem o cabeçalho claro, nada muda.
+- O destaque compacto também usa essa largura a partir de 800 px, para ficar alinhado no tablet.
+- **Serviços:** saiu o limite de 860 px. Os cards ocupam a largura em colunas de no mínimo 340 px: 3 por linha a 1290 px, 2 no tablet e 1 no celular.
+- Verificação: tudo alinhado (mesmo x e largura) a 1920, 1440, 1024 e 390 px; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.

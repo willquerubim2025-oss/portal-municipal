@@ -564,7 +564,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 
 /* Destaque compacto: mais baixo, com setas, pausa redonda e indicadores numerados */
 .vitrine .v-destaque-compacto { min-height: clamp(290px, 22vw, 340px); }   /* ≈ 1290 × 330 px, como na PBH */
-@media (min-width: 1100px) { .vitrine .v-destaque-compacto { width: var(--v-largura-topo); } }
+@media (min-width: 800px) { .vitrine .v-destaque-compacto { width: var(--v-largura-topo); } }
 .v-destaque-compacto .v-slide-texto { gap: .7rem; padding-block: 2rem 3.4rem; }
 .vitrine .v-destaque-compacto .v-miolo { width: calc(100% - 2 * clamp(1.25rem, 5.5vw, 5.5rem)); }
 .v-destaque-compacto .v-slide-texto h2 { font-size: clamp(1.45rem, 1rem + 1.6vw, 2.3rem); max-width: 24ch; }
@@ -616,4 +616,11 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 @media (max-width: 700px) { .v-noticias-linha:not(.v-noticias-linha-larga) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 700px) { .v-noticias-linha-larga { grid-template-columns: 1fr; } }
 @media (max-width: 420px) { .v-noticias-linha { grid-template-columns: 1fr; } }
-@media (min-width: 1100px) { .vitrine.v-claro .v-bloco-noticias > .v-miolo { width: var(--v-largura-topo); } }
+
+/* D-60: no cabeçalho claro, todo o conteúdo (seções da home, páginas internas, migalhas e rodapé) segue a largura
+   do bloco de cima (tema.largura_topo, 1290 px), em vez das margens de D-41. Os fundos continuam de ponta a ponta. */
+.vitrine.v-claro .v-secao > .v-miolo, .vitrine.v-claro main > .container, .vitrine.v-claro .migalhas.container,
+.vitrine.v-claro .rodape .container { width: var(--v-largura-topo); max-width: none; }
+/* Serviços ocupam a largura: colunas de no mínimo 340 px (3 por linha a 1290 px, 2 no tablet, 1 no celular). */
+.v-claro .v-servicos { max-width: none; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
+.v-claro .v-servico { padding: 1.15rem 1.25rem; }
