@@ -560,3 +560,8 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - O tempo parado em cada slide do destaque compacto passou de 7,5 s para 6,5 s e, em seguida, para **4,5 s**, a pedido do usuário (`data-intervalo` na seção; fora do compacto continua 7,5 s). A animação do deslizamento segue em 0,9 s (D-66).
 - Continua com pausa ao passar o mouse, ao receber foco e pelo botão (WCAG 2.2.2).
 - Medido na prévia: a primeira troca automática ocorre em 4,5 s.
+
+**D-69 · 14/10/2026 · Cabeçalho branco 10% mais alto (a pedido do usuário)**
+- A linha do cabeçalho claro passou de `min-height: 104px` para **116 px**; a altura medida foi de 105 para 117 px. O brasão, a fonte e o menu não mudam; só cresce o respiro em cima e embaixo.
+- O menu continua numa linha só a partir de 1280 px de tela.
+- Verificação: axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste; `astro build` passando.

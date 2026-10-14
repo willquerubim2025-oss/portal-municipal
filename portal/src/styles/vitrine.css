@@ -648,7 +648,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 /* D-63/D-64: cabeçalho de uma linha só, como no modelo: marca · menu · lupa e botão. Marca e botão compactos;
    o menu mantém o tamanho de D-57 e a largura útil fica em 1290 px (D-58). Se o menu de um órgão não couber,
    o script do Base.astro ainda o leva para a segunda linha (D-57). */
-.v-cab-claro .v-cab-linha { gap: .75rem 1.25rem; min-height: 104px; }
+.v-cab-claro .v-cab-linha { gap: .75rem 1.25rem; min-height: 116px; }   /* D-69: +10% (era 104 px) */
 .v-cab-claro-brasao { width: 66px; height: 66px; }
 .vitrine .v-cab-claro .marca { gap: .7rem; }
 .vitrine .v-cab-claro .marca-nome { font-size: clamp(1.05rem, .9rem + .35vw, 1.22rem); }
