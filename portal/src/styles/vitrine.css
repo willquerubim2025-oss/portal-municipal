@@ -657,3 +657,12 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .v-cab-fale { padding: .75rem 1.1rem; font-size: .78rem; }
 .vitrine .v-cab-claro.v-cab-uma-linha .menu-lista { justify-content: center; }
 @media (max-width: 700px) { .v-cab-fale { padding: .7rem; } }
+
+/* D-65: título das seções como no modelo (PBH): só o texto, alinhado à esquerda, sem faixa de fundo e sem marcador,
+   na cor primária e um pouco maior. Vale no cabeçalho claro. */
+.vitrine.v-claro .v-secao-titulo { background: none; box-shadow: none; clip-path: none; border-radius: 0; justify-content: flex-start;
+  min-height: 0; padding: 0; margin-bottom: 1.25rem; }
+.vitrine.v-claro .v-secao-titulo h2 { text-align: left; font-size: clamp(1.4rem, 1.2rem + .5vw, 1.65rem); font-weight: 600; color: var(--cor-primaria); }
+.vitrine.v-claro .v-secao-titulo h2::before { display: none; }
+:root.contraste.vitrine.v-claro .v-secao-titulo { background: none; border: 0; }
+:root.contraste.vitrine.v-claro .v-secao-titulo h2 { color: #ff0; }

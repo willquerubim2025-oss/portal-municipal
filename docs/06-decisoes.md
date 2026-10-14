@@ -526,3 +526,12 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Ficam de D-63 a marca e o botão compactos. Com 6 itens, o cabeçalho fica em **uma linha a partir de 1280 px** de tela (menu com 665 px em 672–711 px disponíveis).
 - **Banco (homologação): pendente.** A remoção dos dois itens (`menu_itens` 54904999… "Agenda" e e7d76019… "Transparência", menu principal da SMEDU) não pôde ser feita nesta sessão: as escritas pelo MCP do Supabase excediam o tempo. Fazer pelo painel (Menus) ou por SQL numa sessão com acesso. A prévia já está sem eles.
 - Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste; alinhamento a 1920, 1440, 1024 e 390 px.
+
+**D-65 · 14/10/2026 · Título das seções sem faixa de fundo, como no modelo (a pedido do usuário; ajusta D-43, D-46, D-50 e D-61 no cabeçalho claro)**
+- No cabeçalho claro, o título de cada seção da home é só o texto, como no portal da PBH:
+  - alinhado à esquerda, na cor primária (petróleo), com `clamp(1,4 rem, 1,2 rem + 0,5 vw, 1,65 rem)` e peso 600;
+  - sem a faixa verde-água e sem o marcador vertical em degradê.
+- Objetivo do usuário: sensação de mais clareza, limpeza e simplicidade.
+- O "Ver todas…" segue centralizado no fim da seção (D-50).
+- No alto contraste, o título fica em amarelo sobre preto.
+- Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.
