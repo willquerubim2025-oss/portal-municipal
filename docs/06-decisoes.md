@@ -587,3 +587,12 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Sem o cabeçalho claro, o rodapé anterior não muda.
 - **Em aberto:** crédito do fornecedor (como "Instar Tecnologia" no modelo) e "Portal atualizado em". Não foram incluídos; decidir com o usuário.
 - Verificação: `astro build` passando; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.
+
+**D-73 · 14/10/2026 · Revisão da página inicial no celular (cabeçalho claro) (a pedido do usuário)**
+- **Verificação automática** a 320, 360, 390, 414 e 768 px: rolagem horizontal, elementos passando da tela, áreas de toque abaixo de 24 px (WCAG 2.2, 2.5.8) e textos abaixo de 12 px. Também foram revisadas as capturas da página inteira.
+- **Corrigido:**
+  1. **Rolagem horizontal a 320–360 px** (44 px e 4 px): a marca (brasão + nome) não encolhia e a lupa ficava por cima do nome. Agora a marca encolhe e o nome quebra no espaço ao lado da lupa e do botão. Abaixo de 400 px: brasão de 46 px e nome com 0,95 rem.
+  2. **Áreas de toque de 20–22 px:** Acessibilidade, Alto contraste e Site da Prefeitura, na barra verde, e os links da faixa do rodapé passaram para 28–30 px.
+  3. **Textos de 10,9–11,2 px** passaram para 12 px ou mais: "Prefeitura de Paulínia" no cabeçalho, o selo "Em breve", os números do carrossel e os números dos atalhos.
+- **Resultado:** 0 problemas nas cinco larguras. O cabeçalho do computador continua numa linha a partir de 1280 px.
+- **Observação:** nas capturas automáticas da página inteira, as imagens com `loading="lazy"` às vezes aparecem vazias. É efeito da captura; no navegador elas carregam (conferido rolando até elas).

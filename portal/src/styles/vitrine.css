@@ -490,7 +490,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .vitrine .v-topo a, .vitrine .v-topo .ferramentas button { color: inherit; }
 .vitrine .v-topo .atalhos { gap: .25rem 0; }
 .vitrine .v-topo .atalhos li + li::before { content: "|"; margin-inline: .55rem; opacity: .55; }
-.vitrine .v-topo .atalhos span { border-color: rgb(255 255 255 / .45); font-size: .68rem; }
+.vitrine .v-topo .atalhos span { border-color: rgb(255 255 255 / .45); font-size: .75rem; }
 .v-topo-direita { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem 1.25rem; }
 .vitrine .v-topo .ferramentas { gap: .25rem 1.1rem; align-items: center; }
 .vitrine .v-topo .link-acessibilidade .simbolo-acessibilidade { width: 16px; height: 16px; }
@@ -735,3 +735,23 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 :root.contraste.vitrine .v-rodape-claro, :root.contraste.vitrine .v-rod-faixa, :root.contraste.vitrine .v-rod-direitos { background: #000; color: #fff; }
 :root.contraste.vitrine .v-rodape-claro a { color: #ff0; }
 :root.contraste.vitrine .v-rod-icone { background: #000; color: #ff0; border: 1px solid #ff0; }
+
+/* D-73: revisão do celular (cabeçalho claro).
+   1) Em telas de 320–360 px a marca (brasão + nome) passava da largura e criava rolagem horizontal: agora ela encolhe
+      e o nome quebra dentro do espaço que sobra ao lado da lupa e do botão. */
+@media (max-width: 700px) {
+  .vitrine .v-cab-claro .marca { min-width: 0; max-width: 100%; box-sizing: border-box; }
+  .vitrine .v-cab-claro .marca-texto { min-width: 0; }
+}
+@media (max-width: 400px) {
+  .v-cab-claro-brasao { width: 46px; height: 46px; }
+  .vitrine .v-cab-claro .marca { gap: .55rem; padding-right: 5.75rem; }
+  .vitrine .v-cab-claro .marca-nome, .vitrine.v-fonte-cab .v-cab-claro .marca-nome { font-size: .95rem; }
+}
+/* 2) Áreas de toque de no mínimo 24 px (WCAG 2.2, 2.5.8) na barra de acessibilidade e na faixa do rodapé. */
+.vitrine .v-topo .link-acessibilidade, .vitrine .v-topo #botao-contraste, .v-topo-prefeitura { min-height: 28px; display: inline-flex; align-items: center; }
+.v-rod-faixa-linha a { display: inline-block; padding-block: .3rem; }
+/* 3) Textos pequenos: nada abaixo de 12 px. */
+.vitrine .v-cab-claro .marca-tipo { font-size: .75rem; }
+.vitrine.v-claro .v-chip { font-size: .75rem; }
+.v-destaque-compacto .v-carrossel-pontos button { font-size: .8rem; }
