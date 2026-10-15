@@ -10,8 +10,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const PORTAL = process.env.PORTAL_URL ?? 'https://portal-municipal-homologacao.portal-municipal.workers.dev';
-const PAINEL = process.env.PAINEL_URL ?? 'https://painel-municipal-homologacao.portal-municipal.workers.dev';
+const PORTAL = process.env.PORTAL_URL ?? 'https://portal-municipal-homologacao.willquerubim2025.workers.dev';
+const PAINEL = process.env.PAINEL_URL ?? 'https://painel-municipal-homologacao.willquerubim2025.workers.dev';
 const SENHA = 'Teste@Homologacao2026';
 const REGRAS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 const PASTA = path.join(path.dirname(fileURLToPath(import.meta.url)), 'relatorios');

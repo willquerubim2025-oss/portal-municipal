@@ -677,3 +677,11 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **Só homologação, de propósito:** a produção continua manual, pelo `docs/11-checklist-ir-ao-ar.md`, para nunca ir ao ar por engano.
 - O segredo `CACHE_SEGREDO` do portal fica no Worker (não é apagado por um deploy novo).
 
+**D-80 · 16/10/2026 · Homologação na conta pessoal da Cloudflare; o endereço abre o Portal Educação (escolha do usuário)**
+- A rotina "Publicar homologação" (D-79) usa a conta Cloudflare **willquerubim2025** (a do token cadastrado). O usuário escolheu manter a homologação nela. Substitui, para a homologação, a conta da empresa da D-27 (`comercial@seckesistemas.com`), que fica com a versão de 03/10 parada. A produção ainda não foi publicada em nenhuma das duas, e a conta dela será decidida no checklist de ir ao ar.
+- Endereços:
+  - painel: https://painel-municipal-homologacao.willquerubim2025.workers.dev;
+  - portal: https://portal-municipal-homologacao.willquerubim2025.workers.dev.
+- O endereço do portal foi cadastrado em `municipio_dominios` da homologação para a **SMEDU** (`paulinia-educacao`, ambiente `homologacao`, principal). `educacao.paulinia.teste` deixou de ser principal: continua valendo no `localhost` com `DOMINIO_DEV`. Jeriquara continua com `portal-municipal-homologacao.portal-municipal.workers.dev` (conta da empresa, código de 03/10) e `jeriquara.homologacao.teste`.
+- `painel/e2e/acessibilidade.mjs` passou a usar os endereços novos por padrão.
+
