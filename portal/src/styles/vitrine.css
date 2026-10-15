@@ -761,3 +761,6 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .vitrine.v-claro a.v-servico { border: 1.5px solid transparent; transition: transform .25s ease, box-shadow .25s ease, border-color .2s ease; }
 .vitrine.v-claro a.v-servico:hover, .vitrine.v-claro a.v-servico:focus-visible { border-color: var(--cor-primaria); }
 :root.contraste.vitrine.v-claro a.v-servico:hover, :root.contraste.vitrine.v-claro a.v-servico:focus-visible { border-color: #ff0; }
+
+/* D-75: links da trilha de navegação (migalhas) com área de toque de 24 px+ (WCAG 2.2, 2.5.8). */
+.vitrine .migalhas a { display: inline-block; padding-block: .2rem; }

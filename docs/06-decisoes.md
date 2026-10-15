@@ -604,3 +604,21 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - No alto contraste, a moldura fica amarela.
 - Os cards "Em breve" não são links e não têm o efeito.
 - Verificação: cor da borda medida no hover; axe sem violações na página inteira, a 1440 e a 390 px, com e sem alto contraste.
+
+**D-75 · 14/10/2026 · Padrão visual da SMEDU aprovado (cabeçalho claro, D-57 a D-74); vale para todas as páginas**
+- O usuário aprovou a página inicial no estilo do cabeçalho claro como "a cara do portal". As próximas páginas seguem esse padrão:
+  - barra verde de acessibilidade;
+  - cabeçalho branco em uma linha, com fonte Raleway;
+  - largura de 1290 px;
+  - títulos sem faixa;
+  - cards brancos com moldura verde no hover;
+  - rodapé no estilo da Prefeitura.
+- **Páginas internas conferidas** com o CSS atual: lista de notícias, notícia, Matrícula, Carta de Serviços, Fale com o supervisor (com busca), Educação em Números e Bolsa.
+  - Já herdam o cabeçalho, a largura e o rodapé, sem rolagem horizontal de 320 a 768 px.
+  - Axe sem violações, com e sem alto contraste.
+  - Único ajuste: os links da trilha de navegação passaram a ter área de toque de 24 px ou mais.
+- **Homologação:** a configuração foi ligada em 14/10/2026, pelo MCP:
+  - `config.cabecalho = {estilo: 'claro', botao: {rotulo: 'Fale com a Educação', url: '/fale-com-o-supervisor'}}`;
+  - `config.home.noticias_fileira = 3`;
+  - `tema.fonte_cabecalho = 'Raleway'`.
+  - O portal de homologação só mostra o visual novo depois de publicar o Worker com o código deste branch.
