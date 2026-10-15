@@ -704,3 +704,14 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Publicada a função `convidar-usuario` (versão 2 na produção, mesmo código da v4 da homologação); sem login responde 401.
 - `npm run permissoes:sincronizar` não foi preciso: o catálogo da produção já é igual ao do código (8 permissões, mesmos módulos, nomes, escopos e ordem). Rodar de novo quando o catálogo mudar.
 - Base: teste da homologação em 15/10/2026 (redator só edita rascunho; publicar recusado no banco; admin publica e despublica).
+
+**D-84 · 15/10/2026 · Notícia sem foto ganha imagem padrão (pedido do usuário: "pode fazer")**
+- Visto no teste da fase 1B: uma notícia sem foto no card grande virava um bloco branco com só o título. Agora a manchete (e os cards pequenos) sem imagem mostram um fundo nos tons do portal (`--v-tom-*`) com um ícone de jornal, na mesma proporção da foto. No alto contraste, fundo preto e ícone amarelo. Vale para todas as organizações (D-10).
+
+**D-85 · 15/10/2026 · Notícias no celular em lista compacta (proposta 3 da revisão de 14/10, aprovada)**
+- Até 700 px: a manchete vem primeiro, grande; as demais viram uma lista com a foto pequena (104 px) ao lado da data e do título, sem o resumo. Só CSS (`display: contents` nas duas grades e `order`). A página inicial da SMEDU a 390 px passou de ~8.740 px para ~7.510 px de altura.
+- Conferido: 0 problemas no `verificar_responsivo.cjs` (320 a 768 px) e axe sem violações (1440 e 390 px, normal e alto contraste).
+
+**D-86 · 15/10/2026 · Equipe gestora: cards dividem a largura toda (proposta 6, aprovada)**
+- `v-equipe-grade` passou de `auto-fill` para `auto-fit`: grupos com poucas pessoas (ex.: 3 supervisores) ocupam a fileira inteira, sem espaço vazio no fim. As iniciais sem foto já existiam (D-44).
+- **Revisão de 14/10 (6 propostas), situação em 15/10/2026:** 1) espaços entre seções: já reduzidos nas D-61/D-70, sem mudança; 2) botão de acessibilidade sobre o nome no celular: já resolvido na D-73; 3) Notícias no celular: D-85; 4) destaque de ponta a ponta: **não feito**, porque contraria a D-58 (destaque de 1290 px, no modelo da PBH, aprovado pelo usuário); 5) rodapé com metade vazia: já resolvido na D-72; 6) equipe: D-86.

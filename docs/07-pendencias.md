@@ -40,8 +40,8 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
     - 10 pessoas na `equipe` (resumo começa com "FICTÍCIO");
     - as fotos `carga/ficticio-*.jpg` (midias com `legado.ficticio = true`);
     - as imagens de banco `carga/foco-*.jpg` (Unsplash). **14/10/2026:** William enviou fotos novas para o "Em foco": estudantes na escadaria → Bolsa de estudo; criança chegando ao portão da escola com a família → Matrícula escolar. Os arquivos estão em `docs/design/fotos/` do repositório Portais-Publicos, e a prévia já os usa. **Falta:**
-      - enviar as fotos ao Storage pelo painel (Mídias) ou por um script com rede;
-      - trocar `config.home.foco[].imagem_path` e `imagem_alt` da SMEDU. Textos alternativos propostos:
+      - ~~enviar as fotos ao Storage~~ (feito em 15/10/2026: `carga/foco-matricula-2.jpg` e `carga/foco-bolsa-2.jpg` na homologação; as antigas continuam lá);
+      - ~~trocar `config.home.foco[].imagem_path` e `imagem_alt` da SMEDU~~ (feito em 15/10/2026, com estes textos alternativos):
         - Matrícula: "Criança com mochila de rodinhas chegando ao portão da escola, acompanhada pela família e recebida por funcionárias";
         - Bolsa: "Quatro estudantes sorrindo e conversando sentados na escadaria de um prédio, com notebook e cadernos".
       - **Antes de publicar**, confirmar a origem e o direito de uso das duas fotos. A da matrícula mostra uma criança e adultos reconhecíveis, então precisa de autorização de imagem (ECA/LGPD). A dos estudantes parece de banco de imagens ou gerada: confirmar a licença.
@@ -58,7 +58,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
   - ~~Publicar o painel de homologação~~ (feito em 16/10/2026 pela rotina "Publicar homologação" #2, painel e portal verdes). Falta incluir o endereço `https://painel-municipal-homologacao.willquerubim2025.workers.dev/**` (D-80) em Authentication → URL Configuration → Redirect URLs da branch de homologação (senão convite e redefinir senha não voltam ao painel).
   - ~~Conferir na homologação com usuário de teste~~ (**feito em 15/10/2026, aprovado pelo usuário**): o redator (`redator.teste@secke.dev`, só `conteudo.editar`) cria e edita rascunho e não vê a opção de publicar; no banco, a tentativa de publicar com o login dele é recusada ("Somente admin ou publicador pode alterar conteúdo publicado"), conferido numa transação desfeita. O admin de teste publicou e despublicou pelo painel; o portal atualizou em ~1 min (cache de 60 s + limpeza a cada minuto, respondendo 200).
   - ~~Produção: 0021, `convidar-usuario` e sincronizar~~ (feito em 15/10/2026, D-83).
-- [ ] **Card grande de notícia sem foto (vitrine):** quando a notícia em destaque não tem imagem, o card grande fica um bloco branco com só título e resumo (visto em 15/10/2026). Proposta: imagem padrão (brasão ou fundo na cor do portal). Aguardando o usuário.
+- [x] ~~**Card grande de notícia sem foto (vitrine)**~~ (D-84, 15/10/2026).
 - [ ] **Conta Cloudflare da produção:** decidir em qual conta fica a produção (checklist de ir ao ar; a homologação está na conta pessoal, D-80).
 - [ ] **Permissões, fase 1C:** notícias com escopo por unidade (`publicacoes.unidade_id` + ajuste no gatilho de publicação).
 - [x] ~~**Painel:** telas de papéis e permissões, vínculos de usuários, unidades e equipe gestora (D-38); registro de permissões no código + script de sincronização; menu montado por `minhas_permissoes()`~~ (D-77, 15/10/2026); publicado na homologação e catálogo igual na produção (D-83).

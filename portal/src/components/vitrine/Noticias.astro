@@ -3,6 +3,8 @@
 // abaixo, dois cards grandes lado a lado. Os dois grandes são a manchete (prioridade 'principal', 0020;
 // sem ela, a mais recente) e a notícia seguinte; a linha de cima recebe as demais (até 5, ou
 // config.home.noticias_fileira, D-59). Com 3 ou menos, os cards da fileira ficam maiores.
+// Sem foto, o card mostra um fundo nos tons do portal com ícone (D-84). No celular, a manchete vem primeiro e
+// as demais viram lista compacta (D-85, só CSS).
 import { urlImagem, srcsetImagem } from '../../lib/imagens';
 import { data } from '../../lib/formato';
 interface Props { noticias: any[]; titulo: string; fileira?: number }
@@ -35,7 +37,9 @@ const pequenas = resto.slice(1, 1 + fileira);
     <div class="v-noticias-grandes">
       {grandes.map((n) => (
         <article class="v-noticia v-noticia-manchete">
-          {n.imagem && <img src={urlImagem(n.imagem.storage_path, 800)} srcset={srcsetImagem(n.imagem.storage_path, [480, 800, 1200])} sizes="(max-width: 900px) 100vw, 50vw" alt={n.imagem.texto_alternativo ?? ''} width="800" height="450" decoding="async" />}
+          {n.imagem
+            ? <img src={urlImagem(n.imagem.storage_path, 800)} srcset={srcsetImagem(n.imagem.storage_path, [480, 800, 1200])} sizes="(max-width: 900px) 100vw, 50vw" alt={n.imagem.texto_alternativo ?? ''} width="800" height="450" decoding="async" />
+            : <span class="v-noticia-sem-foto" aria-hidden="true"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h13v14H6a2 2 0 0 1-2-2z" /><path d="M17 9h3v8a2 2 0 0 1-2 2h-1" /><path d="M7 9h7M7 12h7M7 15h4" /></svg></span>}
           <div class="v-noticia-texto">
             <time datetime={n.publicado_em}>{data(n.publicado_em)}</time>
             <h3><a href={`/noticias/${n.slug}`}>{n.titulo}</a></h3>

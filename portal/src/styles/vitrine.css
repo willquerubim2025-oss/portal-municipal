@@ -764,3 +764,37 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 
 /* D-75: links da trilha de navegação (migalhas) com área de toque de 24 px+ (WCAG 2.2, 2.5.8). */
 .vitrine .migalhas a { display: inline-block; padding-block: .2rem; }
+
+/* D-84: notícia sem foto. O card grande (manchete) e os pequenos mostram um fundo nos tons do portal com o ícone de
+   jornal, na mesma proporção da foto, em vez de um bloco branco com só o texto. */
+.v-noticia-sem-foto { display: grid; place-items: center; color: color-mix(in srgb, var(--cor-primaria) 45%, transparent); }
+.v-noticia-manchete .v-noticia-sem-foto { aspect-ratio: 16 / 9; }
+.v-noticia-card .v-noticia-sem-foto svg { width: 40px; height: 40px; }
+:root.contraste.vitrine .v-noticia-sem-foto { background: #000; color: #ff0; }
+
+/* D-85: Notícias no celular (até 700 px). A manchete vem primeiro, grande; as demais viram uma lista compacta,
+   com a foto pequena ao lado do título (como no "Leia também" dos portais de notícia). A seção deixa de ocupar
+   várias telas. As duas grades viram "display: contents" para todas as notícias ficarem numa coluna só. */
+@media (max-width: 700px) {
+  .v-noticias { gap: .75rem; }
+  .v-noticias-linha, .v-noticias-grandes { display: contents; }
+  .v-noticias-grandes > .v-noticia:first-child { order: -1; margin-bottom: .5rem; }
+  .v-noticias-linha > .v-noticia, .v-noticias-grandes > .v-noticia:not(:first-child) {
+    display: grid; grid-template-columns: 104px minmax(0, 1fr); flex-direction: initial;
+  }
+  .v-noticias-linha > .v-noticia img, .v-noticias-linha > .v-noticia .v-noticia-sem-foto,
+  .v-noticias-grandes > .v-noticia:not(:first-child) img, .v-noticias-grandes > .v-noticia:not(:first-child) .v-noticia-sem-foto {
+    aspect-ratio: auto; width: 100%; height: 100%; min-height: 96px;
+  }
+  .v-noticias-grandes > .v-noticia:not(:first-child) .v-noticia-sem-foto svg { width: 32px; height: 32px; }
+  .v-noticias-linha > .v-noticia .v-noticia-texto, .v-noticias-grandes > .v-noticia:not(:first-child) .v-noticia-texto,
+  .v-noticias-linha-larga .v-noticia-card .v-noticia-texto { padding: .65rem .85rem; gap: .2rem; align-content: center; }
+  .v-noticias-linha > .v-noticia h3, .v-noticias-grandes > .v-noticia:not(:first-child) h3,
+  .v-noticias-linha-larga .v-noticia-card h3 { font-size: .95rem; line-height: 1.3; font-weight: 700; }
+  .v-noticias-linha > .v-noticia time, .v-noticias-grandes > .v-noticia:not(:first-child) time { font-size: .75rem; }
+  .v-noticias-linha > .v-noticia p, .v-noticias-grandes > .v-noticia:not(:first-child) p { display: none; }
+}
+
+/* D-86: Equipe gestora: os cards de cada grupo dividem a largura toda (auto-fit), sem deixar espaço vazio no fim
+   da fileira quando o grupo tem poucas pessoas (ex.: 3 supervisores numa linha de 5 lugares). */
+.v-equipe-grade { grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
