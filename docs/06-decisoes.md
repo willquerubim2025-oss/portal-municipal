@@ -692,3 +692,15 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Em telas largas (≥ 1181 px), os itens do menu do cabeçalho claro passam de 0,88rem para **0,8rem**, com espaçamento lateral de 0,5rem (era 0,6rem) e espaço entre letras de 0,02em. O nome do órgão continua o maior texto (até 1,22rem) e "Prefeitura de" o menor (0,68rem). Celular sem mudança.
 - Vale para todos os municípios com cabeçalho claro (D-10). O script do Base.astro continua levando o menu para a segunda linha se ainda não couber (D-57).
 - Junto com isso, o usuário pediu tirar **Agenda** e **Transparência** do menu principal da SMEDU (dado, não código). A exclusão no banco de homologação foi cancelada na confirmação e ficou pendente. Feita depois, em 15/10/2026, pelo usuário no SQL Editor (branch homologacao): o menu ficou com 6 itens e cabe em uma linha com a fonte original de 0,88rem, inclusive com a Raleway em todo o portal (conferido no navegador de 1280 a 1920 px).
+
+**D-82 · 15/10/2026 · Jeriquara fora do projeto; foco no produto multi-organização (pedido do usuário)**
+- A dispensa de Jeriquara (028/2026) não foi ganha: **o site de Jeriquara não será feito.** Palavras do usuário: "não se preocupe mais com as questões de Jeriquara… deixa ele aí quietinho por enquanto".
+- Os dados de Jeriquara (produção e homologação: organização, migração de 03/10, usuários e papéis antigos em `membros`) **ficam como estão, sem manutenção**. Não testar, não conferir e não planejar trabalho para Jeriquara; não apagar sem pedido. As pendências que eram só de Jeriquara saíram de `07-pendencias.md` (lista no fim do arquivo).
+- O norte da D-10 continua e fica mais forte: o produto é **multi-organização** (prefeituras, secretarias, câmaras e outras instituições). O papel antigo em `membros` continua no código porque é genérico, não por causa de Jeriquara.
+- A organização em foco é a SMEDU de Paulínia (Portal Educação).
+
+**D-83 · 15/10/2026 · Fase 1B na produção (aprovado pelo usuário: "pode seguir")**
+- Aplicada `0021_permissoes_conteudo` na produção; os Administradores (papel protegido) das organizações receberam `conteudo.editar`, `conteudo.publicar` e `organizacao.administrar`.
+- Publicada a função `convidar-usuario` (versão 2 na produção, mesmo código da v4 da homologação); sem login responde 401.
+- `npm run permissoes:sincronizar` não foi preciso: o catálogo da produção já é igual ao do código (8 permissões, mesmos módulos, nomes, escopos e ordem). Rodar de novo quando o catálogo mudar.
+- Base: teste da homologação em 15/10/2026 (redator só edita rascunho; publicar recusado no banco; admin publica e despublica).

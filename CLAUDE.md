@@ -1,11 +1,11 @@
 # Portal Municipal (multi-prefeitura) — SECKE Sistemas
 
 Produto da SECKE Sistemas: site institucional para prefeituras, com um único sistema atendendo vários municípios.
-**Primeiro cliente:** Jeriquara/SP (Dispensa Eletrônica 028/2026, Processo 227/2026).
-**Contrato:** 60 dias de implantação + 12 meses de operação, R$ 4.000 + 12 × R$ 750.
+**Organização em foco:** Secretaria Municipal de Educação de Paulínia (SMEDU, `paulinia-educacao`), o Portal Educação. Especificação no repositório `Portais-Publicos`.
+**Jeriquara/SP está fora (D-82, 15/10/2026):** a dispensa (028/2026) não foi ganha e o site de Jeriquara não será feito. Os dados dela ficam no banco, **sem manutenção**: não testar, não conferir nem planejar nada para Jeriquara. Não apagar sem pedido.
 
 ## Norte do projeto (D-10)
-**Não estamos construindo o site de Jeriquara, e sim uma base para sites de prefeituras em geral.** Banco, lógica, painel e portal devem atender a maior parte dos municípios sem mudar código. O que é específico de cada prefeitura vira dado ou configuração. Jeriquara valida a base, mas não a define. Na dúvida, preferir a solução genérica.
+**Não estamos construindo o site de uma organização, e sim uma base multi-organização (prefeituras, secretarias, câmaras e outras instituições públicas).** Banco, lógica, painel e portal devem atender a maior parte dos municípios sem mudar código. O que é específico de cada prefeitura vira dado ou configuração. Nenhuma organização define a base, nem a SMEDU. Na dúvida, preferir a solução genérica.
 
 ## Antes de trabalhar, leia
 - [docs/11-checklist-ir-ao-ar.md](docs/11-checklist-ir-ao-ar.md): **conferir sempre que o assunto for publicação, troca de domínio ou migração final.** Tem itens adiados de propósito (ex.: arquivos acima de 50 MB, D-26).
