@@ -685,3 +685,9 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - O endereço do portal foi cadastrado em `municipio_dominios` da homologação para a **SMEDU** (`paulinia-educacao`, ambiente `homologacao`, principal). `educacao.paulinia.teste` deixou de ser principal: continua valendo no `localhost` com `DOMINIO_DEV`. Jeriquara continua com `portal-municipal-homologacao.portal-municipal.workers.dev` (conta da empresa, código de 03/10) e `jeriquara.homologacao.teste`.
 - `painel/e2e/acessibilidade.mjs` passou a usar os endereços novos por padrão.
 
+
+**D-81 · 15/10/2026 · Hierarquia de fontes do cabeçalho claro: menu um passo abaixo do nome do órgão (a pedido do usuário)**
+- Pedido: o menu voltar a ficar em uma linha entre a marca (brasão e nome) e a busca, como antes, com tamanhos de fonte em hierarquia harmoniosa.
+- Em telas largas (≥ 1181 px), os itens do menu do cabeçalho claro passam de 0,88rem para **0,8rem**, com espaçamento lateral de 0,5rem (era 0,6rem) e espaço entre letras de 0,02em. O nome do órgão continua o maior texto (até 1,22rem) e "Prefeitura de" o menor (0,68rem). Celular sem mudança.
+- Vale para todos os municípios com cabeçalho claro (D-10). O script do Base.astro continua levando o menu para a segunda linha se ainda não couber (D-57).
+- Junto com isso, o usuário pediu tirar **Agenda** e **Transparência** do menu principal da SMEDU (dado, não código). A exclusão no banco de homologação foi cancelada na confirmação e ficou pendente.

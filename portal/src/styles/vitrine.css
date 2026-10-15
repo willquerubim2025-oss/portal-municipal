@@ -657,6 +657,13 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .v-cab-fale { padding: .75rem 1.1rem; font-size: .78rem; }
 .vitrine .v-cab-claro.v-cab-uma-linha .menu-lista { justify-content: center; }
 @media (max-width: 700px) { .v-cab-fale { padding: .7rem; } }
+/* D-81: hierarquia do cabeçalho claro. O nome do órgão é o maior texto (até 1,22rem); o menu em caixa alta fica
+   um passo abaixo (0,8rem) e mais compacto, para caber em uma linha entre a marca e a busca; o rótulo
+   "Prefeitura de" continua o menor (0,68rem). Só telas largas: no celular o menu é a lista vertical. */
+@media (min-width: 1181px) {
+  .vitrine .v-cab-claro .menu-lista > li > a, .vitrine .v-cab-claro .menu-lista > li > .menu-grupo { font-size: .8rem; padding-inline: .5rem; letter-spacing: .02em; }
+  .vitrine.v-fonte-cab .v-cab-claro .menu-lista > li > a, .vitrine.v-fonte-cab .v-cab-claro .menu-lista > li > .menu-grupo { letter-spacing: .02em; }
+}
 
 /* D-65: título das seções como no modelo (PBH): só o texto, alinhado à esquerda, sem faixa de fundo e sem marcador,
    na cor primária e um pouco maior. Vale no cabeçalho claro. */
