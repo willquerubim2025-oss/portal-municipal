@@ -24,7 +24,7 @@ const situacao: Record<string, string> = { rascunho: 'rascunho', publicado: 'pub
           {n.status !== 'publicado' && ' Só quem tem este link consegue ver, e o link vale por 30 minutos.'}
         </p>
       </div>
-      <NoticiaArtigo n={n} />
+      <NoticiaArtigo n={n} previa />
     </>
   ) : (
     <div class="container">
