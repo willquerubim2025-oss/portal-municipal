@@ -719,3 +719,10 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 **D-87 · 15/10/2026 · Cabeçalho branco 15% mais alto no computador (pedido do usuário)**
 - "Aumenta a altura em 15%… com mais espaço na vertical." A linha do cabeçalho claro passou de 116 px (D-69) para **133 px** a partir de 1181 px de largura, onde o menu fica numa linha só. Brasão, nome, menu, lupa e botão continuam centralizados na vertical. No celular e em telas até 1180 px, a altura não muda.
 - Vale para todos os órgãos com cabeçalho claro (D-10).
+
+**D-88 · 15/10/2026 · Raleway em todo o portal da SMEDU (pedido do usuário)**
+- `tema.fonte_texto` e `tema.fonte_titulos` da SMEDU passaram de Prompt para Raleway (já era a fonte do cabeçalho, D-62). O usuário confirmou: "a troca da fonte eu quero". É dado (`municipios.tema`), não código: outras organizações continuam com as fontes que escolherem.
+
+**D-89 · 15/10/2026 · Pendências com a organização num documento único; não parar esperando material (pedido do usuário)**
+- Tudo o que depende da SMEDU ou da Prefeitura fica em `docs/reuniao/smedu-pendencias.md` (repositório Portais-Publicos), com resumo, o que está no site hoje e se bloqueia ir ao ar.
+- Enquanto a resposta não chega, o trabalho segue com dado público, foto de banco com licença livre ou placeholder, marcando no documento o que ficou provisório. Só se para e cobra se a falta travar o trabalho.
