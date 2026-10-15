@@ -78,8 +78,8 @@ export interface Config {
   site_prefeitura?: string;
   /** Layout vitrine: blocos da página inicial e textos das seções. */
   /** Cabeçalho do layout vitrine em carrossel (D-47): ligado por padrão; tempos em segundos.
-   *  estilo 'claro' (D-57): barra de acessibilidade na cor do cabeçalho, cabeçalho branco com marca, menu, lupa e
-   *  um botão de ação (`botao`), e destaque mais baixo com setas. Desliga o carrossel do cabeçalho. */
+   *  estilo 'claro' (D-57; padrão do vitrine desde D-76): barra de acessibilidade na cor do cabeçalho, cabeçalho branco com
+   *  marca, menu, lupa e um botão de ação (`botao`), e destaque mais baixo com setas. 'carrossel' volta ao cabeçalho de D-47. */
   cabecalho?: { carrossel?: boolean; intervalo_s?: number; transicao_s?: number; estilo?: 'carrossel' | 'claro'; botao?: { rotulo: string; url: string } };
   home?: { blocos?: BlocoHome[]; titulos?: Partial<Record<BlocoHome, string>>; foco?: ItemFoco[]; fundo_cinza?: BlocoHome[];
     /** Quantos cards na fileira de cima das Notícias (D-59): 1 a 5, padrão 5. */

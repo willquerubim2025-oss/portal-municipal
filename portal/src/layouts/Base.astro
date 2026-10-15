@@ -142,7 +142,8 @@ const marca2 = cfg.marca?.linha2 ?? nomeCurto(m);
 const cfgCab = cfg.cabecalho ?? {};
 const limitar = (v: unknown, min: number, max: number, padrao: number) => (typeof v === 'number' && v >= min && v <= max ? v : padrao);
 // Cabeçalho claro (D-57): barra de acessibilidade na cor do cabeçalho + cabeçalho branco; sem carrossel.
-const claro = vitrine && cfgCab.estilo === 'claro';
+// Desde D-76 é o padrão do layout vitrine; o cabeçalho antigo em carrossel (D-47) só com config.cabecalho.estilo = 'carrossel'.
+const claro = vitrine && cfgCab.estilo !== 'carrossel';
 const carrosselCab = vitrine && !claro && cfgCab.carrossel !== false
   ? { intervalo: limitar(cfgCab.intervalo_s, 4, 20, 7), transicao: limitar(cfgCab.transicao_s, 0.3, 3, 2) } : null;
 const sitePrefeitura = vitrine && cfg.site_prefeitura?.startsWith('https://') ? cfg.site_prefeitura : null;

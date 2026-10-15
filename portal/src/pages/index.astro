@@ -71,7 +71,7 @@ const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: m.n
   {blocos.length > 0 ? (
     <>
       {blocos.map((b) => {
-        if (b === 'destaque') return <Destaque banners={banners} titulo={m.nome} slogan={m.config.slogan} compacto={m.config.cabecalho?.estilo === 'claro'} />;
+        if (b === 'destaque') return <Destaque banners={banners} titulo={m.nome} slogan={m.config.slogan} compacto={m.config.cabecalho?.estilo !== 'carrossel'} />;
         if (vazio(b)) return null;
         return (
           <section class={`v-secao v-bloco-${b} ${fundo(b)}`} aria-labelledby={`titulo-${b}`}>

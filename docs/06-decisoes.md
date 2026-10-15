@@ -622,3 +622,10 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - `config.home.noticias_fileira = 3`;
   - `tema.fonte_cabecalho = 'Raleway'`.
   - O portal de homologação só mostra o visual novo depois de publicar o Worker com o código deste branch.
+
+**D-76 · 15/10/2026 · O cabeçalho claro é o padrão do layout vitrine (uma só versão) (a pedido do usuário)**
+- O cabeçalho claro e o destaque compacto foram criados como experimento ligado por `config.cabecalho.estilo = 'claro'`, para não comprometer o original. Aprovados (D-75), passam a ser **o padrão do vitrine**:
+  - `Base.astro`: `claro = vitrine && estilo !== 'carrossel'`;
+  - `index.astro`: `compacto` segue a mesma regra.
+- O cabeçalho antigo em carrossel (D-47) continua disponível só com `config.cabecalho.estilo = 'carrossel'`. O layout clássico (Jeriquara) não muda.
+- No repositório Portais-Publicos, as prévias também viraram uma só versão: `docs/previa/` com as 15 páginas no padrão aprovado.
