@@ -38,6 +38,7 @@
 | 0018_estrutura_permissoes | `regioes`, `unidades`, `permissoes` (catálogo global), `papeis`, `papel_permissoes`, `usuario_papeis`, `log_permissoes`; `pode()`, `minhas_permissoes()`, `sincronizar_permissoes()`, `provisionar_papeis()`; corrige auditoria e fila de cache na exclusão de organização | D-38 |
 | 0019_equipe_gestora | `equipe` (3 níveis, foto só com autorização), `unidades.supervisor_id`, `buscar_unidade()` | D-38 |
 | 0020_home_portal | `destaques`: `botao_rotulo`, `frequencia`, `versao`, `publicacao_id`; `publicacoes.prioridade`; `servicos`: `icone`, `ordem`, `na_home`, `em_breve`, `sistema_id` | D-38 |
+| 0021_permissoes_conteudo | permissões `conteudo.editar`, `conteudo.publicar`, `organizacao.administrar`; `is_membro`/`pode_publicar`/`is_admin` aceitam também essas permissões; `seguranca.e_colega()` na política de `perfis`; Administrador de cada organização recebe as três | D-78 |
 
 ## Tabelas, em resumo
 
@@ -100,7 +101,9 @@ Perguntas frequentes, eventos e destaques seguem o mesmo fluxo editorial de publ
 
 Funções de autorização (`security definer`): `is_plataforma()`, `tem_papel(municipio, papeis[])`, `is_membro()`, `pode_publicar()`, `is_admin()`.
 
-**Permissões configuráveis (0018, D-38).** Valem para os módulos novos: unidades, regiões, equipe gestora e papéis. A pergunta é sempre `pode(organização, 'modulo.acao', unidade, dono)`, e a resposta é verdadeira para a SECKE ou para quem tem um papel ativo com a permissão ligada e um escopo que cubra o alvo:
+**Desde a 0021 (D-78):** `is_membro`, `pode_publicar` e `is_admin` valem pelo papel antigo **ou** pela permissão configurável equivalente: `conteudo.editar` ≈ editor, `conteudo.publicar` ≈ publicador, `organizacao.administrar` ≈ admin (todas com alcance `rede`).
+
+**Permissões configuráveis (0018, D-38).** Valem para os módulos novos (unidades, regiões, equipe gestora e papéis) e, desde a 0021, também para o conteúdo. A pergunta é sempre `pode(organização, 'modulo.acao', unidade, dono)`, e a resposta é verdadeira para a SECKE ou para quem tem um papel ativo com a permissão ligada e um escopo que cubra o alvo:
 - `rede`: toda a organização;
 - `regiao`: as unidades da região do vínculo;
 - `unidade`: só a unidade do vínculo;
@@ -183,7 +186,7 @@ O projeto foi criado com *Automatically expose new tables* **desligado** e *auto
 
 ## Testes
 `node supabase/tests/rls.test.mjs` (requer `npm i`, já tem `@electric-sql/pglite` no package.json).
-O teste simula `auth.uid()` e o `storage` do Supabase, aplica todas as migrations e o seed, e verifica **164 regras**: publicação por papel, isolamento entre municípios (RLS e FKs compostas), busca, auditoria, chamados e saldo, nota interna, pastas do Storage, proteção de conteúdo publicado (arquivos e substituição no Storage), provisionamento (idempotência, só a SECKE cria município), os módulos da 0007 e as permissões explícitas da 0008, os campos do município (0010), a fila do cache (0011), a verificação de links (0012, inclusive a extração de links) e a exportação (0013), as correções de segurança (0016), a organização contratante (0017), as permissões por papel com escopo, salvaguardas e histórico (0018), a equipe gestora e a busca de unidade (0019) e os campos da página inicial (0020). Nesse Postgres local não há `pg_cron`, `pg_net` nem Vault: a 0011 só agenda a rotina onde eles existem. O teste **não** concede nada no schema `public`: usa só os GRANTs das migrations, como no projeto real.
+O teste simula `auth.uid()` e o `storage` do Supabase, aplica todas as migrations e o seed, e verifica **183 regras**: publicação por papel, isolamento entre municípios (RLS e FKs compostas), busca, auditoria, chamados e saldo, nota interna, pastas do Storage, proteção de conteúdo publicado (arquivos e substituição no Storage), provisionamento (idempotência, só a SECKE cria município), os módulos da 0007 e as permissões explícitas da 0008, os campos do município (0010), a fila do cache (0011), a verificação de links (0012, inclusive a extração de links) e a exportação (0013), as correções de segurança (0016), a organização contratante (0017), as permissões por papel com escopo, salvaguardas e histórico (0018), a equipe gestora e a busca de unidade (0019) os campos da página inicial (0020) e as permissões de conteúdo (0021). Nesse Postgres local não há `pg_cron`, `pg_net` nem Vault: a 0011 só agenda a rotina onde eles existem. O teste **não** concede nada no schema `public`: usa só os GRANTs das migrations, como no projeto real.
 
 ## Pendências do banco
 Ver [07-pendencias](07-pendencias.md): export diário por município, Edge Functions de links e exportação, carga dos critérios PNTP, conferência das seções da Central com a matriz PNTP vigente.

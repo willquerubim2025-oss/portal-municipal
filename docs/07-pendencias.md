@@ -7,7 +7,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 
 | Frente | Pronto | O que falta |
 |---|---|---|
-| Base (banco, RLS, multi-prefeitura) | ~97% | índices de desempenho; fase 1B das permissões (D-38) |
+| Base (banco, RLS, multi-prefeitura) | ~97% | índices de desempenho; fase 1B das permissões na produção (D-78) |
 | Portal público (RF01–07) | ~93% | identidade visual de Jeriquara, tema ampliado (D-17) |
 | Transparência (RF08–11) | ~70% | links dos sistemas Fiorilli e de cada seção (prefeitura); preencher o PNTP com a prefeitura |
 | Painel (RF12–19) | ~90% | biblioteca de mídias, pré-visualização de rascunho |
@@ -50,7 +50,10 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
   - conteúdo da homologação: 7 notícias reais do site da Prefeitura, com crédito e link. As datas são aproximadas (o site não expõe a data de cada notícia), exceto a do uniforme (9/10). Fotos com crianças, já publicadas pela Prefeitura, precisam de revisão antes de irem ao ar (ECA);
   - blocos ainda vazios na SMEDU: agenda (sem eventos) e equipe gestora (sem nomes); a busca do supervisor precisa da lista de escolas e supervisores;
   - teste manual com leitor de tela do carrossel (pausa, pontos) e dos avisos (janela urgente). Na auditoria automática (axe, WCAG 2.x A/AA), as páginas novas passaram nos modos normal e alto contraste.
-- [ ] **Permissões, fase 1B (D-38): plano pronto, aguardando aprovação** (`Portais-Publicos/docs/Plano de Migração — Fase 1B.md`): ampliar `is_membro`, `pode_publicar` e `is_admin` com 3 permissões novas, em vez de reescrever as ~70 políticas; também perfis de colegas e convite com papel configurável. notícias, páginas, destaques e serviços passam a usar `pode()`; os papéis antigos (admin, publicador, editor) viram papéis do sistema com as mesmas permissões; notícias ganham escopo por unidade. Os 164 testes atuais garantem que Jeriquara não muda.
+- [ ] **Permissões, fase 1B (D-78): aplicada na homologação em 15/10/2026, falta conferir e levar à produção.**
+  - Conferir na homologação: criar um usuário de teste da SMEDU pelo painel (Vínculos → "Dar papel a alguém" com e-mail novo) com um papel que tenha só `conteudo.editar`; ver que cria rascunho e não publica. Conferir também os logins antigos de Jeriquara (admin, editor, publicador). Depende de publicar o painel da homologação (Cloudflare).
+  - Produção (com aprovação do usuário): aplicar `0021_permissoes_conteudo`, publicar `convidar-usuario` e rodar `npm run permissoes:sincronizar` com a chave de serviço.
+- [ ] **Permissões, fase 1C:** notícias com escopo por unidade (`publicacoes.unidade_id` + ajuste no gatilho de publicação); converter os papéis antigos de Jeriquara em papéis configuráveis, com a SECKE e a prefeitura.
 - [x] ~~**Painel:** telas de papéis e permissões, vínculos de usuários, unidades e equipe gestora (D-38); registro de permissões no código + script de sincronização; menu montado por `minhas_permissoes()`~~ (D-77, 15/10/2026). Falta publicar o painel de homologação e rodar `npm run permissoes:sincronizar`.
 - [ ] **Provisionamento por `tipo_ente` (D-37):** o pacote padrão é de prefeitura (Lei Orgânica, licitações, PPA). Adaptar para secretaria, câmara etc. antes de publicar a Central de Transparência de uma organização que não é prefeitura.
 - [ ] **SMEDU de Paulínia (`paulinia-educacao`):** domínio, código IBGE, CNPJ e o primeiro Administrador (papel novo; só a SECKE faz o primeiro vínculo). Detalhes no repositório `Portais-Publicos`.

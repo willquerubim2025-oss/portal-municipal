@@ -652,3 +652,19 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - administrador antigo (Jeriquara) com o mesmo menu de antes e sem acesso às telas novas;
   - testes de banco 164/164.
 - **Limite até a fase 1B:** quem tem só papéis configuráveis não edita conteúdo, não vê o nome dos colegas e não convida pessoas. Plano em `docs/Plano de Migração — Fase 1B.md`, no repositório Portais-Publicos, aguardando aprovação.
+
+**D-78 · 15/10/2026 · Fase 1B: o conteúdo obedece também aos papéis configuráveis (aprovado pelo usuário: "pode sim")**
+- **Como:** em vez de reescrever as ~70 políticas de conteúdo, a migration `0021_permissoes_conteudo` amplia as três funções por onde todas passam (mesmo nome e assinatura, sem `drop`, SECURITY INVOKER como antes):
+  - `is_membro` = papel antigo **ou** `conteudo.editar`, `conteudo.publicar` ou `organizacao.administrar`;
+  - `pode_publicar` = admin/publicador antigo **ou** `conteudo.publicar` ou `organizacao.administrar`;
+  - `is_admin` = admin antigo **ou** `organizacao.administrar`.
+  O papel antigo (`membros`) continua valendo exatamente como antes: Jeriquara não muda. O gatilho `checar_permissao_publicacao` não foi tocado (usa `pode_publicar`).
+- **Catálogo:** 3 permissões novas, só com alcance `rede` (escopo por unidade fica para a 1C). Entraram também em `painel/src/lib/permissoes.catalogo.json`.
+- **Administrador (papel protegido) de cada organização** recebe as três ligadas. Diretor, Professor e Estudante continuam sem elas; o Administrador liga no painel o que decidir.
+- **Colegas:** `perfis` passa a usar `seguranca.e_colega(user)`: vê o perfil quem trabalha com conteúdo, vincula ou configura papéis numa organização em que a pessoa tem vínculo antigo ou configurável.
+- **Convite (`convidar-usuario`):** aceita `papel_id` (com `unidade_id` ou `regiao_id`). Autoriza por `pode(usuarios.vincular)` e grava em `usuario_papeis` com o token de quem convida (o RLS ainda exige `permissoes.gerenciar` para dar o papel Administrador). O caminho antigo (`papel` → `membros`, exige `is_admin`) não mudou. O convite configurável fica na tela **Vínculos** ("Dar papel a alguém" com o e-mail de quem ainda não tem conta), porque quem só tem `usuarios.vincular` não abre a tela Usuários.
+- **Painel:** `AuthContext.nivel` = o maior entre o papel antigo e o equivalente das permissões; `podePublicar`, `isAdmin`, `ExigirAcesso papelMinimo`, menu e início usam esse nível (o mesmo cálculo do banco).
+- **Verificação:** testes de banco 183/183 (19 novos: Administrador configurável cria e publica, Redator só rascunho, Diretor não cria, auditoria, identidade, isolamento entre organizações, colegas, desligar permissão vale na hora, editor antigo igual); `tsc` e build; Playwright com Supabase simulado (sem conteúdo → sem Notícias; Redator → Notícias sem Menus; Administrador configurável → tudo e convite com `papel_id`).
+- **Aplicado na homologação** (`kvilgamsyneenjtlllcf`) em 15/10/2026: migration + função (v4). Conferido: 3 permissões, Administrador de Jeriquara e da SMEDU com as três ligadas, política de `perfis` nova, admin antigo de Jeriquara com `is_membro`/`pode_publicar`/`is_admin` verdadeiros. Na homologação ainda não há nenhum vínculo em `usuario_papeis`, então ninguém mudou de acesso.
+- **Produção:** só depois de conferir na homologação e com aprovação do usuário.
+
