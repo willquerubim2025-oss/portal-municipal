@@ -1,0 +1,75 @@
+# Publica o painel e/ou o portal de HOMOLOGAÇÃO na Cloudflare (D-79), com um botão:
+# Actions → "Publicar homologação" → Run workflow. Só homologação: a produção continua
+# manual (docs/11-checklist-ir-ao-ar.md), para nunca ir ao ar por engano.
+#
+# Segredos do repositório (Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_API_TOKEN   token da Cloudflare com o modelo "Edit Cloudflare Workers"
+#   CLOUDFLARE_ACCOUNT_ID  ID da conta (página inicial da conta na Cloudflare)
+#
+# As chaves do Supabase usadas aqui são publicáveis e já estão versionadas
+# (painel/.env.homologacao e portal/wrangler.jsonc, env "homologacao").
+name: Publicar homologação
+
+on:
+  workflow_dispatch:
+    inputs:
+      alvo:
+        description: 'O que publicar'
+        type: choice
+        options: [painel e portal, painel, portal]
+        default: painel e portal
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publicar-homologacao
+  cancel-in-progress: false
+
+env:
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+jobs:
+  painel:
+    if: inputs.alvo != 'portal'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: painel
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: painel/package-lock.json
+      - run: npm ci
+      # Build com painel/.env.homologacao + Worker painel-municipal-homologacao.
+      - run: npm run deploy:homologacao
+
+  portal:
+    if: inputs.alvo != 'painel'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: portal
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: portal/package-lock.json
+      - run: npm ci
+      # O env "homologacao" do wrangler.jsonc entra no build (Worker portal-municipal-homologacao).
+      - run: npx astro build
+        env:
+          CLOUDFLARE_ENV: homologacao
+      - name: Conferir que o build aponta para a homologação
+        run: |
+          grep -q '"name":"portal-municipal-homologacao"' dist/server/wrangler.json
+          grep -q 'kvilgamsyneenjtlllcf' dist/server/wrangler.json
+      - run: npx wrangler deploy

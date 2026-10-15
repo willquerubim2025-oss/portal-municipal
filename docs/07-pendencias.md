@@ -22,7 +22,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
   - **14/10/2026 (D-64): tirar "Agenda" e "Transparência" do menu principal da SMEDU na homologação**, pelo painel (Menus) ou por SQL. Não foi possível pelo MCP nesta sessão (tempo excedido).
   - **14/10/2026 (D-75): padrão visual aprovado.** A configuração do cabeçalho claro já está na homologação. Falta:
     1. ~~juntar o branch `claude/fervent-turing-szzwyu` na `main`~~ (feito em 15/10/2026, com autorização do usuário);
-    2. publicar o Worker de homologação (`CLOUDFLARE_ENV=homologacao npx astro build && npx wrangler deploy`), numa máquina ou sessão com acesso à Cloudflare;
+    2. publicar o Worker de homologação: rotina **Actions → "Publicar homologação"** (D-79), depois que o usuário cadastrar os segredos `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID` no GitHub. Na mão: `CLOUDFLARE_ENV=homologacao npx astro build && npx wrangler deploy`;
     3. remover os 2 itens do menu (acima) e enviar as fotos novas do "Em foco".
   - menu principal da SMEDU cadastrado na homologação em 12/10/2026 (D-40). **Confirmar com a SMEDU** os rótulos e a ordem, e se Agenda e Transparência ficam no menu. As páginas "Matrícula Escolar" e "Fale com o supervisor" ainda não têm conteúdo real (prazos, documentos, lista de escolas);
   - brasão colorido em uso desde 12/10/2026 (`<id>/carga/brasao-colorido.png`, tema.brasao_path). O arquivo recebido tem só 252 px, e serve no cabeçalho, mas **pedir à Prefeitura o brasão oficial em alta resolução (PNG transparente ou SVG)** para o compartilhamento em redes e a impressão. A função `carga-midias-temporaria` foi reativada só para esse envio e já voltou a responder 410;
@@ -51,6 +51,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
   - blocos ainda vazios na SMEDU: agenda (sem eventos) e equipe gestora (sem nomes); a busca do supervisor precisa da lista de escolas e supervisores;
   - teste manual com leitor de tela do carrossel (pausa, pontos) e dos avisos (janela urgente). Na auditoria automática (axe, WCAG 2.x A/AA), as páginas novas passaram nos modos normal e alto contraste.
 - [ ] **Permissões, fase 1B (D-78): aplicada na homologação em 15/10/2026, falta conferir e levar à produção.**
+  - Publicar o painel de homologação pela rotina "Publicar homologação" (D-79) e incluir o endereço `https://painel-municipal-homologacao.<conta>.workers.dev/**` em Authentication → URL Configuration → Redirect URLs da branch de homologação (senão convite e redefinir senha não voltam ao painel).
   - Conferir na homologação: criar um usuário de teste da SMEDU pelo painel (Vínculos → "Dar papel a alguém" com e-mail novo) com um papel que tenha só `conteudo.editar`; ver que cria rascunho e não publica. Conferir também os logins antigos de Jeriquara (admin, editor, publicador). Depende de publicar o painel da homologação (Cloudflare).
   - Produção (com aprovação do usuário): aplicar `0021_permissoes_conteudo`, publicar `convidar-usuario` e rodar `npm run permissoes:sincronizar` com a chave de serviço.
 - [ ] **Permissões, fase 1C:** notícias com escopo por unidade (`publicacoes.unidade_id` + ajuste no gatilho de publicação); converter os papéis antigos de Jeriquara em papéis configuráveis, com a SECKE e a prefeitura.

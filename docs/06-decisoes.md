@@ -668,3 +668,12 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **Aplicado na homologação** (`kvilgamsyneenjtlllcf`) em 15/10/2026: migration + função (v4). Conferido: 3 permissões, Administrador de Jeriquara e da SMEDU com as três ligadas, política de `perfis` nova, admin antigo de Jeriquara com `is_membro`/`pode_publicar`/`is_admin` verdadeiros. Na homologação ainda não há nenhum vínculo em `usuario_papeis`, então ninguém mudou de acesso.
 - **Produção:** só depois de conferir na homologação e com aprovação do usuário.
 
+**D-79 · 16/10/2026 · Publicação da homologação por botão no GitHub (a pedido do usuário: "opção 2")**
+- O ambiente do Claude na nuvem não alcança a Cloudflare, e o usuário prefere não depender de computador para publicar.
+- Rotina `.github/workflows/publicar-homologacao.yml`: em Actions → "Publicar homologação" → Run workflow, escolhe-se painel, portal ou os dois.
+  - Painel: `npm ci` + `npm run deploy:homologacao` (Worker `painel-municipal-homologacao`).
+  - Portal: `CLOUDFLARE_ENV=homologacao npx astro build`, confere que o `dist/server/wrangler.json` aponta para `portal-municipal-homologacao` e para `kvilgamsyneenjtlllcf`, e então `npx wrangler deploy`.
+- Segredos do repositório: `CLOUDFLARE_API_TOKEN` (modelo "Edit Cloudflare Workers") e `CLOUDFLARE_ACCOUNT_ID`.
+- **Só homologação, de propósito:** a produção continua manual, pelo `docs/11-checklist-ir-ao-ar.md`, para nunca ir ao ar por engano.
+- O segredo `CACHE_SEGREDO` do portal fica no Worker (não é apagado por um deploy novo).
+
