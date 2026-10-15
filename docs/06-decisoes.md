@@ -726,3 +726,11 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 **D-89 · 15/10/2026 · Pendências com a organização num documento único; não parar esperando material (pedido do usuário)**
 - Tudo o que depende da SMEDU ou da Prefeitura fica em `docs/reuniao/smedu-pendencias.md` (repositório Portais-Publicos), com resumo, o que está no site hoje e se bloqueia ir ao ar.
 - Enquanto a resposta não chega, o trabalho segue com dado público, foto de banco com licença livre ou placeholder, marcando no documento o que ficou provisório. Só se para e cobra se a falta travar o trabalho.
+
+**D-90 · 15/10/2026 · Pacote padrão por tipo de organização; secretaria sem estrutura de prefeitura (pedido do usuário)**
+- O usuário: "não faz sentido a gente ter uma estrutura de prefeitura numa secretaria". Até aqui toda organização recebia o pacote de prefeitura (0007): Lei Orgânica, PPA/LDO/LOA, receitas, despesas, obras, emendas parlamentares, saúde... A SMEDU tinha 18 seções de Transparência e 15 categorias de documentos de prefeitura, todas vazias.
+- **Decisão (0022):** o provisionamento lê `tipo_ente`. Secretaria recebe um pacote próprio: atos da área (sem Lei Orgânica), editais, convênios e seleções, conselhos, planos e relatórios, e a seção **Contas Públicas**, que explica que receitas, despesas, licitações, contratos e pessoal da Secretaria são publicados pela Prefeitura e leva ao site dela (`config.site_prefeitura`). Câmara, autarquia e outros seguem com o pacote de prefeitura até terem um próprio (pendência).
+- Organizações que já existem trocam com `aplicar_pacote_tipo(id)`: só sai o que está vazio e sem uso; nada com documento, link, sistema ou página publicada é apagado.
+- Portal: `/legislacao` vira "Legislação" (sem "municipal") e a descrição da Transparência muda para quem não é prefeitura (`ehPrefeitura`).
+- Testes: 15 novos (198 no total, 0 falhas).
+- **Aplicação:** pelo MCP o `apply_migration` excedeu o tempo (comandos de exclusão pedem confirmação que não aparece na sessão na nuvem). Rodar o arquivo no SQL Editor (homologação; depois produção, com aprovação).

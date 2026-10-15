@@ -39,6 +39,7 @@
 | 0019_equipe_gestora | `equipe` (3 níveis, foto só com autorização), `unidades.supervisor_id`, `buscar_unidade()` | D-38 |
 | 0020_home_portal | `destaques`: `botao_rotulo`, `frequencia`, `versao`, `publicacao_id`; `publicacoes.prioridade`; `servicos`: `icone`, `ordem`, `na_home`, `em_breve`, `sistema_id` | D-38 |
 | 0021_permissoes_conteudo | permissões `conteudo.editar`, `conteudo.publicar`, `organizacao.administrar`; `is_membro`/`pode_publicar`/`is_admin` aceitam também essas permissões; `seguranca.e_colega()` na política de `perfis`; Administrador de cada organização recebe as três | D-78 |
+| 0022_pacote_por_tipo_ente | `provisionar_municipio()` lê `tipo_ente` (pacote de prefeitura ou de secretaria); `criar_municipio(..., p_tipo_ente)`; `aplicar_pacote_tipo(id)` (só SECKE) troca o pacote de uma organização, tirando só o que está vazio | D-90 |
 
 ## Tabelas, em resumo
 
@@ -163,7 +164,10 @@ Tipos em `portal/src/lib/municipio.ts`.
 O portal só aceita cores no formato `#rgb`/`#rrggbb` e nomes de fonte da lista: o tema vem do banco e vai para o `style` do `<html>`. Blocos sem conteúdo (sem serviços na home, sem equipe visível, sem eventos) não aparecem. Rota nova: `/fale-com-o-supervisor` (busca de unidade, `buscar_unidade`).
 
 ## Provisionamento de município (D-10)
-- **`criar_municipio(slug, nome, uf, dominio)`** (só SECKE): cria o município e o domínio e aplica o pacote padrão. Retorna o `id`.
+- **`criar_municipio(slug, nome, uf, dominio, tipo_ente = 'prefeitura')`** (só SECKE): cria a organização e o domínio e aplica o pacote padrão **do tipo** (0022, D-90). Retorna o `id`.
+- **`aplicar_pacote_tipo(id)`** (só SECKE, 0022): troca o pacote de uma organização que mudou de tipo. Para secretaria, tira seções, categorias e a página e-SIC do pacote de prefeitura **só se estiverem vazias e sem uso** e aplica o pacote de secretaria. Idempotente.
+- **Pacote de secretaria (0022):** categorias Leis e Decretos da Área, Portarias, Resoluções, Convênios, Editais e Chamamentos, Processos Seletivos, Conselhos, Planos e Programas, Prestação de Contas; `config.legislacao_categorias`; página "Sobre a Secretaria" (sem O Município e e-SIC); 9 seções da Transparência: Informações Institucionais, **Contas Públicas** (atalho para `config.site_prefeitura`; o item só é criado se o site estiver cadastrado), Editais/Convênios/Seleções, Conselhos e Controle Social, Planos e Relatórios, Acesso à Informação, Ouvidoria, Privacidade, Acessibilidade.
+- O que segue abaixo é o **pacote de prefeitura** (também usado, por enquanto, para câmara, autarquia e outros).
 - **`provisionar_municipio(id)`** (SECKE ou admin do município): aplica o pacote padrão. É **idempotente**: rodar de novo não duplica nem sobrescreve o que o município personalizou. Cria:
   - `config.modulos` (estrutura_organizacional, perguntas_frequentes, agenda, galeria, destaques, legislacao, carta_servicos, todos `true`). O que já existir prevalece. O portal e o painel usam isso para ligar e desligar seções;
   - ~21 categorias (Lei Orgânica, Leis, Decretos, Portarias, Licitações, Contratos, Atas, Convênios, Chamamentos, Concursos, Processos Seletivos, PPA/LDO/LOA, Prestação de Contas, mais Cidadão/Empresa/Servidor nos serviços e "Geral" em notícias, eventos e perguntas);
