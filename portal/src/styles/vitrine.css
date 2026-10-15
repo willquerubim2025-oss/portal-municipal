@@ -798,3 +798,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 /* D-86: Equipe gestora: os cards de cada grupo dividem a largura toda (auto-fit), sem deixar espaço vazio no fim
    da fileira quando o grupo tem poucas pessoas (ex.: 3 supervisores numa linha de 5 lugares). */
 .v-equipe-grade { grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
+
+/* D-87: cabeçalho branco 15% mais alto no computador (a pedido do usuário): de 116 para 133 px. No celular e
+   em telas até 1180 px (menu em duas linhas ou no botão "Menu") a altura não muda. */
+@media (min-width: 1181px) { .v-cab-claro .v-cab-linha { min-height: 133px; } }

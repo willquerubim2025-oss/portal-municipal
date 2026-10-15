@@ -715,3 +715,7 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 **D-86 · 15/10/2026 · Equipe gestora: cards dividem a largura toda (proposta 6, aprovada)**
 - `v-equipe-grade` passou de `auto-fill` para `auto-fit`: grupos com poucas pessoas (ex.: 3 supervisores) ocupam a fileira inteira, sem espaço vazio no fim. As iniciais sem foto já existiam (D-44).
 - **Revisão de 14/10 (6 propostas), situação em 15/10/2026:** 1) espaços entre seções: já reduzidos nas D-61/D-70, sem mudança; 2) botão de acessibilidade sobre o nome no celular: já resolvido na D-73; 3) Notícias no celular: D-85; 4) destaque de ponta a ponta: **não feito**, porque contraria a D-58 (destaque de 1290 px, no modelo da PBH, aprovado pelo usuário); 5) rodapé com metade vazia: já resolvido na D-72; 6) equipe: D-86.
+
+**D-87 · 15/10/2026 · Cabeçalho branco 15% mais alto no computador (pedido do usuário)**
+- "Aumenta a altura em 15%… com mais espaço na vertical." A linha do cabeçalho claro passou de 116 px (D-69) para **133 px** a partir de 1181 px de largura, onde o menu fica numa linha só. Brasão, nome, menu, lupa e botão continuam centralizados na vertical. No celular e em telas até 1180 px, a altura não muda.
+- Vale para todos os órgãos com cabeçalho claro (D-10).
