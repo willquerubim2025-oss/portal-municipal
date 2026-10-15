@@ -1,9 +1,11 @@
 // Edge Function: convida um usuário para o painel de um município (D-21).
 //
 // A chave de serviço só cria a conta no Auth e grava o perfil (nome/e-mail, sem
-// nenhum poder). O vínculo com o município (membros, que dá o papel) é gravado COM O
-// TOKEN DE QUEM CONVIDA: o RLS confere que ele é admin daquele município e a
-// auditoria registra quem fez.
+// nenhum poder). O vínculo com o município é gravado COM O TOKEN DE QUEM CONVIDA:
+//  - `papel` (antigo: admin/publicador/editor) → membros; o RLS exige is_admin;
+//  - `papel_id` (papel configurável, D-38/D-78) → usuario_papeis, com unidade_id ou
+//    regiao_id opcionais; o RLS exige usuarios.vincular (e permissoes.gerenciar para
+//    o papel Administrador). Toda mudança vai para a auditoria / histórico.
 //
 // Envio do convite: tenta o e-mail do Supabase. Sem SMTP configurado (ou com o
 // limite atingido), gera o link de convite e devolve para o admin repassar.
@@ -35,19 +37,40 @@ Deno.serve(async (req) => {
   const { data: { user: quem }, error: erroSessao } = await comoUsuario.auth.getUser(autorizacao.replace(/^Bearer /i, ''));
   if (erroSessao || !quem) return resposta(401, { erro: 'Sessão inválida. Entre de novo no painel.' });
 
-  let corpo: { municipio_id?: string; email?: string; nome?: string; papel?: string; redirect_to?: string };
+  let corpo: {
+    municipio_id?: string; email?: string; nome?: string; papel?: string; redirect_to?: string;
+    papel_id?: string; unidade_id?: string | null; regiao_id?: string | null;
+  };
   try { corpo = await req.json(); } catch { return resposta(400, { erro: 'Corpo inválido.' }); }
   const email = (corpo.email ?? '').trim().toLowerCase();
   const nome = (corpo.nome ?? '').trim();
   const papel = corpo.papel ?? '';
+  const papelId = corpo.papel_id ?? '';
+  const unidadeId = corpo.unidade_id || null;
+  const regiaoId = corpo.regiao_id || null;
   const municipioId = corpo.municipio_id ?? '';
+  const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!/^\S+@\S+\.\S+$/.test(email)) return resposta(400, { erro: 'E-mail inválido.' });
   if (!nome) return resposta(400, { erro: 'Informe o nome.' });
-  if (!PAPEIS.includes(papel)) return resposta(400, { erro: 'Papel inválido.' });
+  if (!uuid.test(municipioId)) return resposta(400, { erro: 'Organização inválida.' });
+  if (papelId ? !uuid.test(papelId) || papel : !PAPEIS.includes(papel)) return resposta(400, { erro: 'Papel inválido.' });
+  if ((unidadeId && !uuid.test(unidadeId)) || (regiaoId && !uuid.test(regiaoId)) || (unidadeId && regiaoId)) {
+    return resposta(400, { erro: 'Escolha a unidade ou a região, não as duas.' });
+  }
   if (email === quem.email?.toLowerCase()) return resposta(400, { erro: 'Você não pode alterar o seu próprio acesso.' });
 
-  const { data: ehAdmin, error: erroPapel } = await comoUsuario.rpc('is_admin', { p_municipio: municipioId });
-  if (erroPapel || !ehAdmin) return resposta(403, { erro: 'Só o administrador da prefeitura pode convidar usuários.' });
+  // Checagem antecipada (o RLS confere de novo ao gravar): não cria conta para quem não poderia convidar.
+  const checagem = papelId
+    ? await comoUsuario.rpc('pode', { p_municipio: municipioId, p_permissao: 'usuarios.vincular' })
+    : await comoUsuario.rpc('is_admin', { p_municipio: municipioId });
+  if (checagem.error || !checagem.data) {
+    return resposta(403, { erro: papelId ? 'Você não tem permissão para atribuir papéis nesta organização.' : 'Só o administrador da prefeitura pode convidar usuários.' });
+  }
+  if (papelId) {
+    // O papel precisa existir, estar ativo e ser desta organização (RLS de papeis: quem vincula vê).
+    const { data: p } = await comoUsuario.from('papeis').select('id, ativo').eq('id', papelId).eq('municipio_id', municipioId).maybeSingle();
+    if (!p?.ativo) return resposta(400, { erro: 'Papel inválido ou desativado.' });
+  }
 
   // O endereço de retorno só pode ser o painel (o Supabase ainda confere a lista de URLs permitidas).
   const redirectTo = /^(https:\/\/|http:\/\/localhost[:/])/.test(corpo.redirect_to ?? '') ? corpo.redirect_to : undefined;
@@ -82,11 +105,27 @@ Deno.serve(async (req) => {
   }
 
   // Vínculo (papel) com o token de quem convidou: RLS + auditoria.
-  const vinculo = await comoUsuario.from('membros').upsert(
-    { municipio_id: municipioId, user_id: userId, papel, ativo: true },
-    { onConflict: 'municipio_id,user_id' },
-  );
-  if (vinculo.error) return resposta(500, { erro: 'Usuário criado, mas o acesso à prefeitura não foi gravado.', detalhe: vinculo.error.message });
+  let erroVinculo: string | null = null;
+  if (papelId) {
+    const ins = await comoUsuario.from('usuario_papeis').insert(
+      { municipio_id: municipioId, user_id: userId, papel_id: papelId, unidade_id: unidadeId, regiao_id: regiaoId },
+    );
+    if (ins.error?.code === '23505') {
+      // Já tinha esse papel nesse lugar: só reativa.
+      let q = comoUsuario.from('usuario_papeis').update({ ativo: true }).eq('user_id', userId!).eq('papel_id', papelId);
+      q = unidadeId ? q.eq('unidade_id', unidadeId) : q.is('unidade_id', null);
+      q = regiaoId ? q.eq('regiao_id', regiaoId) : q.is('regiao_id', null);
+      const up = await q;
+      if (up.error) erroVinculo = up.error.message;
+    } else if (ins.error) erroVinculo = ins.error.message;
+  } else {
+    const up = await comoUsuario.from('membros').upsert(
+      { municipio_id: municipioId, user_id: userId, papel, ativo: true },
+      { onConflict: 'municipio_id,user_id' },
+    );
+    if (up.error) erroVinculo = up.error.message;
+  }
+  if (erroVinculo) return resposta(500, { erro: 'Usuário criado, mas o acesso à organização não foi gravado.', detalhe: erroVinculo });
   // Perfil pelo servidor: o admin só "enxerga" perfis de colegas, e o convidado ainda não era.
   // Não sobrescreve o nome de quem já tinha perfil (atende outra prefeitura).
   const perfil = await admin.from('perfis').upsert({ user_id: userId, nome, email }, { onConflict: 'user_id', ignoreDuplicates: true });

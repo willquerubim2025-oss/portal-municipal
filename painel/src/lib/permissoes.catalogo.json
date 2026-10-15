@@ -8,5 +8,11 @@
   { "codigo": "unidades.editar", "modulo": "Unidades", "nome": "Editar dados da unidade",
     "descricao": "Atualizar contato, endereço, foto e etapas da unidade.", "escopos": ["rede", "regiao", "unidade"], "ordem": 11 },
   { "codigo": "equipe.gerenciar", "modulo": "Equipe gestora", "nome": "Gerenciar a equipe gestora",
-    "descricao": "Cadastrar membros, fotos autorizadas e o que aparece no portal.", "escopos": ["rede"], "ordem": 20 }
+    "descricao": "Cadastrar membros, fotos autorizadas e o que aparece no portal.", "escopos": ["rede"], "ordem": 20 },
+  { "codigo": "conteudo.editar", "modulo": "Conteúdo", "nome": "Criar e editar conteúdo",
+    "descricao": "Criar e editar rascunhos de notícias, páginas, documentos, serviços, agenda, perguntas e banners.", "escopos": ["rede"], "ordem": 30 },
+  { "codigo": "conteudo.publicar", "modulo": "Conteúdo", "nome": "Publicar conteúdo",
+    "descricao": "Publicar, agendar, retirar do site e excluir conteúdo; gerenciar categorias.", "escopos": ["rede"], "ordem": 31 },
+  { "codigo": "organizacao.administrar", "modulo": "Organização", "nome": "Administrar a organização",
+    "descricao": "Menus, transparência, identidade visual e dados, estrutura, redirecionamentos, auditoria, exportação e usuários.", "escopos": ["rede"], "ordem": 40 }
 ]

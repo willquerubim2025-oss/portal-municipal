@@ -6,7 +6,7 @@ import { usePortal } from '../lib/portal';
 
 interface Resumo { rascunhos: number; agendadas: number; publicadas: number; saldo: number | null; limite: number | null }
 
-// Quem só tem papéis configuráveis (sem papel antigo de conteúdo, D-38) vê os módulos liberados para ele.
+// Quem não trabalha com conteúdo (sem papel antigo nem permissão de conteúdo, D-38/D-78) vê os módulos liberados para ele.
 const MODULOS_PERMISSAO = [
   { para: '/unidades', rotulo: 'Unidades e regiões', permissoes: ['unidades.gerenciar', 'unidades.editar'] },
   { para: '/equipe', rotulo: 'Equipe gestora', permissoes: ['equipe.gerenciar'] },
@@ -15,8 +15,8 @@ const MODULOS_PERMISSAO = [
 ];
 
 export function Inicio() {
-  const { atual, nome, pode, permissoesCarregadas } = useAuth();
-  if (!atual?.papel) {
+  const { atual, nome, pode, nivel, permissoesCarregadas } = useAuth();
+  if (!nivel) {
     const modulos = MODULOS_PERMISSAO.filter((m) => m.permissoes.some(pode));
     return (
       <>

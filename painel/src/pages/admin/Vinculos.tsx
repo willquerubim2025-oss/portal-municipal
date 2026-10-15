@@ -110,7 +110,7 @@ export function Vinculos() {
           }))}</tbody>
         </table>
       )}
-      <p className="meta">Para dar acesso a alguém que ainda não tem conta, convide a pessoa em Usuários e depois atribua o papel aqui. A equipe da SECKE não aparece nesta lista.</p>
+      <p className="meta">Para dar acesso a alguém que ainda não tem conta, use "Dar papel a alguém" com o e-mail da pessoa: ela recebe um convite. A equipe da SECKE não aparece nesta lista.</p>
     </>
   );
 }
@@ -124,24 +124,47 @@ function NovoVinculo({ mid, eu, pessoas, papeis, unidades, regioes, aoFechar }: 
   const [onde, setOnde] = useState<'rede' | 'unidade' | 'regiao'>('rede');
   const [unidadeId, setUnidadeId] = useState('');
   const [regiaoId, setRegiaoId] = useState('');
+  const [nome, setNome] = useState('');
+  const [semConta, setSemConta] = useState(false);
+  const [convite, setConvite] = useState<{ enviado: boolean; link: string | null; existente: boolean } | null>(null);
+  const [copiado, setCopiado] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
   const candidatos = pessoas.filter((p) => p.user_id !== eu).sort((a, b) => (a.nome || a.email).localeCompare(b.nome || b.email));
 
   async function salvar(ev: FormEvent) {
     ev.preventDefault(); setErro(null);
-    let alvoUser = userId;
-    if (!alvoUser && email.trim()) {
-      // Pessoa que já tem conta (ex.: atende outra organização): procura pelo e-mail no perfil visível.
-      const { data } = await supabase.from('perfis').select('user_id').ilike('email', email.trim()).maybeSingle();
-      if (!data) return setErro('Não encontramos uma conta com esse e-mail. Convide a pessoa em Usuários primeiro.');
-      alvoUser = data.user_id;
-    }
-    if (!alvoUser) return setErro('Escolha a pessoa.');
-    if (alvoUser === eu) return setErro('Você não pode alterar o seu próprio acesso.');
     if (!papelId) return setErro('Escolha o papel.');
     if (onde === 'unidade' && !unidadeId) return setErro('Escolha a unidade.');
     if (onde === 'regiao' && !regiaoId) return setErro('Escolha a região.');
+    let alvoUser = userId;
+    if (!alvoUser && email.trim()) {
+      if (!/^\S+@\S+\.\S+$/.test(email.trim())) return setErro('E-mail inválido.');
+      // Pessoa que já tem conta visível (colega): procura pelo e-mail no perfil.
+      const { data } = await supabase.from('perfis').select('user_id').ilike('email', email.trim()).maybeSingle();
+      if (data) alvoUser = data.user_id;
+      else {
+        // Sem conta visível: convida (a função cria a conta, ou reaproveita a que já existe, e grava o vínculo).
+        if (!semConta) { setSemConta(true); return setErro('Não encontramos essa pessoa entre os colegas. Informe o nome para enviar o convite.'); }
+        if (!nome.trim()) return setErro('Informe o nome.');
+        setSalvando(true);
+        const { data: r, error } = await supabase.functions.invoke('convidar-usuario', {
+          body: {
+            municipio_id: mid, nome: nome.trim(), email: email.trim(), papel_id: papelId,
+            unidade_id: onde === 'unidade' ? unidadeId : null, regiao_id: onde === 'regiao' ? regiaoId : null,
+            redirect_to: `${location.origin}/redefinir-senha`,
+          },
+        });
+        setSalvando(false);
+        if (error) {
+          const corpo = await (error as { context?: Response }).context?.json?.().catch(() => null);
+          return setErro(corpo?.erro ?? 'Não foi possível convidar agora.');
+        }
+        return setConvite(r);
+      }
+    }
+    if (!alvoUser) return setErro('Escolha a pessoa ou informe o e-mail.');
+    if (alvoUser === eu) return setErro('Você não pode alterar o seu próprio acesso.');
     setSalvando(true);
     const { error } = await supabase.from('usuario_papeis').insert({
       municipio_id: mid, user_id: alvoUser, papel_id: papelId,
@@ -153,6 +176,25 @@ function NovoVinculo({ mid, eu, pessoas, papeis, unidades, regioes, aoFechar }: 
   }
 
   const papel = papeis.find((p) => p.id === papelId);
+  if (convite) {
+    return (
+      <section className="painel-form" aria-labelledby="t-convite-ok">
+        <h2 id="t-convite-ok">{convite.existente ? 'Acesso concedido' : 'Convite criado'}</h2>
+        <p role="status">{nome} recebeu o papel {papel?.nome}.{convite.existente && ' A pessoa já tinha conta e entra com a senha de sempre.'}</p>
+        {convite.enviado && <p>Enviamos um e-mail para <strong>{email}</strong> com o link para criar a senha.</p>}
+        {convite.link && (
+          <>
+            <p>O e-mail automático não está disponível. <strong>Copie o link abaixo e envie para {nome}</strong>. Ele vale por tempo limitado e só pode ser usado uma vez.</p>
+            <div className="linha-campos"><input readOnly value={convite.link} aria-label="Link de convite" onFocus={(e) => e.target.select()} /></div>
+            <p className="acoes-linha">
+              <button type="button" className="botao-secundario" onClick={async () => { await navigator.clipboard.writeText(convite.link!); setCopiado(true); }}>{copiado ? 'Link copiado' : 'Copiar link'}</button>
+            </p>
+          </>
+        )}
+        <p><button type="button" className="botao" onClick={() => aoFechar(true)}>Concluir</button></p>
+      </section>
+    );
+  }
   return (
     <form className="painel-form" onSubmit={salvar} aria-labelledby="t-novo-vinculo">
       <h2 id="t-novo-vinculo">Dar papel a alguém</h2>
@@ -163,7 +205,8 @@ function NovoVinculo({ mid, eu, pessoas, papeis, unidades, regioes, aoFechar }: 
             {candidatos.map((p) => <option key={p.user_id} value={p.user_id}>{p.nome || p.email || p.user_id}{p.nome && p.email ? ` (${p.email})` : ''}</option>)}
           </select>
         </label>
-        {!userId && <label>ou e-mail de quem já tem conta<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></label>}
+        {!userId && <label>ou e-mail (quem ainda não tem conta recebe um convite)<input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setSemConta(false); }} /></label>}
+        {!userId && semConta && <label><Obrigatorio>Nome completo</Obrigatorio><input value={nome} onChange={(e) => setNome(e.target.value)} /></label>}
         <label><Obrigatorio>Papel</Obrigatorio>
           <select value={papelId} onChange={(e) => setPapelId(e.target.value)}>
             {papeis.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
@@ -188,7 +231,7 @@ function NovoVinculo({ mid, eu, pessoas, papeis, unidades, regioes, aoFechar }: 
       {papel?.protegido && <p className="meta">Atenção: o Administrador configura papéis e dá acesso a outras pessoas.</p>}
       {erro && <p className="erro" role="alert">{erro}</p>}
       <p className="acoes-linha">
-        <button className="botao" disabled={salvando}>{salvando ? 'Salvando…' : 'Atribuir papel'}</button>
+        <button className="botao" disabled={salvando}>{salvando ? 'Salvando…' : semConta && !userId ? 'Convidar e atribuir papel' : 'Atribuir papel'}</button>
         <button type="button" className="botao-secundario" onClick={() => aoFechar(false)}>Cancelar</button>
       </p>
     </form>

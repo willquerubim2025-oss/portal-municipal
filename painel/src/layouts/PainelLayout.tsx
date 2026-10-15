@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ROTULO_PAPEL } from '../lib/tipos';
 
-// `papel`: papel antigo mínimo (conteúdo, até a fase 1B). `permissao`: permissões configuráveis (basta uma), D-38.
+// `papel`: nível mínimo no conteúdo (papel antigo ou permissão equivalente, D-78). `permissao`: permissões configuráveis (basta uma), D-38.
 interface ItemMenu { rotulo: string; para: string; pronto: boolean; papel?: 'editor' | 'publicador' | 'admin'; permissao?: string[] }
 
 // Módulos do painel. `pronto: false` aparece desabilitado até ser implementado (fases seguintes).
@@ -41,10 +41,10 @@ const GRUPOS: { titulo: string; itens: ItemMenu[] }[] = [
 ];
 
 export function PainelLayout() {
-  const { nome, atual, acessos, escolherMunicipio, isPlataforma, podePublicar, isAdmin, sair, pode } = useAuth();
+  const { nome, atual, acessos, escolherMunicipio, isPlataforma, podePublicar, isAdmin, nivel, sair, pode } = useAuth();
   const navegar = useNavigate();
   const permitido = (i: ItemMenu) => i.permissao ? i.permissao.some(pode)
-    : !i.papel || (i.papel === 'admin' ? isAdmin : i.papel === 'publicador' ? podePublicar : !!atual?.papel);
+    : !i.papel || (i.papel === 'admin' ? isAdmin : i.papel === 'publicador' ? podePublicar : !!nivel);
 
   return (
     <div className="painel">

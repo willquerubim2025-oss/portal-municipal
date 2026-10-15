@@ -2,10 +2,11 @@
 // pode trabalhar e com QUAL papel (padrão do GeoEscolas). Nenhuma tela consulta
 // `membros`, `usuario_papeis` ou `equipe_plataforma` por conta própria: todas usam useAuth().
 //
-// Dois sistemas de papéis convivem até a fase 1B (D-38):
-//  - papel antigo (membros: admin/publicador/editor), que ainda rege o conteúdo;
-//  - papéis configuráveis (usuario_papeis + papel_permissoes), que regem os módulos novos
-//    (papéis, vínculos, unidades, equipe) e são consultados por pode().
+// Dois sistemas de papéis convivem (D-38, D-78):
+//  - papel antigo (membros: admin/publicador/editor), de Jeriquara;
+//  - papéis configuráveis (usuario_papeis + papel_permissoes), consultados por pode().
+// Desde a fase 1B, o conteúdo aceita os dois: conteudo.editar ≈ editor, conteudo.publicar ≈ publicador,
+// organizacao.administrar ≈ admin. `nivel` é o maior dos dois (o mesmo que is_membro/pode_publicar/is_admin no banco).
 //
 // O frontend só esconde botões; quem garante a permissão é o banco (RLS + public.pode()).
 // Aqui é só para a interface não oferecer o que vai falhar.
@@ -26,6 +27,8 @@ interface AuthValor {
   /** Município em edição (escolhido no seletor; lembrado no navegador). */
   atual: Acesso | null;
   escolherMunicipio: (id: string) => void;
+  /** Papel equivalente no conteúdo: o antigo ou o que as permissões de conteúdo dão (o maior). */
+  nivel: Papel | null;
   podePublicar: boolean;
   isAdmin: boolean;
   /** Permissões configuráveis do usuário no município atual (public.minhas_permissoes). */
@@ -156,11 +159,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [isPlataforma, permissoes],
   );
 
+  const permissoesAtuais = permissoesDe === atualMid ? permissoes : [];
+  const tem = (c: string) => permissoesAtuais.some((p) => p.permissao === c);
+  const nivel: Papel | null = isPlataforma || atual?.papel === 'admin' || tem('organizacao.administrar') ? 'admin'
+    : atual?.papel === 'publicador' || tem('conteudo.publicar') ? 'publicador'
+    : atual?.papel === 'editor' || tem('conteudo.editar') ? 'editor' : null;
+
   const valor: AuthValor = {
     sessao, carregando, erro, nome, isPlataforma, acessos, atual, escolherMunicipio,
-    podePublicar: atual?.papel === 'admin' || atual?.papel === 'publicador',
-    isAdmin: atual?.papel === 'admin',
-    permissoes: permissoesDe === atualMid ? permissoes : [],
+    nivel: atual ? nivel : null,
+    podePublicar: !!atual && (nivel === 'admin' || nivel === 'publicador'),
+    isAdmin: !!atual && nivel === 'admin',
+    permissoes: permissoesAtuais,
     permissoesCarregadas: isPlataforma || (!!atualMid && permissoesDe === atualMid),
     pode, podeNaRede,
     entrar, sair, saiu,
