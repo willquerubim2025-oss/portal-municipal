@@ -18,7 +18,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 
 ## Próximos passos
 - [ ] **Teste de fonte única na SMEDU (15/10/2026, só homologação, a pedido do usuário: "vamos ver como fica").** `tema.fonte_titulos` e `tema.fonte_texto` passaram de `Prompt` para `Raleway` (a fonte do cabeçalho, D-62), em `paulinia-educacao`. Sem mudança de código. Vale para o portal inteiro da SMEDU, não só para a página inicial. Decidir: se ficar, registrar como decisão e repetir na produção; se não, voltar as duas chaves para `Prompt`.
-- [ ] **Menu principal da SMEDU sem Agenda e Transparência (pedido de 15/10/2026, D-81).** A exclusão dos dois itens em `menu_itens` da homologação foi cancelada na confirmação; fazer pelo painel (Menus) ou autorizar a exclusão no banco. Depois, publicar a homologação para ver o menu em uma linha.
+- [ ] **Menu principal da SMEDU sem Agenda e Transparência (pedido de 15/10/2026, D-81).** A exclusão dos dois itens em `menu_itens` da homologação foi cancelada na confirmação; fazer pelo painel (Menus) ou autorizar a exclusão no banco. Depois, publicar a homologação. (A mudança de fonte do menu da D-81 foi revertida a pedido do usuário; o cabeçalho voltou ao de antes.)
 - [ ] **Portal Educação Paulínia (layout vitrine, D-39), feito em 12/10/2026 na homologação.** Pendências:
   - publicar o portal de homologação na Cloudflare com o código novo, para ver no navegador. Até lá, testar com `DOMINIO_DEV=educacao.paulinia.teste` no `.env` do `portal/`;
   - **14/10/2026 (D-64): tirar "Agenda" e "Transparência" do menu principal da SMEDU na homologação**, pelo painel (Menus) ou por SQL. Não foi possível pelo MCP nesta sessão (tempo excedido).

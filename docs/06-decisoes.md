@@ -686,7 +686,8 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - `painel/e2e/acessibilidade.mjs` passou a usar os endereços novos por padrão.
 
 
-**D-81 · 15/10/2026 · Hierarquia de fontes do cabeçalho claro: menu um passo abaixo do nome do órgão (a pedido do usuário)**
+**D-81 · 15/10/2026 · Hierarquia de fontes do cabeçalho claro: menu um passo abaixo do nome do órgão (a pedido do usuário) — REVERTIDA no mesmo dia**
+- **Revertida em 15/10/2026, a pedido do usuário** ("mexeu no cabeçalho e não era pra mexer; volte apenas o cabeçalho como era antes"): o bloco de CSS saiu de `vitrine.css` e o menu voltou a 0,88rem, como na D-76/D-80. O teste da Raleway (dado, em `tema`) e o pedido de tirar Agenda e Transparência do menu não fazem parte da reversão.
 - Pedido: o menu voltar a ficar em uma linha entre a marca (brasão e nome) e a busca, como antes, com tamanhos de fonte em hierarquia harmoniosa.
 - Em telas largas (≥ 1181 px), os itens do menu do cabeçalho claro passam de 0,88rem para **0,8rem**, com espaçamento lateral de 0,5rem (era 0,6rem) e espaço entre letras de 0,02em. O nome do órgão continua o maior texto (até 1,22rem) e "Prefeitura de" o menor (0,68rem). Celular sem mudança.
 - Vale para todos os municípios com cabeçalho claro (D-10). O script do Base.astro continua levando o menu para a segunda linha se ainda não couber (D-57).
