@@ -230,3 +230,7 @@ button.menu-grupo:hover, button.menu-grupo:focus-visible { background: rgb(255 2
   .barra-acessibilidade, .menu-principal, .busca, .rodape, .alertas, .paginacao { display: none; }
   a { color: inherit; }
 }
+
+/* Pré-visualização de rascunho (D-91): aviso no topo da página. */
+.aviso-previa { margin: 1.25rem 0 0; padding: .85rem 1.1rem; border-radius: 10px; background: #fff3cd; color: #5c4400; border: 1px solid #e6c766; }
+:root.contraste .aviso-previa { background: #000; color: #ff0; border-color: #ff0; }

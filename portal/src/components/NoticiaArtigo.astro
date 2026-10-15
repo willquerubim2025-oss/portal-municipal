@@ -1,0 +1,49 @@
+---
+// Corpo da notícia (cabeçalho, foto, texto, galeria, categorias). Usado pela página da notícia e pela
+// pré-visualização de rascunho (D-91), para as duas ficarem iguais.
+import { urlMidia } from '../lib/supabase';
+import { urlImagem, srcsetImagem } from '../lib/imagens';
+import { dataExtenso } from '../lib/formato';
+import { htmlSeguro } from '../lib/html';
+interface Props { n: any }
+const { n } = Astro.props;
+const img = urlMidia(n.imagem?.storage_path);
+const galeria = (n.galeria ?? []).sort((a: any, b: any) => a.ordem - b.ordem);
+const atualizado = n.atualizado_em && new Date(n.atualizado_em).getTime() - new Date(n.publicado_em).getTime() > 3600_000;
+---
+  <article class="container">
+    <header class="cabecalho-pagina">
+      <h1>{n.titulo}</h1>
+      {n.resumo && <p>{n.resumo}</p>}
+      <p class="meta">
+        Publicado em <time datetime={n.publicado_em}>{dataExtenso(n.publicado_em)}</time>
+        {atualizado && <> · atualizado em <time datetime={n.atualizado_em}>{dataExtenso(n.atualizado_em)}</time></>}
+        {n.orgao && <> · <a href={`/estrutura-organizacional/${n.orgao.slug}`}>{n.orgao.nome}</a></>}
+      </p>
+    </header>
+    {img && (
+      <figure class="figura-destaque">
+        <img src={urlImagem(n.imagem.storage_path, 1200)} srcset={srcsetImagem(n.imagem.storage_path, [640, 800, 1200, 1600])} sizes="(max-width: 1200px) 100vw, 1200px" alt={n.imagem.texto_alternativo ?? ''} width="1200" height="675" fetchpriority="high" />
+      </figure>
+    )}
+    <div class="conteudo" set:html={htmlSeguro(n.corpo_html)} />
+    {galeria.length > 0 && (
+      <section aria-labelledby="titulo-galeria">
+        <h2 id="titulo-galeria">Galeria de fotos</h2>
+        <ul class="galeria">
+          {galeria.map((g: any) => (
+            <li>
+              <figure>
+                <a href={urlMidia(g.midia.storage_path)}><img src={urlImagem(g.midia.storage_path, 480)} srcset={srcsetImagem(g.midia.storage_path, [320, 480, 800])} sizes="(max-width: 600px) 50vw, 400px" alt={g.midia.texto_alternativo ?? ''} loading="lazy" decoding="async" width="400" height="300" /></a>
+                {g.legenda && <figcaption>{g.legenda}</figcaption>}
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+    {n.categorias?.length > 0 && (
+      <p class="meta">Categorias: {n.categorias.map((c: any, i: number) => <>{i > 0 && ', '}<a href={`/noticias?categoria=${c.categoria.slug}`}>{c.categoria.nome}</a></>)}</p>
+    )}
+    <p><a href="/noticias">← Voltar para as notícias</a></p>
+  </article>

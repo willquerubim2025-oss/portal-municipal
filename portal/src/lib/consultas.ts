@@ -84,6 +84,13 @@ export async function noticia(municipioId: string, slug: string) {
     .eq('municipio_id', municipioId).eq('slug', slug).maybeSingle()) as any;
 }
 
+/** Rascunho aberto por um link de pré-visualização (D-91): null se o token não existir, tiver vencido
+ *  (30 min) ou for de outra organização. Mesmo formato de noticia(). */
+export async function previaPublicacao(municipioId: string, token: string) {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(token)) return null;
+  return erro(await supabase().rpc('previa_publicacao', { p_token: token, p_municipio: municipioId })) as any;
+}
+
 // ---------------------------------------------------------------- destaques e eventos
 export async function destaques(municipioId: string) {
   return erro(await supabase().from('destaques')

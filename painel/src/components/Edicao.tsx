@@ -4,9 +4,12 @@ import type { ReactNode } from 'react';
 import type { Edicao } from '../lib/edicao';
 import { dataHora, slugificar } from '../lib/texto';
 import { EtiquetaSituacao } from './Situacao';
+import { supabase, mensagemErro } from '../lib/supabase';
 
-export function CabecalhoEdicao<F>({ e, rotuloLista, titulo, linkSite }: {
+export function CabecalhoEdicao<F>({ e, rotuloLista, titulo, linkSite, previa }: {
   e: Edicao<F>; rotuloLista: string; titulo: string; linkSite?: string | null;
+  /** Pré-visualização de rascunho no portal (D-91): tabela do conteúdo e endereço do portal. */
+  previa?: { tabela: 'publicacoes'; portal: string | null };
 }) {
   return (
     <div className="cabecalho-tela">
@@ -20,12 +23,30 @@ export function CabecalhoEdicao<F>({ e, rotuloLista, titulo, linkSite }: {
             {e.sit === 'publicado' && ` em ${dataHora(e.publicadoEm)}`}
             {e.atualizadoEm && ` · última alteração ${dataHora(e.atualizadoEm)}`}
             {e.sit === 'publicado' && linkSite && <> · <a href={linkSite} target="_blank" rel="noopener">Ver no site<span className="sr-only"> (abre em nova aba)</span></a></>}
+            {e.sit !== 'publicado' && previa?.portal && e.id && <> · <BotaoPrevia tabela={previa.tabela} id={e.id} portal={previa.portal} /></>}
           </p>
         )}
       </div>
     </div>
   );
   function rotaLista() { return location.pathname.replace(/\/[^/]+$/, ''); }
+}
+
+/** Abre o conteúdo como ficará no site, por um link temporário (30 min) gerado no banco (criar_previa, 0023).
+ *  Mostra a última versão SALVA. A aba é aberta já no clique, para o navegador não bloquear. */
+function BotaoPrevia({ tabela, id, portal }: { tabela: 'publicacoes'; id: string; portal: string }) {
+  const abrir = async () => {
+    const aba = window.open('about:blank', '_blank');
+    const { data, error } = await supabase.rpc('criar_previa', { p_tabela: tabela, p_id: id });
+    if (error || !data) { aba?.close(); alert(`Não foi possível gerar a pré-visualização. ${mensagemErro(error)}`); return; }
+    const url = `${portal}/previa/${data}`;
+    if (aba) aba.location.href = url; else window.location.href = url;
+  };
+  return (
+    <button type="button" className="botao-link" onClick={abrir} title="Mostra a última versão salva, como vai aparecer no site">
+      Pré-visualizar no site<span className="sr-only"> (abre em nova aba, mostra a última versão salva)</span>
+    </button>
+  );
 }
 
 export function MensagensEdicao<F>({ e, nome }: { e: Edicao<F>; nome: string }) {

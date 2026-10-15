@@ -79,7 +79,7 @@ export function EditarNoticia() {
     <CarregandoOuAusente e={e} rotuloLista="Notícias e avisos">
       <form onSubmit={enviar} className="formulario-conteudo" noValidate>
         <CabecalhoEdicao e={e} rotuloLista="Notícias e avisos" titulo={e.nova ? 'Nova notícia' : f.titulo || 'Sem título'}
-          linkSite={portal && `${portal}/noticias/${f.slug}`} />
+          linkSite={portal && `${portal}/noticias/${f.slug}`} previa={{ tabela: 'publicacoes', portal }} />
         <MensagensEdicao e={e} nome="notícia" />
         <fieldset disabled={e.bloqueado || e.salvando} className="grade-formulario">
           <div className="coluna-principal">

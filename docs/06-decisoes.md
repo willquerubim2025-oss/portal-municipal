@@ -734,3 +734,9 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Portal: `/legislacao` vira "Legislação" (sem "municipal") e a descrição da Transparência muda para quem não é prefeitura (`ehPrefeitura`).
 - Testes: 15 novos (198 no total, 0 falhas).
 - **Aplicação:** pelo MCP o `apply_migration` excedeu o tempo (comandos de exclusão pedem confirmação que não aparece na sessão na nuvem). Rodar o arquivo no SQL Editor (homologação; depois produção, com aprovação). Aplicada na homologação em 15/10/2026 pelo usuário (SQL Editor). Correção junto: o objeto da organização no portal (`resolverMunicipio`) não levava `tipo_ente`.
+
+**D-91 · 15/10/2026 · Pré-visualização de rascunho no portal (pendência do painel, aprovada pelo usuário)**
+- No painel, notícias e avisos ainda não publicados ganham o botão **"Pré-visualizar no site"**. Ele gera um link temporário (`criar_previa`, 0023) e abre `/previa/<token>` no portal: a notícia com o visual do site e um aviso amarelo "Pré-visualização". Mostra a última versão **salva**.
+- **Segurança:** o token é um uuid aleatório, vale 30 minutos e só abre aquele conteúdo, só no domínio da própria organização. A tabela `previas` não tem policy nem grant; as funções ficam no schema `seguranca` com invólucros em `public` (padrão da 0016). Só quem pode editar o conteúdo (`is_membro`) gera o link. A página não vai para cache (`private, no-store`, também na borda) nem para buscadores.
+- O corpo da notícia virou o componente `NoticiaArtigo.astro`, usado pela página publicada e pela prévia (as duas iguais).
+- Testes: 10 novos (208 no total, 0 falhas). Próximos módulos (páginas, serviços, eventos) seguem o mesmo molde: acrescentar a tabela no `check` de `previas` e uma função de leitura.
