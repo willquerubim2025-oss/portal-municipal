@@ -1,0 +1,12 @@
+[
+  { "codigo": "permissoes.gerenciar", "modulo": "Usuários e permissões", "nome": "Configurar papéis e permissões",
+    "descricao": "Criar papéis, ligar e desligar permissões e ver o histórico.", "escopos": ["rede"], "ordem": 1 },
+  { "codigo": "usuarios.vincular", "modulo": "Usuários e permissões", "nome": "Atribuir papéis a usuários",
+    "descricao": "Dar e retirar papéis das pessoas (nunca de si mesmo).", "escopos": ["rede"], "ordem": 2 },
+  { "codigo": "unidades.gerenciar", "modulo": "Unidades", "nome": "Gerenciar unidades e regiões",
+    "descricao": "Cadastrar, excluir e organizar unidades, regiões e supervisores.", "escopos": ["rede"], "ordem": 10 },
+  { "codigo": "unidades.editar", "modulo": "Unidades", "nome": "Editar dados da unidade",
+    "descricao": "Atualizar contato, endereço, foto e etapas da unidade.", "escopos": ["rede", "regiao", "unidade"], "ordem": 11 },
+  { "codigo": "equipe.gerenciar", "modulo": "Equipe gestora", "nome": "Gerenciar a equipe gestora",
+    "descricao": "Cadastrar membros, fotos autorizadas e o que aparece no portal.", "escopos": ["rede"], "ordem": 20 }
+]

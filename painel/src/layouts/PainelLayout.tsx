@@ -2,18 +2,23 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ROTULO_PAPEL } from '../lib/tipos';
 
-interface ItemMenu { rotulo: string; para: string; pronto: boolean; papel?: 'publicador' | 'admin' }
+// `papel`: papel antigo mínimo (conteúdo, até a fase 1B). `permissao`: permissões configuráveis (basta uma), D-38.
+interface ItemMenu { rotulo: string; para: string; pronto: boolean; papel?: 'editor' | 'publicador' | 'admin'; permissao?: string[] }
 
 // Módulos do painel. `pronto: false` aparece desabilitado até ser implementado (fases seguintes).
 const GRUPOS: { titulo: string; itens: ItemMenu[] }[] = [
   { titulo: 'Conteúdo', itens: [
-    { rotulo: 'Notícias e avisos', para: '/noticias', pronto: true },
-    { rotulo: 'Documentos e legislação', para: '/documentos', pronto: true },
-    { rotulo: 'Páginas', para: '/paginas', pronto: true },
-    { rotulo: 'Serviços', para: '/servicos', pronto: true },
-    { rotulo: 'Agenda', para: '/eventos', pronto: true },
-    { rotulo: 'Perguntas frequentes', para: '/perguntas', pronto: true },
-    { rotulo: 'Banners e alertas', para: '/destaques', pronto: true },
+    { rotulo: 'Notícias e avisos', para: '/noticias', pronto: true, papel: 'editor' },
+    { rotulo: 'Documentos e legislação', para: '/documentos', pronto: true, papel: 'editor' },
+    { rotulo: 'Páginas', para: '/paginas', pronto: true, papel: 'editor' },
+    { rotulo: 'Serviços', para: '/servicos', pronto: true, papel: 'editor' },
+    { rotulo: 'Agenda', para: '/eventos', pronto: true, papel: 'editor' },
+    { rotulo: 'Perguntas frequentes', para: '/perguntas', pronto: true, papel: 'editor' },
+    { rotulo: 'Banners e alertas', para: '/destaques', pronto: true, papel: 'editor' },
+  ]},
+  { titulo: 'Rede', itens: [
+    { rotulo: 'Unidades e regiões', para: '/unidades', pronto: true, permissao: ['unidades.gerenciar', 'unidades.editar'] },
+    { rotulo: 'Equipe gestora', para: '/equipe', pronto: true, permissao: ['equipe.gerenciar'] },
   ]},
   { titulo: 'Estrutura', itens: [
     { rotulo: 'Estrutura organizacional', para: '/orgaos', pronto: true, papel: 'admin' },
@@ -26,7 +31,9 @@ const GRUPOS: { titulo: string; itens: ItemMenu[] }[] = [
   ]},
   { titulo: 'Administração', itens: [
     { rotulo: 'Usuários', para: '/usuarios', pronto: true, papel: 'admin' },
-    { rotulo: 'Chamados', para: '/chamados', pronto: true },
+    { rotulo: 'Papéis e permissões', para: '/papeis', pronto: true, permissao: ['permissoes.gerenciar'] },
+    { rotulo: 'Vínculos de usuários', para: '/vinculos', pronto: true, permissao: ['usuarios.vincular', 'permissoes.gerenciar'] },
+    { rotulo: 'Chamados', para: '/chamados', pronto: true, papel: 'editor' },
     { rotulo: 'Links quebrados', para: '/links', pronto: true, papel: 'publicador' },
     { rotulo: 'Auditoria', para: '/auditoria', pronto: true, papel: 'admin' },
     { rotulo: 'Exportar dados', para: '/exportar', pronto: true, papel: 'admin' },
@@ -34,9 +41,10 @@ const GRUPOS: { titulo: string; itens: ItemMenu[] }[] = [
 ];
 
 export function PainelLayout() {
-  const { nome, atual, acessos, escolherMunicipio, isPlataforma, podePublicar, isAdmin, sair } = useAuth();
+  const { nome, atual, acessos, escolherMunicipio, isPlataforma, podePublicar, isAdmin, sair, pode } = useAuth();
   const navegar = useNavigate();
-  const permitido = (i: ItemMenu) => !i.papel || (i.papel === 'admin' ? isAdmin : podePublicar);
+  const permitido = (i: ItemMenu) => i.permissao ? i.permissao.some(pode)
+    : !i.papel || (i.papel === 'admin' ? isAdmin : i.papel === 'publicador' ? podePublicar : !!atual?.papel);
 
   return (
     <div className="painel">
@@ -53,7 +61,7 @@ export function PainelLayout() {
             </label>
           ) : <span className="topo-municipio">{atual?.municipio.nome}</span>}
           <span className="topo-usuario">
-            {nome || 'Usuário'} · {isPlataforma ? 'SECKE' : atual && ROTULO_PAPEL[atual.papel]}
+            {nome || 'Usuário'} · {isPlataforma ? 'SECKE' : atual && [atual.papel && ROTULO_PAPEL[atual.papel], ...atual.papeis].filter(Boolean).join(', ')}
           </span>
           <button type="button" className="botao-link" onClick={() => sair()}>Sair</button>
         </div>

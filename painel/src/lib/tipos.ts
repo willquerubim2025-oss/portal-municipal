@@ -11,8 +11,11 @@ export interface MunicipioResumo {
 /** Município que o usuário pode editar e o papel dele nesse município. */
 export interface Acesso {
   municipio: MunicipioResumo;
-  /** Equipe SECKE tem acesso de admin em todos (is_plataforma no banco). */
-  papel: Papel;
+  /** Papel antigo (membros: admin/publicador/editor). null = só papéis configuráveis (usuario_papeis, D-38).
+   *  Equipe SECKE tem acesso de admin em todos (is_plataforma no banco). */
+  papel: Papel | null;
+  /** Nomes dos papéis configuráveis da pessoa nesta organização (D-38). */
+  papeis: string[];
 }
 
 export const ROTULO_PAPEL: Record<Papel, string> = {

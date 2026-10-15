@@ -17,6 +17,8 @@ export function urlMidia(storagePath: string | null | undefined): string | null 
 export function mensagemErro(e: unknown): string {
   const err = e as { code?: string; message?: string } | null;
   if (!err) return 'Erro desconhecido.';
+  // Gatilhos de regra (ex.: "O Administrador não perde a permissão…") usam 42501 com mensagem própria: mostra como veio.
+  if (err.code === '42501' && err.message && !/row-level security|permission denied/i.test(err.message)) return err.message;
   if (err.code === '42501' || /row-level security|permission denied/i.test(err.message ?? '')) {
     return 'Você não tem permissão para esta ação.';
   }

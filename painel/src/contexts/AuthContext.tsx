@@ -1,14 +1,20 @@
 // Fonte única de verdade, no painel, sobre QUEM está logado, em QUAIS municípios
 // pode trabalhar e com QUAL papel (padrão do GeoEscolas). Nenhuma tela consulta
-// `membros` ou `equipe_plataforma` por conta própria: todas usam useAuth().
+// `membros`, `usuario_papeis` ou `equipe_plataforma` por conta própria: todas usam useAuth().
 //
-// O frontend só esconde botões; quem garante a permissão é o banco (RLS + trigger
-// checar_permissao_publicacao). Aqui é só para a interface não oferecer o que vai falhar.
+// Dois sistemas de papéis convivem até a fase 1B (D-38):
+//  - papel antigo (membros: admin/publicador/editor), que ainda rege o conteúdo;
+//  - papéis configuráveis (usuario_papeis + papel_permissoes), que regem os módulos novos
+//    (papéis, vínculos, unidades, equipe) e são consultados por pode().
+//
+// O frontend só esconde botões; quem garante a permissão é o banco (RLS + public.pode()).
+// Aqui é só para a interface não oferecer o que vai falhar.
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import type { Acesso, MunicipioResumo, Papel } from '../lib/tipos';
+import type { MinhaPermissao } from '../lib/permissoes';
 
 interface AuthValor {
   sessao: Session | null;
@@ -22,6 +28,13 @@ interface AuthValor {
   escolherMunicipio: (id: string) => void;
   podePublicar: boolean;
   isAdmin: boolean;
+  /** Permissões configuráveis do usuário no município atual (public.minhas_permissoes). */
+  permissoes: MinhaPermissao[];
+  permissoesCarregadas: boolean;
+  /** Tem a permissão em algum escopo? (SECKE: sempre.) O escopo exato é conferido pelo banco. */
+  pode: (codigo: string) => boolean;
+  /** Tem a permissão para toda a rede? */
+  podeNaRede: (codigo: string) => boolean;
   entrar: (email: string, senha: string) => Promise<string | null>;
   sair: () => Promise<void>;
   /** true depois de um "Sair" explícito: o login não deve voltar à página do usuário anterior. */
@@ -39,31 +52,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isPlataforma, setIsPlataforma] = useState(false);
   const [acessos, setAcessos] = useState<Acesso[]>([]);
   const [saiu, setSaiu] = useState(false);
+  const [permissoes, setPermissoes] = useState<MinhaPermissao[]>([]);
+  const [permissoesDe, setPermissoesDe] = useState<string | null>(null);
   const [atualId, setAtualId] = useState<string | null>(() => {
     try { return localStorage.getItem(CHAVE_MUNICIPIO); } catch { return null; }
   });
 
   const carregarPerfil = useCallback(async (userId: string) => {
-    const [perfil, equipe, membros] = await Promise.all([
+    const [perfil, equipe, membros, vinculos] = await Promise.all([
       supabase.from('perfis').select('nome').eq('user_id', userId).maybeSingle(),
       supabase.from('equipe_plataforma').select('nome').eq('user_id', userId).maybeSingle(),
       supabase.from('membros').select('papel, ativo, municipio:municipios(id, nome, slug, uf)').eq('user_id', userId).eq('ativo', true),
+      supabase.from('usuario_papeis').select('papel:papeis(nome, ativo), municipio:municipios(id, nome, slug, uf)').eq('user_id', userId).eq('ativo', true),
     ]);
     const plataforma = !!equipe.data;
     let lista: Acesso[];
     if (plataforma) {
       // SECKE: todos os municípios, como admin.
       const { data } = await supabase.from('municipios').select('id, nome, slug, uf').order('nome');
-      lista = (data ?? []).map((m) => ({ municipio: m as MunicipioResumo, papel: 'admin' as Papel }));
+      lista = (data ?? []).map((m) => ({ municipio: m as MunicipioResumo, papel: 'admin' as Papel, papeis: [] }));
     } else {
-      lista = (membros.data ?? [])
-        .filter((m) => m.municipio)
-        .map((m) => ({ municipio: m.municipio as unknown as MunicipioResumo, papel: m.papel as Papel }))
-        .sort((a, b) => a.municipio.nome.localeCompare(b.municipio.nome));
+      // Junta os dois sistemas de papéis por organização.
+      const porMunicipio = new Map<string, Acesso>();
+      for (const m of membros.data ?? []) {
+        const mun = m.municipio as unknown as MunicipioResumo | null;
+        if (mun) porMunicipio.set(mun.id, { municipio: mun, papel: m.papel as Papel, papeis: [] });
+      }
+      for (const v of vinculos.data ?? []) {
+        const mun = v.municipio as unknown as MunicipioResumo | null;
+        const papel = v.papel as unknown as { nome: string; ativo: boolean } | null;
+        if (!mun || !papel?.ativo) continue;
+        const a = porMunicipio.get(mun.id) ?? { municipio: mun, papel: null, papeis: [] };
+        if (!a.papeis.includes(papel.nome)) a.papeis.push(papel.nome);
+        porMunicipio.set(mun.id, a);
+      }
+      lista = [...porMunicipio.values()].sort((a, b) => a.municipio.nome.localeCompare(b.municipio.nome));
     }
     if (!plataforma && lista.length === 0) {
-      // Login válido, mas sem vínculo ativo com nenhum município: sem acesso (nunca "admin por omissão").
-      setErro('Seu usuário não está vinculado a nenhuma prefeitura. Fale com o administrador.');
+      // Login válido, mas sem vínculo ativo com nenhuma organização: sem acesso (nunca "admin por omissão").
+      setErro('Seu usuário não está vinculado a nenhuma organização. Fale com o administrador.');
     } else {
       setErro(null);
     }
@@ -82,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     const { data: inscricao } = supabase.auth.onAuthStateChange((evento, nova) => {
       setSessao(nova);
-      if (evento === 'SIGNED_OUT') { setAcessos([]); setIsPlataforma(false); setNome(''); }
+      if (evento === 'SIGNED_OUT') { setAcessos([]); setIsPlataforma(false); setNome(''); setPermissoes([]); setPermissoesDe(null); }
       // Não await dentro do callback (recomendação do supabase-js para evitar travas).
       if (evento === 'SIGNED_IN' && nova?.user) {
         setSaiu(false);
@@ -98,6 +125,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [acessos, atualId],
   );
 
+  // Permissões configuráveis da organização em edição (recarrega ao trocar de organização).
+  const atualMid = atual?.municipio.id ?? null;
+  useEffect(() => {
+    if (!atualMid || !sessao) return;
+    let ativo = true;
+    supabase.rpc('minhas_permissoes', { p_municipio: atualMid }).then(({ data }) => {
+      if (!ativo) return;
+      setPermissoes((data ?? []) as MinhaPermissao[]);
+      setPermissoesDe(atualMid);
+    });
+    return () => { ativo = false; };
+  }, [atualMid, sessao]);
+
   const escolherMunicipio = useCallback((id: string) => {
     setAtualId(id);
     try { localStorage.setItem(CHAVE_MUNICIPIO, id); } catch { /* navegação privada */ }
@@ -110,10 +150,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const sair = useCallback(async () => { setSaiu(true); await supabase.auth.signOut(); }, []);
 
+  const pode = useCallback((codigo: string) => isPlataforma || permissoes.some((p) => p.permissao === codigo), [isPlataforma, permissoes]);
+  const podeNaRede = useCallback(
+    (codigo: string) => isPlataforma || permissoes.some((p) => p.permissao === codigo && p.escopo === 'rede'),
+    [isPlataforma, permissoes],
+  );
+
   const valor: AuthValor = {
     sessao, carregando, erro, nome, isPlataforma, acessos, atual, escolherMunicipio,
     podePublicar: atual?.papel === 'admin' || atual?.papel === 'publicador',
     isAdmin: atual?.papel === 'admin',
+    permissoes: permissoesDe === atualMid ? permissoes : [],
+    permissoesCarregadas: isPlataforma || (!!atualMid && permissoesDe === atualMid),
+    pode, podeNaRede,
     entrar, sair, saiu,
   };
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;

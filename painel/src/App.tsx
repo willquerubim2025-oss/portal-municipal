@@ -23,6 +23,10 @@ import { DetalheChamado, ListaChamados, NovoChamado } from './pages/admin/Chamad
 import { Auditoria } from './pages/admin/Auditoria';
 import { Links } from './pages/admin/Links';
 import { Exportacao } from './pages/admin/Exportacao';
+import { Papeis } from './pages/admin/Papeis';
+import { Vinculos } from './pages/admin/Vinculos';
+import { EditarUnidade, ListaUnidades } from './pages/estrutura/Unidades';
+import { EditarEquipe, ListaEquipe } from './pages/estrutura/Equipe';
 
 // Módulos de conteúdo com lista + edição (/x, /x/novo, /x/:id).
 const MODULOS = [
@@ -46,6 +50,8 @@ export function App() {
           <Route element={<ExigirAcesso />}>
             <Route element={<PainelLayout />}>
               <Route index element={<Inicio />} />
+              {/* Conteúdo: papel antigo (membros) até a fase 1B (D-38). */}
+              <Route element={<ExigirAcesso papelMinimo="editor" />}>
               <Route path="noticias" element={<ListaNoticias />} />
               <Route path="noticias/nova" element={<EditarNoticia key="nova" />} />
               <Route path="noticias/:id" element={<EditarNoticia />} />
@@ -57,6 +63,26 @@ export function App() {
               <Route path="chamados" element={<ListaChamados />} />
               <Route path="chamados/novo" element={<NovoChamado />} />
               <Route path="chamados/:id" element={<DetalheChamado />} />
+              </Route>
+              {/* Módulos com permissões configuráveis (D-38). */}
+              <Route element={<ExigirAcesso permissao="permissoes.gerenciar" />}>
+                <Route path="papeis" element={<Papeis />} />
+              </Route>
+              <Route element={<ExigirAcesso permissao={['usuarios.vincular', 'permissoes.gerenciar']} />}>
+                <Route path="vinculos" element={<Vinculos />} />
+              </Route>
+              <Route element={<ExigirAcesso permissao={['unidades.gerenciar', 'unidades.editar']} />}>
+                <Route path="unidades" element={<ListaUnidades />} />
+                <Route path="unidades/:id" element={<EditarUnidade />} />
+              </Route>
+              <Route element={<ExigirAcesso permissao="unidades.gerenciar" />}>
+                <Route path="unidades/nova" element={<EditarUnidade key="nova" />} />
+              </Route>
+              <Route element={<ExigirAcesso permissao="equipe.gerenciar" />}>
+                <Route path="equipe" element={<ListaEquipe />} />
+                <Route path="equipe/nova" element={<EditarEquipe key="nova" />} />
+                <Route path="equipe/:id" element={<EditarEquipe />} />
+              </Route>
               <Route element={<ExigirAcesso papelMinimo="publicador" />}>
                 <Route path="categorias" element={<Categorias />} />
                 <Route path="links" element={<Links />} />

@@ -14,7 +14,8 @@
     "build:producao": "tsc --noEmit && vite build --mode producao",
     "deploy:homologacao": "npm run build:homologacao && wrangler deploy --env homologacao",
     "deploy:producao": "npm run build:producao && wrangler deploy",
-    "e2e:limpar": "node e2e/limpar-homologacao.mjs --aplicar"
+    "e2e:limpar": "node e2e/limpar-homologacao.mjs --aplicar",
+    "permissoes:sincronizar": "node scripts/sincronizar-permissoes.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",

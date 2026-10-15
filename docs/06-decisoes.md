@@ -629,3 +629,26 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
   - `index.astro`: `compacto` segue a mesma regra.
 - O cabeçalho antigo em carrossel (D-47) continua disponível só com `config.cabecalho.estilo = 'carrossel'`. O layout clássico (Jeriquara) não muda.
 - No repositório Portais-Publicos, as prévias também viraram uma só versão: `docs/previa/` com as 15 páginas no padrão aprovado.
+
+**D-77 · 15/10/2026 · Painel: telas de permissões configuráveis (fase 1A no painel)**
+- **Registro central das permissões no código:** `painel/src/lib/permissoes.catalogo.json`, lido pelo painel em `lib/permissoes.ts`.
+  - O script `npm run permissoes:sincronizar` (com `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`) envia o catálogo a `public.sincronizar_permissoes`.
+  - Rodar a cada deploy do painel, na homologação e na produção.
+- **AuthContext:** reconhece quem tem só papéis configuráveis (`usuario_papeis`, sem `membros`) e carrega `minhas_permissoes()` da organização em edição.
+  - Expõe `pode(codigo)` e `podeNaRede(codigo)`.
+  - `Acesso.papel` passa a aceitar `null` (sem papel antigo) e ganha `papeis` (nomes dos papéis configuráveis).
+- **ExigirAcesso:** além de `papelMinimo`, aceita `permissao` (uma ou lista, basta uma). Sem props, só exige sessão e organização. O conteúdo continua exigindo o papel antigo até a fase 1B.
+- **Telas novas:**
+  - Papéis e permissões (`/papeis`): criar, editar, desativar e excluir papéis; matriz liga/desliga por módulo, com alcance; histórico de `log_permissoes`. As permissões essenciais do Administrador ficam travadas;
+  - Vínculos de usuários (`/vinculos`): dar, suspender e retirar papel, com unidade ou região;
+  - Unidades e regiões (`/unidades`): quem só tem `unidades.editar` vê e edita apenas as unidades do seu alcance, e os campos da rede ficam ocultos;
+  - Equipe gestora (`/equipe`): três níveis, visível, dados confirmados, foto só com autorização.
+- **Menu lateral e início:** o menu é montado por papel antigo ou por permissão. O início de quem só tem papéis configuráveis lista os módulos liberados.
+- **Erros:** mensagens 42501 dos gatilhos (ex.: "O Administrador não perde a permissão…") são mostradas como vêm do banco.
+- **`package-lock.json` do painel:** estava fora de sincronia na `main` (faltava `@floating-ui/dom`, e o `npm ci` falhava); foi regenerado com `npm install`.
+- **Verificação:**
+  - `tsc` e build passando;
+  - teste com Playwright e o Supabase simulado: as 8 telas abrem com um Administrador configurável da SMEDU, axe sem violações, sem erros no navegador, gravações conferidas (upsert de `papel_permissoes` e insert em `usuario_papeis`);
+  - administrador antigo (Jeriquara) com o mesmo menu de antes e sem acesso às telas novas;
+  - testes de banco 164/164.
+- **Limite até a fase 1B:** quem tem só papéis configuráveis não edita conteúdo, não vê o nome dos colegas e não convida pessoas. Plano em `docs/Plano de Migração — Fase 1B.md`, no repositório Portais-Publicos, aguardando aprovação.

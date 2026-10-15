@@ -6,7 +6,32 @@ import { usePortal } from '../lib/portal';
 
 interface Resumo { rascunhos: number; agendadas: number; publicadas: number; saldo: number | null; limite: number | null }
 
+// Quem só tem papéis configuráveis (sem papel antigo de conteúdo, D-38) vê os módulos liberados para ele.
+const MODULOS_PERMISSAO = [
+  { para: '/unidades', rotulo: 'Unidades e regiões', permissoes: ['unidades.gerenciar', 'unidades.editar'] },
+  { para: '/equipe', rotulo: 'Equipe gestora', permissoes: ['equipe.gerenciar'] },
+  { para: '/papeis', rotulo: 'Papéis e permissões', permissoes: ['permissoes.gerenciar'] },
+  { para: '/vinculos', rotulo: 'Vínculos de usuários', permissoes: ['usuarios.vincular', 'permissoes.gerenciar'] },
+];
+
 export function Inicio() {
+  const { atual, nome, pode, permissoesCarregadas } = useAuth();
+  if (!atual?.papel) {
+    const modulos = MODULOS_PERMISSAO.filter((m) => m.permissoes.some(pode));
+    return (
+      <>
+        <h1>Olá{nome ? `, ${nome.split(' ')[0]}` : ''}</h1>
+        <p>Você está no painel da <strong>{atual!.municipio.nome}</strong>{atual!.papeis.length > 0 && <> como {atual!.papeis.join(', ')}</>}.</p>
+        {!permissoesCarregadas ? <p role="status">Carregando…</p> : modulos.length === 0
+          ? <p>Seu papel ainda não tem nenhuma permissão ligada. Fale com o administrador da organização.</p>
+          : <ul className="lista-escolha">{modulos.map((m) => <li key={m.para}><Link className="botao-secundario" to={m.para}>{m.rotulo}</Link></li>)}</ul>}
+      </>
+    );
+  }
+  return <InicioConteudo />;
+}
+
+function InicioConteudo() {
   const { atual, nome, podePublicar } = useAuth();
   const portal = usePortal();
   const [r, setR] = useState<Resumo | null>(null);
