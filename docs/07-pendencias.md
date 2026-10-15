@@ -21,7 +21,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
   - publicar o portal de homologação na Cloudflare com o código novo, para ver no navegador. Até lá, testar com `DOMINIO_DEV=educacao.paulinia.teste` no `.env` do `portal/`;
   - **14/10/2026 (D-64): tirar "Agenda" e "Transparência" do menu principal da SMEDU na homologação**, pelo painel (Menus) ou por SQL. Não foi possível pelo MCP nesta sessão (tempo excedido).
   - **14/10/2026 (D-75): padrão visual aprovado.** A configuração do cabeçalho claro já está na homologação. Falta:
-    1. juntar o branch `claude/fervent-turing-szzwyu` na `main`;
+    1. ~~juntar o branch `claude/fervent-turing-szzwyu` na `main`~~ (feito em 15/10/2026, com autorização do usuário);
     2. publicar o Worker de homologação (`CLOUDFLARE_ENV=homologacao npx astro build && npx wrangler deploy`), numa máquina ou sessão com acesso à Cloudflare;
     3. remover os 2 itens do menu (acima) e enviar as fotos novas do "Em foco".
   - menu principal da SMEDU cadastrado na homologação em 12/10/2026 (D-40). **Confirmar com a SMEDU** os rótulos e a ordem, e se Agenda e Transparência ficam no menu. As páginas "Matrícula Escolar" e "Fale com o supervisor" ainda não têm conteúdo real (prazos, documentos, lista de escolas);
