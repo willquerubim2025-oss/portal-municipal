@@ -140,7 +140,7 @@ export async function resolverMunicipio(dominio: string): Promise<Contexto | nul
       .eq('principal', true)
       .maybeSingle();
     valor = {
-      municipio: { id: m.id, slug: m.slug, nome: m.nome, uf: m.uf, cnpj: m.cnpj, tema: m.tema ?? {}, config: m.config ?? {} },
+      municipio: { id: m.id, slug: m.slug, nome: m.nome, uf: m.uf, cnpj: m.cnpj, tipo_ente: m.tipo_ente ?? 'prefeitura', cidade: m.cidade ?? null, tema: m.tema ?? {}, config: m.config ?? {} },
       dominio,
       dominioPrincipal: irmaos?.dominio ?? dominio,
       homologacao: data.ambiente === 'homologacao',
