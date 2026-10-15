@@ -733,4 +733,4 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Organizações que já existem trocam com `aplicar_pacote_tipo(id)`: só sai o que está vazio e sem uso; nada com documento, link, sistema ou página publicada é apagado.
 - Portal: `/legislacao` vira "Legislação" (sem "municipal") e a descrição da Transparência muda para quem não é prefeitura (`ehPrefeitura`).
 - Testes: 15 novos (198 no total, 0 falhas).
-- **Aplicação:** pelo MCP o `apply_migration` excedeu o tempo (comandos de exclusão pedem confirmação que não aparece na sessão na nuvem). Rodar o arquivo no SQL Editor (homologação; depois produção, com aprovação).
+- **Aplicação:** pelo MCP o `apply_migration` excedeu o tempo (comandos de exclusão pedem confirmação que não aparece na sessão na nuvem). Rodar o arquivo no SQL Editor (homologação; depois produção, com aprovação). Aplicada na homologação em 15/10/2026 pelo usuário (SQL Editor). Correção junto: o objeto da organização no portal (`resolverMunicipio`) não levava `tipo_ente`.
