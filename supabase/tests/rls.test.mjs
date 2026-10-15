@@ -395,6 +395,44 @@ espera('admin da prefeitura NÃO escreve na secretaria (organizações isoladas)
 r = await como('plat', `update municipios set codigo_ibge = '123' where id = '${sec}'`)
 espera('código IBGE exige 7 dígitos', !!r.erro)
 
+console.log('\nPacote padrão por tipo de organização (0022)')
+const secoesDe = async (m) => (await db.query(`select string_agg(slug, ',' order by ordem) s from transparencia_secoes where municipio_id = '${m}'`)).rows[0].s ?? ''
+const secoesJAntes = (await secoesDe(J))
+const catsDe = async (m) => (await db.query(`select string_agg(slug, ',' order by slug) s from categorias where municipio_id = '${m}' and escopo = 'documento'`)).rows[0].s ?? ''
+r = await como('plat', `select criar_municipio('pref-pacote', 'Prefeitura de Pacote', 'sp') id`)
+const prefPac = r.rows?.[0]?.id
+espera('prefeitura continua com o pacote de prefeitura (18 seções, Lei Orgânica)', (await secoesDe(prefPac)).split(',').length === 18 && (await catsDe(prefPac)).includes('lei-organica'))
+r = await como('plat', `select criar_municipio('sec-pacote', 'Secretaria de Pacote', 'sp', null, 'secretaria') id`)
+const secPac = r.rows?.[0]?.id
+espera('secretaria nova nasce com o pacote de secretaria',
+  (await secoesDe(secPac)) === 'institucional,contas-publicas,editais,conselhos,planejamento,sic,ouvidoria,lgpd,acessibilidade')
+espera('secretaria nova NÃO tem Lei Orgânica, licitações nem PPA',
+  !/lei-organica|licitacoes|planejamento|concursos/.test(await catsDe(secPac)) && (await catsDe(secPac)).includes('leis-e-decretos'))
+r = await db.query(`select config->'legislacao_categorias' c from municipios where id = '${secPac}'`)
+espera('legislação da secretaria lista os atos da área', JSON.stringify(r.rows[0].c) === '["leis-e-decretos","portarias","resolucoes"]')
+r = await db.query(`select count(*)::int n from transparencia_itens ti join transparencia_secoes ts on ts.id = ti.secao_id where ts.municipio_id = '${secPac}' and ts.slug = 'contas-publicas'`)
+espera('sem site da prefeitura cadastrado, o atalho de contas públicas não é criado (sem link quebrado)', r.rows[0].n === 0)
+// Secretaria criada com o pacote antigo (cidade-educacao, acima): ganha um documento em Licitações e troca o pacote.
+await db.exec(`insert into documentos (municipio_id, titulo, slug, categoria_id) select '${sec}', 'Edital 1', 'edital-1', id from categorias where municipio_id = '${sec}' and slug = 'licitacoes'`)
+await db.exec(`update municipios set config = config || '{"site_prefeitura": "https://cidade.sp.gov.br"}' where id = '${sec}'`)
+r = await como('admin', `select aplicar_pacote_tipo('${sec}')`)
+espera('admin de organização NÃO troca o pacote', !!r.erro)
+r = await como('plat', `select aplicar_pacote_tipo('${sec}')`)
+espera('SECKE troca o pacote de uma secretaria antiga', !r.erro)
+const secoesSec = (await secoesDe(sec)).split(',')
+espera('seções vazias de prefeitura saem (receitas, obras, emendas, saúde)', !secoesSec.some((x) => ['receitas', 'obras', 'emendas', 'saude', 'diarias'].includes(x)))
+espera('seção de prefeitura com documento fica (licitações)', secoesSec.includes('licitacoes') && (await catsDe(sec)).includes('licitacoes'))
+espera('seções de secretaria entram', ['contas-publicas', 'editais', 'conselhos', 'planejamento'].every((x) => secoesSec.includes(x)))
+espera('categorias vazias de prefeitura saem (Lei Orgânica, PPA)', !/lei-organica|planejamento/.test(await catsDe(sec)))
+r = await db.query(`select ti.url from transparencia_itens ti join transparencia_secoes ts on ts.id = ti.secao_id where ts.municipio_id = '${sec}' and ts.slug = 'contas-publicas'`)
+espera('atalho de contas públicas aponta para o site da prefeitura', r.rows[0]?.url === 'https://cidade.sp.gov.br')
+r = await db.query(`select count(*)::int n from paginas where municipio_id = '${sec}' and caminho in ('sobre', 'e-sic')`)
+espera('ganha a página "Sobre a Secretaria" e perde o e-SIC vazio', r.rows[0].n === 1)
+r = await como('plat', `select aplicar_pacote_tipo('${sec}')`)
+espera('trocar o pacote de novo não duplica nada', !r.erro && (await secoesDe(sec)).split(',').length === secoesSec.length)
+espera('outra organização (prefeitura) não muda', (await secoesDe(J)) === secoesJAntes)
+await db.exec(`delete from municipios where id in ('${prefPac}', '${secPac}')`)
+
 
 console.log('\nPermissões configuráveis (0018)')
 const UP = { dir: 'a0000000-0000-4000-8000-000000000011', viz: 'a0000000-0000-4000-8000-000000000012',

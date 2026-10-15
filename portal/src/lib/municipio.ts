@@ -96,6 +96,9 @@ export interface Municipio {
   nome: string;
   uf: string;
   cnpj: string | null;
+  /** Tipo de organização (0017): orienta textos e o pacote padrão (D-90). */
+  tipo_ente: 'prefeitura' | 'secretaria' | 'camara' | 'autarquia' | string;
+  cidade: string | null;
   tema: Tema;
   config: Config;
 }
@@ -121,7 +124,7 @@ export async function resolverMunicipio(dominio: string): Promise<Contexto | nul
 
   const { data, error } = await supabase()
     .from('municipio_dominios')
-    .select('dominio, ambiente, principal, municipio:municipios!inner(id, slug, nome, uf, cnpj, tema, config, ativo)')
+    .select('dominio, ambiente, principal, municipio:municipios!inner(id, slug, nome, uf, cnpj, tipo_ente, cidade, tema, config, ativo)')
     .eq('dominio', dominio)
     .maybeSingle();
   if (error) throw error;
@@ -156,3 +159,6 @@ export function moduloAtivo(m: Municipio, modulo: Modulo): boolean {
 export function nomeCurto(m: Municipio): string {
   return m.config.nome_curto ?? m.nome.replace(/^Prefeitura( Municipal)? d[eoa]s? /i, '');
 }
+
+/** Organização que não é a prefeitura inteira (secretaria, câmara...): textos sem "municipal" (D-90). */
+export const ehPrefeitura = (m: Municipio) => (m.tipo_ente ?? 'prefeitura') === 'prefeitura';

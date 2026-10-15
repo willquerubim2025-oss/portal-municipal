@@ -1,13 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
 import { centralTransparencia } from '../lib/consultas';
+import { ehPrefeitura } from '../lib/municipio';
 
 const { municipio: m } = Astro.locals.contexto;
 // Seções sem nenhum item ativo não aparecem (o município ainda não cadastrou os links).
 const secoes = (await centralTransparencia(m.id)).filter((s) => s.itens.length > 0);
 ---
 <Base titulo="Transparência"
-  descricao={`Central de Transparência da ${m.nome}: receitas, despesas, licitações, contratos, pessoal, acesso à informação e mais.`}
+  descricao={ehPrefeitura(m)
+    ? `Central de Transparência da ${m.nome}: receitas, despesas, licitações, contratos, pessoal, acesso à informação e mais.`
+    : `Central de Transparência da ${m.nome}: documentos, editais, conselhos, relatórios, acesso à informação e o caminho para as contas públicas.`}
   migalhas={[{ nome: 'Transparência' }]}>
   <div class="container">
     <header class="cabecalho-pagina">
