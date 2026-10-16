@@ -63,7 +63,7 @@ export function EditarServico() {
   return (
     <CarregandoOuAusente e={e} rotuloLista="Serviços">
       <form onSubmit={enviar} className="formulario-conteudo" noValidate>
-        <CabecalhoEdicao e={e} rotuloLista="Carta de Serviços" titulo={e.nova ? 'Novo serviço' : f.titulo || 'Sem título'} linkSite={portal && `${portal}/servicos/${f.slug}`} />
+        <CabecalhoEdicao e={e} rotuloLista="Carta de Serviços" titulo={e.nova ? 'Novo serviço' : f.titulo || 'Sem título'} linkSite={portal && `${portal}/servicos/${f.slug}`} previa={{ tabela: 'servicos', portal }} />
         <MensagensEdicao e={e} nome="serviço" />
         <fieldset disabled={e.bloqueado || e.salvando} className="grade-formulario">
           <div className="coluna-principal">

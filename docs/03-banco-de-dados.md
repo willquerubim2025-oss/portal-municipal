@@ -41,6 +41,7 @@
 | 0021_permissoes_conteudo | permissões `conteudo.editar`, `conteudo.publicar`, `organizacao.administrar`; `is_membro`/`pode_publicar`/`is_admin` aceitam também essas permissões; `seguranca.e_colega()` na política de `perfis`; Administrador de cada organização recebe as três | D-78 |
 | 0022_pacote_por_tipo_ente | `provisionar_municipio()` lê `tipo_ente` (pacote de prefeitura ou de secretaria); `criar_municipio(..., p_tipo_ente)`; `aplicar_pacote_tipo(id)` (só SECKE) troca o pacote de uma organização, tirando só o que está vazio | D-90 |
 | 0023_previa_rascunho | `previas` (token temporário, 30 min, sem acesso direto); `criar_previa(tabela, id)` (quem edita) e `previa_publicacao(token, organização)` (portal), definer em `seguranca` | D-91 |
+| 0024_previa_paginas_servicos_eventos | `previas` aceita `paginas`, `servicos`, `eventos`; `previa_conteudo(token, organização)` devolve `{ tabela, dados }` | D-93 |
 
 ## Tabelas, em resumo
 

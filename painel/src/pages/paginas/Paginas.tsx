@@ -66,7 +66,7 @@ export function EditarPagina() {
   return (
     <CarregandoOuAusente e={e} rotuloLista="Páginas">
       <form onSubmit={enviar} className="formulario-conteudo" noValidate>
-        <CabecalhoEdicao e={e} rotuloLista="Páginas" titulo={e.nova ? 'Nova página' : f.titulo || 'Sem título'} linkSite={portal && `${portal}/${caminho}`} />
+        <CabecalhoEdicao e={e} rotuloLista="Páginas" titulo={e.nova ? 'Nova página' : f.titulo || 'Sem título'} linkSite={portal && `${portal}/${caminho}`} previa={{ tabela: 'paginas', portal }} />
         <MensagensEdicao e={e} nome="página" />
         <fieldset disabled={e.bloqueado || e.salvando} className="grade-formulario">
           <div className="coluna-principal">

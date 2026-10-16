@@ -1,36 +1,50 @@
 ---
-// Pré-visualização de rascunho (D-91): o painel gera um link /previa/<token> válido por 30 minutos
-// (criar_previa, 0023). A página mostra o conteúdo como ficará no site, com um aviso no topo.
-// Nunca vai para cache (navegador ou borda) nem para buscadores.
+// Pré-visualização de rascunho (D-91, D-93): o painel gera um link /previa/<token> válido por 30 minutos
+// (criar_previa, 0023/0024). A página mostra o conteúdo como ficará no site (notícia, página, serviço ou
+// evento), com um aviso no topo. Nunca vai para cache (navegador ou borda) nem para buscadores.
 import Base from '../../layouts/Base.astro';
 import NoticiaArtigo from '../../components/NoticiaArtigo.astro';
-import { previaPublicacao } from '../../lib/consultas';
+import PaginaArtigo from '../../components/PaginaArtigo.astro';
+import ServicoArtigo from '../../components/ServicoArtigo.astro';
+import EventoArtigo from '../../components/EventoArtigo.astro';
+import { previaConteudo } from '../../lib/consultas';
 
 const { municipio: m } = Astro.locals.contexto;
-const n = await previaPublicacao(m.id, Astro.params.token!);
+const c = await previaConteudo(m.id, Astro.params.token!);
+const d = c?.dados;
 Astro.response.headers.set('Cache-Control', 'private, no-store');
 Astro.response.headers.set('Cloudflare-CDN-Cache-Control', 'no-store');
 Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
-if (!n) Astro.response.status = 404;
+if (!d) Astro.response.status = 404;
 const situacao: Record<string, string> = { rascunho: 'rascunho', publicado: 'publicado', despublicado: 'fora do ar' };
+const TIPOS = {
+  publicacoes: { nome: 'a notícia', lista: { nome: 'Notícias', href: '/noticias' } },
+  paginas: { nome: 'a página', lista: null },
+  servicos: { nome: 'o serviço', lista: { nome: 'Serviços', href: '/servicos' } },
+  eventos: { nome: 'o evento', lista: { nome: 'Agenda', href: '/eventos' } },
+} as const;
+const tipo = c ? TIPOS[c.tabela] : null;
 ---
-<Base titulo={n ? `Pré-visualização: ${n.titulo}` : 'Pré-visualização indisponível'} noindex
-  migalhas={[{ nome: 'Notícias', href: '/noticias' }, { nome: 'Pré-visualização' }]}>
-  {n ? (
+<Base titulo={d ? `Pré-visualização: ${d.titulo}` : 'Pré-visualização indisponível'} noindex
+  migalhas={[...(tipo?.lista ? [tipo.lista] : []), { nome: 'Pré-visualização' }]}>
+  {d && tipo ? (
     <>
       <div class="container">
         <p class="aviso-previa" role="status">
-          <strong>Pré-visualização.</strong> É assim que a notícia vai aparecer no site. Situação atual: {situacao[n.status] ?? n.status}.
-          {n.status !== 'publicado' && ' Só quem tem este link consegue ver, e o link vale por 30 minutos.'}
+          <strong>Pré-visualização.</strong> É assim que {tipo.nome} vai aparecer no site. Situação atual: {situacao[d.status] ?? d.status}.
+          {d.status !== 'publicado' && ' Só quem tem este link consegue ver, e o link vale por 30 minutos.'}
         </p>
       </div>
-      <NoticiaArtigo n={n} previa />
+      {c!.tabela === 'publicacoes' && <NoticiaArtigo n={d} previa />}
+      {c!.tabela === 'paginas' && <PaginaArtigo p={d} />}
+      {c!.tabela === 'servicos' && <ServicoArtigo s={d} />}
+      {c!.tabela === 'eventos' && <EventoArtigo e={d} />}
     </>
   ) : (
     <div class="container">
       <header class="cabecalho-pagina">
         <h1>Pré-visualização indisponível</h1>
-        <p>O link venceu (vale 30 minutos) ou não existe. Gere um novo no painel, no botão "Pré-visualizar".</p>
+        <p>O link venceu (vale 30 minutos) ou não existe. Gere um novo no painel, em "Pré-visualizar no site".</p>
       </header>
     </div>
   )}

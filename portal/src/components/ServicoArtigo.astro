@@ -1,0 +1,26 @@
+---
+// Corpo da página do serviço (Carta de Serviços). Usado pela página publicada e pela pré-visualização (D-93).
+import { htmlSeguro } from '../lib/html';
+interface Props { s: any }
+const { s } = Astro.props;
+const blocos: [string, string | null][] = [
+  ['Quem pode solicitar', s.publico_alvo],
+  ['Prazo', s.prazo],
+  ['Custo', s.custo],
+  ['Canal de atendimento', s.canal_atendimento],
+  ['Local e horário', s.local_horario],
+];
+---
+  <article class="container">
+    <header class="cabecalho-pagina">
+      <h1>{s.titulo}</h1>
+      {s.descricao && <p>{s.descricao}</p>}
+    </header>
+    {s.url_externa && <p><a class="botao" href={s.url_externa} target="_blank" rel="noopener">Acessar o serviço on-line<span class="sr-only"> (abre em nova aba)</span></a></p>}
+    <dl class="ficha">
+      {blocos.filter(([, v]) => v).map(([r, v]) => <><dt>{r}</dt><dd>{v}</dd></>)}
+      {s.orgao && <><dt>Órgão responsável</dt><dd><a href={`/estrutura-organizacional/${s.orgao.slug}`}>{s.orgao.nome}</a>{s.orgao.telefone && ` · ${s.orgao.telefone}`}</dd></>}
+    </dl>
+    {s.requisitos_html && <section class="conteudo"><h2>Documentos e requisitos</h2><div set:html={htmlSeguro(s.requisitos_html)} /></section>}
+    {s.etapas_html && <section class="conteudo"><h2>Como solicitar</h2><div set:html={htmlSeguro(s.etapas_html)} /></section>}
+  </article>

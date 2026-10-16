@@ -4,7 +4,7 @@
 // (notícias, documentos...) têm prioridade sobre esta.
 import Base from '../layouts/Base.astro';
 import { pagina } from '../lib/consultas';
-import { htmlSeguro } from '../lib/html';
+import PaginaArtigo from '../components/PaginaArtigo.astro';
 import { resumir } from '../lib/formato';
 
 const { municipio: m } = Astro.locals.contexto;
@@ -21,18 +21,5 @@ const migalhas = segmentos.map((_, i) => {
 });
 ---
 <Base titulo={p.titulo} descricao={p.resumo || resumir(p.corpo_html)} migalhas={migalhas}>
-  <article class="container">
-    <header class="cabecalho-pagina">
-      <h1>{p.titulo}</h1>
-      {p.resumo && <p>{p.resumo}</p>}
-    </header>
-    <div class="conteudo" set:html={htmlSeguro(p.corpo_html)} />
-    {p.filhas?.length > 0 && (
-      <nav aria-label={`Páginas em ${p.titulo}`}>
-        <ul class="lista-simples">
-          {p.filhas.map((f: any) => <li><h2><a href={`/${f.caminho}`}>{f.titulo}</a></h2>{f.resumo && <p>{f.resumo}</p>}</li>)}
-        </ul>
-      </nav>
-    )}
-  </article>
+  <PaginaArtigo p={p} />
 </Base>

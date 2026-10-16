@@ -1,0 +1,26 @@
+---
+// Corpo da página do evento (agenda). Usado pela página publicada e pela pré-visualização (D-93).
+import { urlMidia } from '../lib/supabase';
+import { urlImagem, srcsetImagem } from '../lib/imagens';
+import { htmlSeguro } from '../lib/html';
+import { dataExtenso, hora } from '../lib/formato';
+interface Props { e: any }
+const { e } = Astro.props;
+const img = urlMidia(e.imagem?.storage_path);
+const quando = `${dataExtenso(e.inicio_em)}${e.dia_inteiro ? '' : `, ${hora(e.inicio_em)}`}`
+  + (e.fim_em ? ` até ${dataExtenso(e.fim_em) === dataExtenso(e.inicio_em) ? '' : `${dataExtenso(e.fim_em)}, `}${e.dia_inteiro ? '' : hora(e.fim_em)}` : '');
+---
+  <article class="container">
+    <header class="cabecalho-pagina">
+      <h1>{e.titulo}</h1>
+      {e.resumo && <p>{e.resumo}</p>}
+    </header>
+    <dl class="ficha">
+      <dt>Quando</dt><dd><time datetime={e.inicio_em}>{quando}</time></dd>
+      {e.local && <><dt>Local</dt><dd>{e.local}{e.endereco && ` — ${e.endereco}`}</dd></>}
+      {e.orgao && <><dt>Organização</dt><dd><a href={`/estrutura-organizacional/${e.orgao.slug}`}>{e.orgao.nome}</a></dd></>}
+    </dl>
+    {e.url_externa && <p><a class="botao" href={e.url_externa} target="_blank" rel="noopener">Inscrição / mais informações<span class="sr-only"> (abre em nova aba)</span></a></p>}
+    {img && <figure class="figura-destaque"><img src={urlImagem(e.imagem.storage_path, 1200)} srcset={srcsetImagem(e.imagem.storage_path, [640, 800, 1200, 1600])} sizes="(max-width: 1200px) 100vw, 1200px" alt={e.imagem.texto_alternativo ?? ''} width="1200" height="675" /></figure>}
+    {e.descricao_html && <div class="conteudo" set:html={htmlSeguro(e.descricao_html)} />}
+  </article>

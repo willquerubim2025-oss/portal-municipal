@@ -6,10 +6,13 @@ import { dataHora, slugificar } from '../lib/texto';
 import { EtiquetaSituacao } from './Situacao';
 import { supabase, mensagemErro } from '../lib/supabase';
 
+/** Conteúdos com pré-visualização no portal (criar_previa, 0023/0024). */
+export type TabelaPrevia = 'publicacoes' | 'paginas' | 'servicos' | 'eventos';
+
 export function CabecalhoEdicao<F>({ e, rotuloLista, titulo, linkSite, previa }: {
   e: Edicao<F>; rotuloLista: string; titulo: string; linkSite?: string | null;
   /** Pré-visualização de rascunho no portal (D-91): tabela do conteúdo e endereço do portal. */
-  previa?: { tabela: 'publicacoes'; portal: string | null };
+  previa?: { tabela: TabelaPrevia; portal: string | null };
 }) {
   return (
     <div className="cabecalho-tela">
@@ -34,7 +37,7 @@ export function CabecalhoEdicao<F>({ e, rotuloLista, titulo, linkSite, previa }:
 
 /** Abre o conteúdo como ficará no site, por um link temporário (30 min) gerado no banco (criar_previa, 0023).
  *  Mostra a última versão SALVA. A aba é aberta já no clique, para o navegador não bloquear. */
-function BotaoPrevia({ tabela, id, portal }: { tabela: 'publicacoes'; id: string; portal: string }) {
+function BotaoPrevia({ tabela, id, portal }: { tabela: TabelaPrevia; id: string; portal: string }) {
   const abrir = async () => {
     const aba = window.open('about:blank', '_blank');
     const { data, error } = await supabase.rpc('criar_previa', { p_tabela: tabela, p_id: id });

@@ -66,7 +66,7 @@ export function EditarEvento() {
   return (
     <CarregandoOuAusente e={e} rotuloLista="Agenda">
       <form onSubmit={enviar} className="formulario-conteudo" noValidate>
-        <CabecalhoEdicao e={e} rotuloLista="Agenda" titulo={e.nova ? 'Novo evento' : f.titulo || 'Sem título'} linkSite={portal && `${portal}/eventos/${f.slug}`} />
+        <CabecalhoEdicao e={e} rotuloLista="Agenda" titulo={e.nova ? 'Novo evento' : f.titulo || 'Sem título'} linkSite={portal && `${portal}/eventos/${f.slug}`} previa={{ tabela: 'eventos', portal }} />
         <MensagensEdicao e={e} nome="evento" />
         <fieldset disabled={e.bloqueado || e.salvando} className="grade-formulario">
           <div className="coluna-principal">

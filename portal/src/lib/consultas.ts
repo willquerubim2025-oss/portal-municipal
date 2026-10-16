@@ -86,6 +86,13 @@ export async function noticia(municipioId: string, slug: string) {
 
 /** Rascunho aberto por um link de pré-visualização (D-91): null se o token não existir, tiver vencido
  *  (30 min) ou for de outra organização. Mesmo formato de noticia(). */
+/** Qualquer conteúdo aberto por link de pré-visualização (D-93): { tabela, dados } ou null. */
+export async function previaConteudo(municipioId: string, token: string) {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(token)) return null;
+  return erro(await supabase().rpc('previa_conteudo', { p_token: token, p_municipio: municipioId })) as
+    { tabela: 'publicacoes' | 'paginas' | 'servicos' | 'eventos'; dados: any } | null;
+}
+
 export async function previaPublicacao(municipioId: string, token: string) {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(token)) return null;
   return erro(await supabase().rpc('previa_publicacao', { p_token: token, p_municipio: municipioId })) as any;

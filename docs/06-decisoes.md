@@ -747,4 +747,10 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Escolher reaproveita a mesma mídia (mesmo arquivo e mesmo texto alternativo); nada é copiado nem enviado de novo.
 - Janela em `<dialog>` nativo (foco preso, Esc fecha), desenhada no `<body>` por portal do React, porque a busca é um formulário e não pode ficar dentro do formulário de edição. axe sem violações.
 - Sem mudança no banco: a lista usa a policy existente (membros veem as mídias da própria organização).
-- Fica para depois: escolher da biblioteca também na galeria de fotos da notícia e na imagem dentro do texto (editor).
+- **16/10/2026:** a biblioteca chegou também à galeria de fotos da notícia ("Escolher da biblioteca", só cria o vínculo; recusa foto repetida) e ao editor de texto (botão "Da biblioteca"; se a mídia não tiver descrição, pede uma, que é obrigatória). Testado no painel.
+
+**D-93 · 16/10/2026 · Pré-visualização também em páginas, serviços e eventos (amplia a D-91)**
+- A 0024 estende `previas` e `criar_previa` a `paginas`, `servicos` e `eventos`, e cria `previa_conteudo(token, organização)`, que devolve `{ tabela, dados }` no formato de cada página. `/previa/<token>` mostra o tipo certo, com o mesmo aviso.
+- Os corpos das páginas viraram componentes compartilhados (`PaginaArtigo`, `ServicoArtigo`, `EventoArtigo`, além do `NoticiaArtigo`), usados pela página publicada e pela prévia. Conferido: as páginas publicadas ficaram idênticas (comparação do HTML do artigo antes e depois).
+- No painel, o botão "Pré-visualizar no site" aparece nos editores de notícias, páginas, serviços e eventos (conteúdo ainda não publicado).
+- Testes: 10 novos (218 no total, 0 falhas).

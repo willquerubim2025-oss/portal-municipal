@@ -657,6 +657,26 @@ await db.exec(`update previas set expira_em = now() - interval '1 minute' where 
 r = await como('anon', `select previa_publicacao('${tokPrev}', '${J}') p`)
 espera('link vencido (30 min) não abre mais', r.rows?.[0]?.p === null)
 
+console.log('\nPré-visualização de páginas, serviços e eventos (0024)')
+r = await como('admin', `insert into paginas (municipio_id, titulo, caminho, corpo_html) values ('${J}', 'Página em rascunho', 'pagina-rascunho', '<p>x</p>') returning id`)
+const pagPrev = r.rows?.[0]?.id
+r = await como('admin', `insert into servicos (municipio_id, titulo, slug, descricao) values ('${J}', 'Serviço em rascunho', 'servico-rascunho', 'd') returning id`)
+const servPrev = r.rows?.[0]?.id
+r = await como('admin', `insert into eventos (municipio_id, titulo, slug, inicio_em) values ('${J}', 'Evento em rascunho', 'evento-rascunho', now() + interval '3 days') returning id`)
+const evPrev = r.rows?.[0]?.id
+for (const [tabela, id, titulo] of [['paginas', pagPrev, 'Página em rascunho'], ['servicos', servPrev, 'Serviço em rascunho'], ['eventos', evPrev, 'Evento em rascunho'], ['publicacoes', rascPrev, 'Rascunho para prévia']]) {
+  r = await como('editor', `select criar_previa('${tabela}', '${id}') t`)
+  const t = r.rows?.[0]?.t
+  r = await como('anon', `select previa_conteudo('${t}', '${J}') c`)
+  espera(`prévia de ${tabela}: o portal lê o rascunho pelo token`, r.rows?.[0]?.c?.tabela === tabela && r.rows?.[0]?.c?.dados?.titulo === titulo)
+  r = await como('anon', `select previa_conteudo('${t}', '${O}') c`)
+  espera(`prévia de ${tabela}: NÃO abre no domínio de outra organização`, r.rows?.[0]?.c === null)
+}
+r = await como('outro', `select criar_previa('eventos', '${evPrev}') t`)
+espera('admin de outra organização NÃO gera link de evento', !!r.erro)
+r = await como('editor', `select criar_previa('documentos', '${evPrev}') t`)
+espera('tabela fora da lista NÃO gera link', !!r.erro)
+
 console.log('\nExclusão de organização com permissões')
 r = await como('plat', `delete from municipios where slug = 'org-nova-papeis' returning 1`)
 espera('SECKE exclui organização com papéis (cascata não trava)', r.rows?.length === 1)

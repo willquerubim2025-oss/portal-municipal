@@ -7,6 +7,7 @@ import { deInputDataHora, paraInputDataHora, SLUG_VALIDO, slugificar } from '../
 import { usePortal } from '../../lib/portal';
 import { EditorTexto } from '../../components/EditorTexto';
 import { CampoImagem } from '../../components/CampoImagem';
+import { BibliotecaMidias } from '../../components/BibliotecaMidias';
 import { BarraAcoes, CabecalhoEdicao, CampoSlug, CarregandoOuAusente, MensagensEdicao, Obrigatorio, SeletorOrgao } from '../../components/Edicao';
 
 interface ItemGaleria { midia: Midia; legenda: string | null; ordem: number }
@@ -69,6 +70,14 @@ export function EditarNoticia() {
     if (error) throw error;
     setGaleria([...galeria, { midia: m, legenda: legenda || null, ordem }]);
   }
+  /** Foto já enviada, escolhida na biblioteca (D-92): só cria o vínculo com a notícia. */
+  async function adicionarExistente(m: Midia, legenda: string) {
+    if (galeria.some((g) => g.midia.id === m.id)) throw new Error('Esta foto já está na galeria.');
+    const ordem = galeria.length ? Math.max(...galeria.map((g) => g.ordem)) + 1 : 0;
+    const { error } = await supabase.from('publicacao_midias').insert({ municipio_id: e.mid, publicacao_id: e.id, midia_id: m.id, legenda: legenda || null, ordem });
+    if (error) throw error;
+    setGaleria([...galeria, { midia: m, legenda: legenda || null, ordem }]);
+  }
   async function removerFoto(midiaId: string) {
     const { error } = await supabase.from('publicacao_midias').delete().eq('publicacao_id', e.id).eq('midia_id', midiaId);
     if (error) e.setErro(mensagemErro(error)); else setGaleria(galeria.filter((g) => g.midia.id !== midiaId));
@@ -121,17 +130,24 @@ export function EditarNoticia() {
         </fieldset>
         {e.nova
           ? <p className="meta">Salve o rascunho para adicionar uma galeria de fotos.</p>
-          : <Galeria itens={galeria} bloqueada={e.bloqueado} aoAdicionar={adicionarFoto} aoRemover={removerFoto} />}
+          : <Galeria itens={galeria} bloqueada={e.bloqueado} municipioId={e.mid} aoAdicionar={adicionarFoto} aoAdicionarExistente={adicionarExistente} aoRemover={removerFoto} />}
         <BarraAcoes e={e} />
       </form>
     </CarregandoOuAusente>
   );
 }
 
-function Galeria({ itens, bloqueada, aoAdicionar, aoRemover }: {
-  itens: ItemGaleria[]; bloqueada: boolean;
-  aoAdicionar: (f: File, alt: string, legenda: string) => Promise<void>; aoRemover: (midiaId: string) => void;
+function Galeria({ itens, bloqueada, municipioId, aoAdicionar, aoAdicionarExistente, aoRemover }: {
+  itens: ItemGaleria[]; bloqueada: boolean; municipioId: string;
+  aoAdicionar: (f: File, alt: string, legenda: string) => Promise<void>;
+  aoAdicionarExistente: (m: Midia, legenda: string) => Promise<void>; aoRemover: (midiaId: string) => void;
 }) {
+  const [biblioteca, setBiblioteca] = useState(false);
+  async function escolher(m: Midia) {
+    setErro(null);
+    try { await aoAdicionarExistente(m, legenda.trim()); setLegenda(''); }
+    catch (err) { setErro(mensagemErro(err)); }
+  }
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [alt, setAlt] = useState('');
   const [legenda, setLegenda] = useState('');
@@ -164,6 +180,10 @@ function Galeria({ itens, bloqueada, aoAdicionar, aoRemover }: {
       {!bloqueada && (
         <fieldset className="nova-foto">
           <legend>Adicionar foto</legend>
+          <div className="imagem-opcoes">
+            <button type="button" className="botao-secundario" onClick={() => setBiblioteca(true)}>Escolher da biblioteca</button>
+            <span>ou envie um arquivo novo:</span>
+          </div>
           <input type="file" accept="image/jpeg,image/png,image/webp" aria-label="Arquivo da foto" onChange={(ev) => setArquivo(ev.target.files?.[0] ?? null)} />
           {arquivo && (
             <>
@@ -173,6 +193,7 @@ function Galeria({ itens, bloqueada, aoAdicionar, aoRemover }: {
             </>
           )}
           {erro && <p className="erro" role="alert">{erro}</p>}
+          <BibliotecaMidias municipioId={municipioId} aberta={biblioteca} aoFechar={() => setBiblioteca(false)} aoEscolher={escolher} />
         </fieldset>
       )}
     </section>

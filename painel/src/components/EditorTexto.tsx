@@ -3,11 +3,12 @@
 // - toda imagem exige texto alternativo;
 // - sem cores/fontes livres (a identidade vem do tema do portal).
 // O portal ainda sanitiza o HTML na saída (htmlSeguro), então isto não é a barreira de segurança.
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
-import { enviarMidia } from '../lib/midias';
+import { enviarMidia, type Midia } from '../lib/midias';
+import { BibliotecaMidias } from './BibliotecaMidias';
 import { mensagemErro, urlMidia } from '../lib/supabase';
 
 interface Props {
@@ -20,6 +21,7 @@ interface Props {
 
 export function EditorTexto({ rotulo, valor, aoMudar, municipioId, desabilitado = false }: Props) {
   const arquivo = useRef<HTMLInputElement>(null);
+  const [biblioteca, setBiblioteca] = useState(false);
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -67,6 +69,14 @@ export function EditorTexto({ rotulo, valor, aoMudar, municipioId, desabilitado 
     } catch (e) { alert(`Não foi possível enviar a imagem: ${mensagemErro(e)}`); }
   }
 
+  /** Imagem já enviada, da biblioteca (D-92). Sem descrição cadastrada, pede uma (obrigatória). */
+  function daBiblioteca(m: Midia) {
+    const alt = m.texto_alternativo?.trim()
+      || window.prompt('Descreva a imagem para quem não pode vê-la (texto alternativo, obrigatório):')?.trim();
+    if (!alt) { alert('A imagem não foi inserida: o texto alternativo é obrigatório.'); return; }
+    cmd().setImage({ src: urlMidia(m.storage_path)!, alt }).run();
+  }
+
   const Botao = ({ ativo, onClick, children, titulo }: { ativo?: boolean; onClick: () => void; children: React.ReactNode; titulo: string }) => (
     <button type="button" title={titulo} aria-label={titulo} aria-pressed={ativo} disabled={desabilitado}
       className={ativo ? 'ativo' : undefined} onMouseDown={(e) => e.preventDefault()} onClick={onClick}>{children}</button>
@@ -86,13 +96,15 @@ export function EditorTexto({ rotulo, valor, aoMudar, municipioId, desabilitado 
         <Botao titulo="Citação" ativo={estado?.citacao} onClick={() => cmd().toggleBlockquote().run()}>“ ”</Botao>
         <span className="separador" />
         <Botao titulo="Link" ativo={estado?.link} onClick={link}>Link</Botao>
-        <Botao titulo="Inserir imagem" onClick={() => arquivo.current?.click()}>Imagem</Botao>
+        <Botao titulo="Inserir imagem (enviar arquivo)" onClick={() => arquivo.current?.click()}>Imagem</Botao>
+        <Botao titulo="Inserir imagem da biblioteca" onClick={() => setBiblioteca(true)}>Da biblioteca</Botao>
         <span className="separador" />
         <Botao titulo="Desfazer" onClick={() => cmd().undo().run()}>↶</Botao>
         <Botao titulo="Refazer" onClick={() => cmd().redo().run()}>↷</Botao>
         <input ref={arquivo} type="file" accept="image/*" hidden onChange={(e) => { imagem(e.target.files?.[0]); e.target.value = ''; }} />
       </div>
       <EditorContent editor={editor} />
+      <BibliotecaMidias municipioId={municipioId} aberta={biblioteca} aoFechar={() => setBiblioteca(false)} aoEscolher={daBiblioteca} />
     </div>
   );
 }
