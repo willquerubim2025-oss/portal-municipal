@@ -19,6 +19,16 @@ const CATEGORIAS_SISTEMA: Record<string, string> = {
   diario_oficial: 'Diário Oficial', ouvidoria: 'Ouvidoria', esic: 'e-SIC', protocolo: 'Protocolo', nfse: 'Nota fiscal (NFS-e)', outro: 'Outro',
 };
 
+/** Página própria dos sistemas (menu Estrutura → Sistemas, D-94): públicos e de servidores. */
+export function SistemasExternos() {
+  return (
+    <>
+      <div className="cabecalho-tela"><h1>Sistemas</h1></div>
+      <Sistemas />
+    </>
+  );
+}
+
 export function Transparencia() {
   const [aba, setAba] = useState<'central' | 'sistemas'>('central');
   return (
@@ -26,7 +36,7 @@ export function Transparencia() {
       <div className="cabecalho-tela"><h1>Transparência</h1></div>
       <div className="abas" role="tablist">
         <button type="button" role="tab" aria-selected={aba === 'central'} className={aba === 'central' ? 'aba ativa' : 'aba'} onClick={() => setAba('central')}>Central de Transparência</button>
-        <button type="button" role="tab" aria-selected={aba === 'sistemas'} className={aba === 'sistemas' ? 'aba ativa' : 'aba'} onClick={() => setAba('sistemas')}>Sistemas externos</button>
+        <button type="button" role="tab" aria-selected={aba === 'sistemas'} className={aba === 'sistemas' ? 'aba ativa' : 'aba'} onClick={() => setAba('sistemas')}>Sistemas</button>
       </div>
       {aba === 'central' ? <Central /> : <Sistemas />}
     </>
@@ -189,7 +199,7 @@ function FormItemT({ secao, item, mid, sistemas, paginas, categorias, aoFechar }
           <label key={v} className="opcao"><input type="radio" name="destinot" checked={destino === v} onChange={() => setDestino(v)} /> {r}</label>
         ))}
       </fieldset>
-      {destino === 'sistema' && (sistemas.length === 0 ? <p className="meta">Cadastre o sistema na aba "Sistemas externos".</p> : (
+      {destino === 'sistema' && (sistemas.length === 0 ? <p className="meta">Cadastre o sistema em Estrutura → Sistemas (ou na aba "Sistemas").</p> : (
         <label>Sistema<select value={sistemaId} onChange={(e) => setSistemaId(e.target.value)}><option value="">Escolha…</option>{sistemas.map((s) => <option key={s.id} value={s.id}>{s.nome}{s.fornecedor && ` (${s.fornecedor})`}</option>)}</select></label>
       ))}
       {destino === 'categoria' && <label>Categoria<select value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)}><option value="">Escolha…</option>{categorias.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}</select></label>}

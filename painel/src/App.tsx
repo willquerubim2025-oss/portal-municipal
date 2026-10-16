@@ -14,7 +14,7 @@ import { EditarPergunta, ListaPerguntas } from './pages/perguntas/Perguntas';
 import { EditarDestaque, ListaDestaques } from './pages/destaques/Destaques';
 import { EditarOrgao, ListaOrgaos } from './pages/estrutura/Orgaos';
 import { Menus } from './pages/estrutura/Menus';
-import { Transparencia } from './pages/estrutura/Transparencia';
+import { SistemasExternos, Transparencia } from './pages/estrutura/Transparencia';
 import { Pntp } from './pages/estrutura/Pntp';
 import { Identidade } from './pages/estrutura/Identidade';
 import { Categorias, Redirecionamentos } from './pages/estrutura/Cadastros';
@@ -93,6 +93,7 @@ export function App() {
                 <Route path="orgaos/:id" element={<EditarOrgao />} />
                 <Route path="menus" element={<Menus />} />
                 <Route path="transparencia" element={<Transparencia />} />
+                <Route path="sistemas" element={<SistemasExternos />} />
                 <Route path="pntp" element={<Pntp />} />
                 <Route path="identidade" element={<Identidade />} />
                 <Route path="redirecionamentos" element={<Redirecionamentos />} />

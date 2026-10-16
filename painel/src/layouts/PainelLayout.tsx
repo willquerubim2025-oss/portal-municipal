@@ -24,6 +24,7 @@ const GRUPOS: { titulo: string; itens: ItemMenu[] }[] = [
     { rotulo: 'Estrutura organizacional', para: '/orgaos', pronto: true, papel: 'admin' },
     { rotulo: 'Menus', para: '/menus', pronto: true, papel: 'admin' },
     { rotulo: 'Transparência', para: '/transparencia', pronto: true, papel: 'admin' },
+    { rotulo: 'Sistemas', para: '/sistemas', pronto: true, papel: 'admin' },
     { rotulo: 'PNTP', para: '/pntp', pronto: true, papel: 'admin' },
     { rotulo: 'Identidade visual e dados', para: '/identidade', pronto: true, papel: 'admin' },
     { rotulo: 'Categorias', para: '/categorias', pronto: true, papel: 'publicador' },
