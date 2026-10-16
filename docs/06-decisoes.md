@@ -741,3 +741,10 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - O corpo da notícia virou o componente `NoticiaArtigo.astro`, usado pela página publicada e pela prévia (as duas iguais).
 - Aplicada na homologação e na produção (SQL Editor, 15/10/2026); testada de ponta a ponta no painel publicado. Na prévia de conteúdo não publicado, a data vira "Ainda não publicada".
 - Testes: 10 novos (208 no total, 0 falhas). Próximos módulos (páginas, serviços, eventos) seguem o mesmo molde: acrescentar a tabela no `check` de `previas` e uma função de leitura.
+
+**D-92 · 16/10/2026 · Biblioteca de mídias no painel (pendência do painel, aprovada pelo usuário)**
+- O campo de imagem (`CampoImagem`), usado em notícias, eventos, banners, identidade visual, órgãos, equipe e unidades, ganhou **"Escolher da biblioteca"** (e "Trocar por uma já enviada" quando já há imagem). Abre uma janela com as imagens já enviadas pela organização, das mais recentes para as mais antigas, 24 por página, com busca pela descrição (texto alternativo) ou pelo nome do arquivo.
+- Escolher reaproveita a mesma mídia (mesmo arquivo e mesmo texto alternativo); nada é copiado nem enviado de novo.
+- Janela em `<dialog>` nativo (foco preso, Esc fecha), desenhada no `<body>` por portal do React, porque a busca é um formulário e não pode ficar dentro do formulário de edição. axe sem violações.
+- Sem mudança no banco: a lista usa a policy existente (membros veem as mídias da própria organização).
+- Fica para depois: escolher da biblioteca também na galeria de fotos da notícia e na imagem dentro do texto (editor).

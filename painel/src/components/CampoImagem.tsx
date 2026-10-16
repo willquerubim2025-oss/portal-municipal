@@ -1,8 +1,9 @@
-// Imagem de destaque: envia um arquivo novo com texto alternativo obrigatório,
-// ou remove a atual. O texto alternativo da imagem já enviada pode ser corrigido.
+// Imagem de destaque: envia um arquivo novo com texto alternativo obrigatório, escolhe uma já
+// enviada na biblioteca de mídias (D-92) ou remove a atual. O texto alternativo pode ser corrigido.
 import { useId, useState } from 'react';
 import { enviarMidia, type Midia } from '../lib/midias';
 import { mensagemErro, supabase, urlMidia } from '../lib/supabase';
+import { BibliotecaMidias } from './BibliotecaMidias';
 
 interface Props {
   rotulo: string;
@@ -18,6 +19,7 @@ export function CampoImagem({ rotulo, municipioId, midia, aoMudar, desabilitado 
   const [alt, setAlt] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [biblioteca, setBiblioteca] = useState(false);
 
   async function enviar() {
     if (!arquivo) return;
@@ -45,11 +47,18 @@ export function CampoImagem({ rotulo, municipioId, midia, aoMudar, desabilitado 
           <div>
             <label htmlFor={`${id}-alt`}>Texto alternativo</label>
             <input id={`${id}-alt`} defaultValue={midia.texto_alternativo ?? ''} onBlur={(e) => corrigirAlt(e.target.value.trim())} />
-            <button type="button" className="botao-link" onClick={() => aoMudar(null)}>Remover imagem</button>
+            <div className="imagem-opcoes">
+              <button type="button" className="botao-link" onClick={() => setBiblioteca(true)}>Trocar por uma já enviada</button>
+              <button type="button" className="botao-link" onClick={() => aoMudar(null)}>Remover imagem</button>
+            </div>
           </div>
         </div>
       ) : (
         <div className="imagem-nova">
+          <div className="imagem-opcoes">
+            <button type="button" className="botao-secundario" onClick={() => setBiblioteca(true)}>Escolher da biblioteca</button>
+            <span>ou envie um arquivo novo:</span>
+          </div>
           <label htmlFor={`${id}-arq`}>Arquivo (JPG, PNG ou WebP)</label>
           <input id={`${id}-arq`} type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => setArquivo(e.target.files?.[0] ?? null)} />
           {arquivo && (
@@ -62,6 +71,7 @@ export function CampoImagem({ rotulo, municipioId, midia, aoMudar, desabilitado 
         </div>
       )}
       {erro && <p className="erro" role="alert">{erro}</p>}
+      <BibliotecaMidias municipioId={municipioId} aberta={biblioteca} aoFechar={() => setBiblioteca(false)} aoEscolher={aoMudar} />
     </fieldset>
   );
 }

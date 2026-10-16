@@ -236,3 +236,20 @@ code { background: var(--fundo); padding: 0 .3rem; border-radius: 4px; font-size
 .botao-link.perigo { color: var(--vermelho); }
 tr.inativo td, tr.inativo th { color: var(--suave); }
 .acoes-celula { margin-left: .75rem; }
+
+/* Biblioteca de mídias (D-92) */
+.biblioteca-midias { width: min(960px, calc(100vw - 2rem)); max-height: calc(100vh - 2rem); padding: 1.25rem; border: 1px solid var(--borda); border-radius: var(--raio); color: var(--texto); }
+.biblioteca-midias::backdrop { background: rgb(15 23 32 / .55); }
+.biblioteca-topo { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.biblioteca-topo h2 { margin: 0; }
+.biblioteca-busca { display: grid; gap: .3rem; margin: .9rem 0 .4rem; }
+.biblioteca-busca div { display: flex; gap: .5rem; }
+.biblioteca-busca input { flex: 1; min-width: 0; }
+.biblioteca-situacao p { margin: .3rem 0 .7rem; color: var(--suave); }
+.biblioteca-grade { list-style: none; margin: 0; padding: 0; display: grid; gap: .75rem; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.biblioteca-grade button { width: 100%; display: grid; gap: .35rem; padding: .4rem; background: var(--branco); border: 2px solid var(--borda); border-radius: var(--raio); cursor: pointer; text-align: left; color: var(--texto); font: inherit; }
+.biblioteca-grade button:hover, .biblioteca-grade button:focus-visible { border-color: var(--azul); }
+.biblioteca-grade img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 6px; background: var(--fundo); }
+.biblioteca-legenda { font-size: .82rem; line-height: 1.3; color: var(--suave); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.biblioteca-paginas { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1rem; }
+.imagem-opcoes { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; }
