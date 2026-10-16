@@ -6,8 +6,9 @@ Há duas camadas de backup:
 |---|---|---|---|---|
 | Supabase Pro (automático) | Supabase | diária | 7 dias | banco inteiro, restaura pelo painel do Supabase |
 | **Backup extra** (este doc) | Cloudflare R2 (outro fornecedor) | diária, 3h de Brasília | 30 dias | conteúdo do portal (`public`, `interno`), usuários do login e índice do Storage |
+| **Cópia dos arquivos** (D-96, seção no fim) | Cloudflare R2, bucket próprio | diária, 4h de Brasília | sem prazo (nada é apagado) | fotos, PDFs e demais arquivos dos buckets do Storage |
 
-O backup extra existe para o caso de perder a conta ou o projeto do Supabase. Ele **não copia os arquivos** (PDFs e imagens, vários GB); eles ficam no Storage do Supabase (pendência: cópia periódica para o R2).
+O backup extra existe para o caso de perder a conta ou o projeto do Supabase. O do banco **não copia os arquivos** (PDFs e imagens, vários GB): eles vão pela rotina "Backup dos arquivos", descrita no fim deste documento.
 
 ## Como funciona
 Workflow `.github/workflows/backup-banco.yml` (GitHub Actions), todo dia e sob demanda (*Actions → Backup do banco → Run workflow*):
@@ -54,3 +55,38 @@ Retenção de 30 dias: regra de ciclo de vida do bucket no R2 (apaga sozinho).
 4. **Só uma tabela ou um registro** (ex.: notícia apagada por engano): restaurar num Postgres local e copiar o que falta, ou usar o backup do próprio Supabase (mais simples para os últimos 7 dias).
 
 Conferir sempre com `contagens.txt`.
+
+## Cópia dos arquivos do Storage (D-96)
+Workflow `.github/workflows/backup-arquivos.yml` (*Actions → Backup dos arquivos*), todo dia às 4h de Brasília e sob demanda. Usa o **rclone** pela interface S3 do Storage do Supabase:
+1. Lista os buckets do Storage do ambiente (hoje, `midias`).
+2. Copia para `r2:<R2_BUCKET_ARQUIVOS>/<ambiente>/<bucket>/` só o que é novo ou mudou (a primeira vez copia tudo).
+3. **Nunca apaga** no R2: arquivo excluído no portal continua na cópia.
+4. Confere que tudo o que está no Storage está no R2 com o mesmo tamanho; se não bater, o workflow falha e o GitHub avisa por e-mail.
+
+Os arquivos vão **sem criptografia**: são, na quase totalidade, os mesmos que o portal publica. Se um dia houver bucket privado com dado pessoal, criptografar antes (rclone `crypt`).
+
+### Configuração (uma vez; a pessoa digita os valores, não colar em chat nem em arquivo)
+1. **Bucket próprio no R2**, sem regra de expiração (o do banco apaga tudo com 30 dias; o workflow se recusa a usar o mesmo):
+   ```bash
+   npx wrangler r2 bucket create portal-municipal-arquivos --location enam
+   ```
+   Ou pelo painel: *R2 → Create bucket*.
+2. **Token do R2:** editar o token do backup (*R2 → Manage API tokens*) e incluir o bucket `portal-municipal-arquivos` com *Object Read & Write*. Assim os segredos `R2_ACCESS_KEY_ID` e `R2_SECRET_ACCESS_KEY` servem às duas rotinas.
+3. **Chave S3 do Storage** em cada projeto Supabase: *Storage → S3 Configuration* (ligar "S3 protocol connection", se estiver desligado) → *Access keys → New access key*. Guardar o *Access key ID* e o *Secret access key* (aparece uma vez só). Repetir na branch de homologação, se quiser cópia dela também.
+4. **Segredos e variável no GitHub** (*Settings → Secrets and variables → Actions*):
+   ```bash
+   gh secret set SUPABASE_S3_ID_PRODUCAO
+   gh secret set SUPABASE_S3_SEGREDO_PRODUCAO
+   gh secret set SUPABASE_S3_ID_HOMOLOGACAO        # opcional
+   gh secret set SUPABASE_S3_SEGREDO_HOMOLOGACAO   # opcional
+   gh variable set R2_BUCKET_ARQUIVOS --body portal-municipal-arquivos
+   ```
+5. Rodar uma vez à mão (*Actions → Backup dos arquivos → Run workflow*) e conferir as linhas "conferido".
+
+### Restaurar arquivos
+- **Um arquivo:** baixar pelo painel do R2 (`<ambiente>/midias/<organização>/...`) e reenviar pelo painel do portal, ou pelo Storage do Supabase no mesmo caminho (o índice `midias.storage_path` aponta para ele).
+- **Tudo (projeto novo):** com as mesmas variáveis do workflow, rodar no sentido contrário:
+  ```bash
+  rclone copy r2:portal-municipal-arquivos/producao/midias supabase:midias --transfers 16
+  ```
+  Antes, criar o bucket `midias` (público) no projeto novo e restaurar o banco (seção "Restaurar").

@@ -1,0 +1,87 @@
+# Cópia extra dos ARQUIVOS (D-96): todo dia, os buckets do Storage do Supabase (fotos, PDFs)
+# são copiados para um bucket próprio no Cloudflare R2, só o que é novo ou mudou.
+# O backup do banco (backup-banco.yml) guarda o índice do Storage; este guarda os arquivos.
+# Nada é apagado no R2: um arquivo excluído no portal continua na cópia (dá para recuperar).
+#
+# Segredos do repositório (Settings → Secrets and variables → Actions):
+#   SUPABASE_S3_ID_PRODUCAO, SUPABASE_S3_SEGREDO_PRODUCAO        chave S3 do Storage da produção
+#   SUPABASE_S3_ID_HOMOLOGACAO, SUPABASE_S3_SEGREDO_HOMOLOGACAO  idem, da homologação (opcional)
+#   R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY   os mesmos do backup do banco, com escrita também neste bucket
+# Variáveis (não secretas): R2_ACCOUNT_ID (já existe), R2_BUCKET_ARQUIVOS
+#
+# Configuração e restauração: docs/12-backup-e-restauracao.md.
+name: Backup dos arquivos
+
+on:
+  schedule:
+    - cron: '0 7 * * *'   # 4h de Brasília (o do banco roda às 3h)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  copiar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ambiente: producao
+            projeto: qgywucdnaeheqndcxtho
+          - ambiente: homologacao
+            projeto: kvilgamsyneenjtlllcf
+    env:
+      # Um segredo por ambiente; vazio = ambiente não configurado (pula). Nunca cai no do outro.
+      S3_ID: ${{ matrix.ambiente == 'producao' && secrets.SUPABASE_S3_ID_PRODUCAO || '' }}${{ matrix.ambiente == 'homologacao' && secrets.SUPABASE_S3_ID_HOMOLOGACAO || '' }}
+      S3_SEGREDO: ${{ matrix.ambiente == 'producao' && secrets.SUPABASE_S3_SEGREDO_PRODUCAO || '' }}${{ matrix.ambiente == 'homologacao' && secrets.SUPABASE_S3_SEGREDO_HOMOLOGACAO || '' }}
+      R2_BUCKET: ${{ vars.R2_BUCKET_ARQUIVOS }}
+      # rclone configurado por variáveis: "supabase" (origem) e "r2" (destino).
+      RCLONE_CONFIG_SUPABASE_TYPE: s3
+      RCLONE_CONFIG_SUPABASE_PROVIDER: Other
+      RCLONE_CONFIG_SUPABASE_ENDPOINT: https://${{ matrix.projeto }}.storage.supabase.co/storage/v1/s3
+      RCLONE_CONFIG_SUPABASE_REGION: sa-east-1
+      RCLONE_CONFIG_SUPABASE_FORCE_PATH_STYLE: 'true'
+      RCLONE_CONFIG_R2_TYPE: s3
+      RCLONE_CONFIG_R2_PROVIDER: Cloudflare
+      RCLONE_CONFIG_R2_ENDPOINT: https://${{ vars.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+      RCLONE_CONFIG_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      RCLONE_CONFIG_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      RCLONE_CONFIG_R2_NO_CHECK_BUCKET: 'true'   # o token só enxerga o bucket, não pode criá-lo
+    steps:
+      - name: Ambiente configurado?
+        id: cfg
+        run: |
+          if [ -z "$S3_ID" ] || [ -z "$S3_SEGREDO" ]; then echo "Sem chave S3 do Storage para ${{ matrix.ambiente }}: pulando."; echo "pular=1" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if [ -z "$R2_BUCKET" ]; then echo "::error::Falta a variável R2_BUCKET_ARQUIVOS"; exit 1; fi
+          # Não reaproveitar o bucket do banco: a regra de 30 dias de lá apagaria os arquivos.
+          if [ "$R2_BUCKET" = "${{ vars.R2_BUCKET }}" ]; then echo "::error::R2_BUCKET_ARQUIVOS precisa ser outro bucket (o do banco apaga tudo em 30 dias)."; exit 1; fi
+
+      - name: Instalar o rclone
+        if: steps.cfg.outputs.pular != '1'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq rclone && rclone version | head -1
+
+      - name: Copiar os buckets
+        if: steps.cfg.outputs.pular != '1'
+        env:
+          RCLONE_CONFIG_SUPABASE_ACCESS_KEY_ID: ${{ env.S3_ID }}
+          RCLONE_CONFIG_SUPABASE_SECRET_ACCESS_KEY: ${{ env.S3_SEGREDO }}
+        run: |
+          set -euo pipefail
+          buckets=$(rclone lsf --dirs-only supabase: | sed 's#/$##')
+          [ -n "$buckets" ] || { echo "::error::Nenhum bucket encontrado no Storage (chave errada?)"; exit 1; }
+          falhou=0
+          for b in $buckets; do
+            destino="r2:$R2_BUCKET/${{ matrix.ambiente }}/$b"
+            echo "== $b → $destino"
+            # copy (e não sync): o que foi apagado no Storage continua na cópia.
+            rclone copy "supabase:$b" "$destino" --transfers 16 --checkers 32 --fast-list --stats-one-line --stats 60s || falhou=1
+            # Conferência: tudo o que está no Storage tem de estar no R2, com o mesmo tamanho.
+            if rclone check "supabase:$b" "$destino" --one-way --size-only 2> check-$b.log; then
+              echo "$b: conferido ($(rclone size "$destino" --json | tr -d '\n'))"
+            else
+              echo "::error::$b: a cópia não bateu com o Storage"; tail -20 check-$b.log; falhou=1
+            fi
+          done
+          exit $falhou
