@@ -26,6 +26,20 @@ const chave = (a: any) => `aviso-${a.id}-${a.versao ?? 1}`;
     ))}
   </section>
 )}
+{/* Esconde já os avisos vistos ou vencidos, antes de pintar (o script do fim da página
+     fazia isso depois e o conteúdo "pulava"). */}
+{faixas.length > 0 && (
+  <script is:inline>
+    document.querySelectorAll('.v-avisos [data-aviso]').forEach(function (el) {
+      var f = el.dataset.frequencia || 'uma_vez', visto = false;
+      try { visto = f !== 'sempre' && (f === 'por_sessao' ? sessionStorage : localStorage).getItem(el.dataset.aviso) === '1'; } catch (e) {}
+      if (visto || (el.dataset.fim && new Date(el.dataset.fim) <= new Date())) el.hidden = true;
+    });
+    document.querySelectorAll('.v-avisos').forEach(function (s) {
+      if (!s.querySelector('[data-aviso]:not([hidden])')) s.hidden = true;
+    });
+  </script>
+)}
 
 {urgentes.map((a) => (
   <>
@@ -63,6 +77,8 @@ const chave = (a: any) => `aviso-${a.id}-${a.versao ?? 1}`;
     const fechar = () => {
       if (freq !== 'sempre') gravar(freq, chave);
       if (el instanceof HTMLDialogElement) el.close(); else el.hidden = true;
+      const secao = el.closest<HTMLElement>('.v-avisos');
+      if (secao && !secao.querySelector('[data-aviso]:not([hidden])')) secao.hidden = true;
     };
     if (vencido(el) || visto) {
       if (!(el instanceof HTMLDialogElement)) el.hidden = true;

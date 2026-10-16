@@ -347,6 +347,15 @@ const painelUrl = (() => { try { return getSecret('PAINEL_URL') || null; } catch
     </header>
   )}
 
+  <!-- Menu do celular fechado antes da primeira pintura (sem JS ele fica aberto). Sem isto, o
+       script do fim da página fechava o menu depois de pintar e a página "pulava" (CLS). -->
+  <script is:inline>
+    (function () {
+      var d = document.querySelector('.menu-movel'), r = document.documentElement;
+      if (d && matchMedia(r.classList.contains('vitrine') ? '(max-width: 1180px)' : '(max-width: 800px)').matches) d.open = false;
+    })();
+  </script>
+
   {vitrine && <Avisos avisos={alertas} />}
   {!vitrine && alertas.length > 0 && (
     <section class="alertas" aria-label="Alertas">

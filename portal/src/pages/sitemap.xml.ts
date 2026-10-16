@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { urlsSitemap } from '../lib/consultas';
 import { moduloAtivo } from '../lib/municipio';
+import { supabase } from '../lib/supabase';
 
 // Sitemap por município (D-15): só conteúdo publicado (o RLS garante) e no domínio principal.
 export const GET: APIRoute = async ({ locals }) => {
@@ -14,6 +15,9 @@ export const GET: APIRoute = async ({ locals }) => {
     moduloAtivo(m, 'perguntas_frequentes') && '/perguntas-frequentes',
     moduloAtivo(m, 'estrutura_organizacional') && '/estrutura-organizacional',
   ].filter(Boolean) as string[];
+  // Busca de escola e supervisor: só quando a rede tem unidades cadastradas.
+  const { count: unidades } = await supabase().from('unidades').select('id', { count: 'exact', head: true }).eq('municipio_id', m.id);
+  if (unidades) fixas.push('/fale-com-o-supervisor');
 
   const desligado = (c: string) =>
     (c.startsWith('/servicos/') && !moduloAtivo(m, 'carta_servicos')) ||

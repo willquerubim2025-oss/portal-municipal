@@ -82,6 +82,50 @@ export function Categorias() {
 interface Redir { id: string; origem: string; destino: string; codigo: number; acessos: number; ultimo_acesso: string | null }
 const POR_PAGINA = 50;
 
+// Origem: só o caminho (sem domínio), minúsculo, começando com "/".
+function normalizarOrigem(texto: string) {
+  const o = texto.trim().replace(/^https?:\/\/[^/]+/i, '').toLowerCase();
+  return o.startsWith('/') ? o : `/${o}`;
+}
+const destinoValido = (d: string) => /^(https?:\/\/|\/)/.test(d.trim());
+
+// Importação em lote: uma linha por redirecionamento, "endereço antigo;destino;tipo" (tipo opcional,
+// 301 se vazio). Aceita ponto e vírgula, tabulação (colar do Excel) ou vírgula, com ou sem aspas.
+interface LinhaImportada { origem: string; destino: string; codigo: number }
+interface ResultadoLeitura { validas: LinhaImportada[]; problemas: string[] }
+function lerCsv(texto: string): ResultadoLeitura {
+  const linhas = texto.replace(/^\uFEFF/, '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const amostra = linhas.find((l) => !l.startsWith('#')) ?? '';
+  const sep = amostra.includes('\t') ? '\t' : amostra.includes(';') ? ';' : ',';
+  const campos = (l: string) => {
+    const r: string[] = []; let atual = ''; let aspas = false;
+    for (let i = 0; i < l.length; i++) {
+      const c = l[i];
+      if (c === '"') { if (aspas && l[i + 1] === '"') { atual += '"'; i++; } else aspas = !aspas; }
+      else if (c === sep && !aspas) { r.push(atual); atual = ''; }
+      else atual += c;
+    }
+    r.push(atual);
+    return r.map((x) => x.trim());
+  };
+  const validas: LinhaImportada[] = []; const problemas: string[] = []; const vistas = new Set<string>();
+  linhas.forEach((l, i) => {
+    if (l.startsWith('#')) return;
+    const [a = '', b = '', c = ''] = campos(l);
+    if (i === 0 && !/^(\/|https?:)/i.test(a)) return;                 // cabeçalho
+    const n = i + 1;
+    const codigo = c === '' ? 301 : Number(c);
+    if (![301, 302, 410].includes(codigo)) return problemas.push(`Linha ${n}: tipo "${c}" inválido (use 301, 302 ou 410).`);
+    const origem = normalizarOrigem(a);
+    if (origem === '/') return problemas.push(`Linha ${n}: falta o endereço antigo.`);
+    if (codigo !== 410 && !destinoValido(b)) return problemas.push(`Linha ${n}: o destino "${b}" deve começar com / ou https://.`);
+    if (vistas.has(origem)) return problemas.push(`Linha ${n}: ${origem} aparece mais de uma vez no arquivo (vale a primeira).`);
+    vistas.add(origem);
+    validas.push({ origem, destino: codigo === 410 ? '/' : b, codigo });
+  });
+  return { validas, problemas };
+}
+
 export function Redirecionamentos() {
   const { atual } = useAuth();
   const mid = atual!.municipio.id;
@@ -106,11 +150,9 @@ export function Redirecionamentos() {
 
   async function criar(ev: FormEvent) {
     ev.preventDefault(); setErro(null); setAviso(null);
-    // Origem: só o caminho (sem domínio), minúsculo, começando com "/".
-    let o = origem.trim().replace(/^https?:\/\/[^/]+/i, '').toLowerCase();
-    if (!o.startsWith('/')) o = `/${o}`;
+    const o = normalizarOrigem(origem);
     if (o === '/') return setErro('Informe o caminho antigo (ex.: /noticia-antiga/).');
-    if (codigo !== '410' && !/^(https?:\/\/|\/)/.test(destino.trim())) return setErro('O destino deve começar com / (página do portal) ou https://.');
+    if (codigo !== '410' && !destinoValido(destino)) return setErro('O destino deve começar com / (página do portal) ou https://.');
     const { error } = await supabase.from('redirecionamentos').insert({ municipio_id: mid, origem: o, destino: codigo === '410' ? '/' : destino.trim(), codigo: Number(codigo) });
     if (error) return setErro(error.code === '23505' ? `Já existe um redirecionamento para ${o}.` : mensagemErro(error));
     setOrigem(''); setDestino(''); setAviso(`Redirecionamento de ${o} criado.`); carregar();
@@ -121,6 +163,37 @@ export function Redirecionamentos() {
     if (error) setErro(mensagemErro(error)); else carregar();
   }
   const paginas = Math.max(1, Math.ceil(total / POR_PAGINA));
+
+  const [leitura, setLeitura] = useState<ResultadoLeitura | null>(null);
+  const [substituir, setSubstituir] = useState(false);
+  const [importando, setImportando] = useState(false);
+  async function lerArquivo(arquivo: File | undefined) {
+    setErro(null); setAviso(null); setLeitura(null);
+    if (!arquivo) return;
+    if (arquivo.size > 5 * 1024 * 1024) return setErro('Arquivo muito grande (máximo 5 MB).');
+    setLeitura(lerCsv(await arquivo.text()));
+  }
+  async function importar() {
+    if (!leitura?.validas.length) return;
+    setImportando(true); setErro(null); setAviso(null);
+    const linhas = leitura.validas.map((l) => ({ municipio_id: mid, ...l }));
+    let enviados = 0;
+    for (let i = 0; i < linhas.length; i += 500) {
+      const lote = linhas.slice(i, i + 500);
+      const { error } = await supabase.from('redirecionamentos')
+        .upsert(lote, { onConflict: 'municipio_id,origem', ignoreDuplicates: !substituir });
+      if (error) {
+        setImportando(false);
+        return setErro(`Parou na linha ${i + 1} de ${linhas.length}: ${mensagemErro(error)}. As ${enviados} anteriores foram gravadas.`);
+      }
+      enviados += lote.length;
+    }
+    setImportando(false); setLeitura(null);
+    setAviso(substituir
+      ? `${enviados} redirecionamentos importados (os que já existiam foram atualizados).`
+      : `${enviados} linhas processadas. Endereços que já existiam ficaram como estavam.`);
+    setPagina(1); carregar();
+  }
 
   return (
     <>
@@ -142,6 +215,26 @@ export function Redirecionamentos() {
         </div>
         <p><button className="botao-secundario">Criar</button></p>
       </form>
+      <section className="painel-form" aria-labelledby="t-importar-redir">
+        <h2 id="t-importar-redir">Importar uma lista</h2>
+        <p className="meta">Arquivo CSV (ou texto salvo do Excel), uma linha por endereço: <code>endereço antigo;leva para;tipo</code>. O tipo é opcional (301 se vazio). Exemplo: <code>/noticias/antiga.html;/noticias/nova;301</code></p>
+        <label>Arquivo<input type="file" accept=".csv,.txt,text/csv,text/plain" onChange={(e) => lerArquivo(e.target.files?.[0])} /></label>
+        {leitura && (
+          <div role="status">
+            <p><strong>{leitura.validas.length}</strong> {leitura.validas.length === 1 ? 'linha pronta' : 'linhas prontas'} para importar{leitura.problemas.length > 0 && <>; <strong>{leitura.problemas.length}</strong> com problema (ficam de fora)</>}.</p>
+            {leitura.problemas.length > 0 && (
+              <details><summary>Ver as linhas com problema</summary>
+                <ul>{leitura.problemas.slice(0, 200).map((p) => <li key={p}>{p}</li>)}</ul>
+                {leitura.problemas.length > 200 && <p className="meta">E mais {leitura.problemas.length - 200}.</p>}
+              </details>
+            )}
+            {leitura.validas.length > 0 && <>
+              <label className="opcao"><input type="checkbox" checked={substituir} onChange={(e) => setSubstituir(e.target.checked)} /> Se o endereço antigo já existir, trocar o destino pelo do arquivo</label>
+              <p><button type="button" className="botao-secundario" disabled={importando} onClick={importar}>{importando ? 'Importando…' : `Importar ${leitura.validas.length}`}</button></p>
+            </>}
+          </div>
+        )}
+      </section>
       <form className="filtros" role="search" onSubmit={(e) => { e.preventDefault(); setPagina(1); setTermo(busca.trim().toLowerCase().replace(/[%_,()]/g, '')); }}>
         <label>Buscar endereço<input type="search" value={busca} onChange={(e) => setBusca(e.target.value)} /></label>
         <button className="botao-secundario">Buscar</button>
