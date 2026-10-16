@@ -5,6 +5,7 @@ import { mensagemErro, supabase } from '../../lib/supabase';
 import { dataHora } from '../../lib/texto';
 import { EtiquetaSituacao } from '../../components/Situacao';
 import type { Status } from '../../lib/tipos';
+import { useUnidadesNoticia } from '../../lib/unidadesNoticia';
 
 interface Linha { id: string; titulo: string; tipo: 'noticia' | 'aviso'; status: Status; publicado_em: string | null; atualizado_em: string; destaque: boolean; unidade: { nome: string } | null }
 const POR_PAGINA = 20;
@@ -19,8 +20,12 @@ export function ListaNoticias() {
   const [total, setTotal] = useState(0);
   const [erro, setErro] = useState<string | null>(null);
   const [busca, setBusca] = useState(termo);
+  // Quem só escreve na unidade vê as notícias dela (as publicadas da rede são públicas, mas não são dele).
+  const unidades = useUnidadesNoticia();
+  const filtroUnidade = unidades.soUnidade ? unidades.opcoes.map((u) => u.id).join(',') : null;
 
   useEffect(() => {
+    if (unidades.soUnidade && !unidades.carregado) return;
     let ativo = true;
     const agora = new Date().toISOString();
     let q = supabase.from('publicacoes')
@@ -31,6 +36,7 @@ export function ListaNoticias() {
     if (filtro === 'agendado') q = q.eq('status', 'publicado').gt('publicado_em', agora);
     else if (filtro === 'publicado') q = q.eq('status', 'publicado').lte('publicado_em', agora);
     else if (filtro) q = q.eq('status', filtro);
+    if (filtroUnidade !== null) q = q.in('unidade_id', filtroUnidade ? filtroUnidade.split(',') : ['00000000-0000-0000-0000-000000000000']);
     if (termo) q = q.ilike('titulo', `%${termo.replace(/[%_]/g, '\\$&')}%`);
     q.then(({ data, count, error }) => {
       if (!ativo) return;
@@ -39,7 +45,8 @@ export function ListaNoticias() {
       setTotal(count ?? 0);
     });
     return () => { ativo = false; };
-  }, [atual, filtro, termo, pagina]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [atual, filtro, termo, pagina, filtroUnidade, unidades.carregado]);
 
   const mudar = (chave: string, valor: string) => {
     const p = new URLSearchParams(params);

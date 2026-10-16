@@ -37,7 +37,7 @@ await page.getByRole('button', { name: 'Salvar rascunho' }).click();
 await page.waitForURL(/\/noticias\/[0-9a-f-]{36}$/, { timeout: 15000 });
 espera('rascunho salvo', await ve(page.getByRole('status').filter({ hasText: 'Alterações salvas' }), 10000));
 const urlRascunho = page.url();
-espera('redator gera o link de pré-visualização', await page.getByRole('button', { name: /Pré-visualizar/ }).isVisible());
+espera('redator vê o botão de pré-visualização', await ve(page.getByRole('button', { name: /Pré-visualizar/ })));
 await page.screenshot({ path: `${OUT}/n1-rascunho-redator.png`, fullPage: true });
 
 // Notícia já publicada fica só leitura para quem não publica.

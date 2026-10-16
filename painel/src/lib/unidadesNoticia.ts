@@ -12,12 +12,13 @@ export function useUnidadesNoticia() {
   const { atual, nivel, podePublicar, noticiasUnidade } = useAuth();
   const mid = atual?.municipio.id;
   const [todas, setTodas] = useState<UnidadeOpcao[]>([]);
+  const [carregado, setCarregado] = useState(false);
 
   useEffect(() => {
     if (!mid) return;
     let ativo = true;
     supabase.from('unidades').select('id, nome, regiao_id').eq('municipio_id', mid).eq('ativo', true).order('nome')
-      .then(({ data }) => { if (ativo) setTodas((data ?? []) as UnidadeOpcao[]); });
+      .then(({ data }) => { if (ativo) { setTodas((data ?? []) as UnidadeOpcao[]); setCarregado(true); } });
     return () => { ativo = false; };
   }, [mid]);
 
@@ -32,5 +33,5 @@ export function useUnidadesNoticia() {
     const u = todas.find((x) => x.id === unidadeId);
     return !!u && cobre(u, ['conteudo.publicar']);
   };
-  return { soUnidade, opcoes, todas, podePublicarNa };
+  return { soUnidade, opcoes, todas, podePublicarNa, carregado };
 }

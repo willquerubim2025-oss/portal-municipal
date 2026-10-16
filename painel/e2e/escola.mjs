@@ -10,7 +10,7 @@ const page = await novaPagina(browser);
 
 console.log('Conta da escola');
 await entrar(page, CONTAS.escola);
-espera('menu mostra "Notícias e avisos"', await page.getByRole('link', { name: 'Notícias e avisos' }).isVisible());
+espera('menu mostra "Notícias e avisos"', await ve(page.getByRole('link', { name: 'Notícias e avisos' })));
 espera('menu NÃO mostra Páginas, Documentos nem Identidade visual',
   !(await page.getByRole('link', { name: 'Páginas' }).isVisible()) && !(await page.getByRole('link', { name: 'Documentos e legislação' }).isVisible())
   && !(await page.getByRole('link', { name: 'Identidade visual e dados' }).isVisible()));
@@ -21,7 +21,9 @@ espera('abrir /paginas manda de volta ao início', new URL(page.url()).pathname 
 await page.goto(`${PAINEL}/noticias`);
 await page.getByRole('link', { name: 'Nova notícia' }).click();
 const unidade = page.getByRole('combobox', { name: /^Unidade/ });
-espera('notícia nova já vem com a unidade da escola', await ve(unidade) && (await unidade.inputValue()) !== '');
+await ve(unidade);
+await page.waitForFunction(() => !!document.querySelector('select[aria-describedby="ajuda-unidade"]')?.value, null, { timeout: 15000 }).catch(() => {});
+espera('notícia nova já vem com a unidade da escola', (await unidade.inputValue()) !== '');
 espera('só a unidade dela na lista (sem "notícia da organização")', !(await unidade.locator('option', { hasText: 'Nenhuma' }).count()));
 espera('sem "Destacar na página inicial"', !(await page.getByLabel('Destacar na página inicial').isVisible()));
 const nomeUnidade = (await unidade.locator('option:checked').textContent())?.trim();
@@ -29,7 +31,7 @@ await page.getByRole('textbox', { name: 'Título', exact: true }).fill(titulo);
 await page.getByRole('button', { name: 'Salvar rascunho' }).click();
 await page.waitForURL(/\/noticias\/[0-9a-f-]{36}$/, { timeout: 15000 });
 espera('rascunho da escola salvo', await ve(page.getByRole('status').filter({ hasText: 'Alterações salvas' })));
-espera('a escola vê "Publicar agora" na notícia dela', await page.getByRole('button', { name: 'Publicar agora' }).isVisible());
+espera('a escola vê "Publicar agora" na notícia dela', await ve(page.getByRole('button', { name: 'Publicar agora' })));
 await page.getByRole('button', { name: 'Publicar agora' }).click();
 espera('a escola publica a notícia dela', await ve(page.getByRole('status').filter({ hasText: 'Notícia publicada' })));
 const slug = await page.getByRole('textbox', { name: 'Endereço no site', exact: true }).inputValue();

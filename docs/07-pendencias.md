@@ -63,7 +63,8 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 - Revisão das páginas internas da SMEDU em 15/10/2026 (21 endereços, 1440 e 360 px): axe sem violações e sem rolagem horizontal em todas; só os 3 links acima dão 404.
 - A gravação de HTML longo pelo `execute_sql` do MCP voltou a exceder o tempo (60 s). Contorno usado: PATCH na API REST (`/rest/v1/paginas`) com o login do admin de teste.
 - [ ] **Conta Cloudflare da produção:** decidir em qual conta fica a produção (checklist de ir ao ar; a homologação está na conta pessoal, D-80).
-- [ ] **Permissões, fase 1C (D-97): código pronto em 16/10/2026** (migração 0026, 257 testes; painel e portal). **Falta:** William rodar a `0026_noticias_por_unidade.sql` no SQL Editor (homologação e produção); depois publicar painel e portal e rodar `node e2e/preparar.mjs` e as baterias `noticias` e `escola`. Quem escreve/publica pelas escolas: pergunta à SMEDU (item 19 de `smedu-pendencias.md`).
+- [x] **Permissões, fase 1C (D-97):** feito em 16/10/2026. 0026 aplicada pelo William na homologação e na produção (conferida nas duas); painel e portal da homologação publicados; baterias `noticias` (20) e `escola` (15) com 0 falhas. Falta só a resposta da SMEDU sobre quem escreve/publica pelas escolas (item 19 de `smedu-pendencias.md`).
+- [ ] **Antes da ida ao ar:** apagar as contas e papéis de teste da homologação e da produção (lista na D-98).
 - [x] **Testes automáticos do painel na SMEDU (D-98):** feito em 16/10/2026 (conteúdo, estrutura e administração com 0 falhas).
 - [x] **Contraste de todas as cores do layout no painel (D-99):** feito em 16/10/2026.
 - [x] ~~**Painel:** telas de papéis e permissões, vínculos de usuários, unidades e equipe gestora (D-38); registro de permissões no código + script de sincronização; menu montado por `minhas_permissoes()`~~ (D-77, 15/10/2026); publicado na homologação e catálogo igual na produção (D-83).

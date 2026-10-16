@@ -783,7 +783,9 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - As baterias (`painel/e2e/`) deixam de usar a organização parada (D-82): rodam na organização de `E2E_ORG` (padrão SMEDU), com dados que existem nela (tipos de documento, "Sobre a Secretaria", unidades) e contas próprias criadas por `e2e/preparar.mjs` (`redator.e2e`, `escola.e2e`).
 - **Contas e senhas em `painel/e2e/.env.e2e`, fora do git** (modelo `.env.e2e.exemplo`). As senhas que estavam escritas nos testes saíram do código (D-25).
 - A bateria de estrutura **guarda e restaura** a identidade da organização (cor e slogan); a limpeza só apaga na organização de teste. Bateria nova `escola.mjs` (fase 1C).
-- Resultado em 16/10/2026: conteúdo 31, estrutura 26 e administração 19 verificações, **0 falhas**; `noticias` e `escola` rodam depois da 0026 (gravam a coluna nova).
+- Resultado em 16/10/2026: conteúdo 31, estrutura 26, administração 19, notícias 20 e escola 15 verificações, **0 falhas** (as duas últimas depois da 0026).
+- Contas de teste na homologação, **a apagar antes da ida ao ar** (junto com `admin.teste` e `redator.teste`): `redator.e2e@secke.dev`, `escola2.e2e@secke.dev` e `escola.e2e@secke.dev` (esta ficou sem senha nem vínculo: o convite se perdeu quando o ambiente reiniciou), os convidados `novo.e2e.*` e os papéis "Redator (teste)" e "Comunicação da escola (teste)".
+- A lista de notícias de quem só escreve na unidade mostra apenas as notícias das unidades dele (as publicadas da rede são públicas, mas não são dele para editar).
 
 **D-99 · 16/10/2026 · Contraste de todas as cores do layout no painel**
 - Identidade visual ganha a seção **"Cores do layout"** (layout vitrine): destaque escuro (contra branco), acento (contra a cor principal), fundo dos títulos (contra o texto escuro), fundo e texto do cabeçalho (um contra o outro) e as paletas dos cards de Serviços e dos blocos (texto forte sobre o claro e branco sobre o forte). Mínimo 4,5:1; salvar fica bloqueado com a lista do que ajustar. A razão aparece arredondada para baixo (4,49 aparece 4,4, não 4,5).

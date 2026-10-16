@@ -8,6 +8,11 @@
 import { createClient } from '@supabase/supabase-js';
 import { CONTAS, ORG, PAINEL, SUPABASE_URL, CHAVE_PUBLICA, abrirNavegador, novaPagina } from './comum.mjs';
 
+// O link do convite volta para o painel local: sem ele no ar, o convite se perde.
+if (!(await fetch(PAINEL).then((r) => r.ok).catch(() => false))) {
+  console.error(`O painel não está respondendo em ${PAINEL}. Suba com: npx vite --mode homologacao --port 5190`);
+  process.exit(2);
+}
 const sb = createClient(SUPABASE_URL, CHAVE_PUBLICA, { auth: { persistSession: false } });
 const { error: erroLogin } = await sb.auth.signInWithPassword({ email: CONTAS.admin.email, password: CONTAS.admin.senha });
 if (erroLogin) throw new Error(`Login do administrador falhou: ${erroLogin.message}`);

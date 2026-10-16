@@ -49,7 +49,7 @@ O painel é estático: as variáveis entram no build (por isso um build por ambi
 ## Teste ponta a ponta (Playwright, D-98)
 Rodam na **homologação**, na organização de `E2E_ORG` (padrão: a SMEDU), com o painel (`npx vite --mode homologacao --port 5190`) **e o portal** (porta 4321, `DOMINIO_DEV` da mesma organização) locais.
 1. Copie `e2e/.env.e2e.exemplo` para `e2e/.env.e2e` (fora do git) e preencha as senhas. **Nenhuma senha fica no código** (D-25).
-2. Uma vez: `node e2e/preparar.mjs` cria as contas `redator.e2e` (papel "Redator (teste)", conteúdo na rede) e `escola.e2e` (papel "Comunicação da escola (teste)", publica só na unidade; precisa da migração 0026).
+2. Uma vez: `node e2e/preparar.mjs` cria as contas `redator.e2e` (papel "Redator (teste)", conteúdo na rede) e a da escola (`E2E_ESCOLA_EMAIL`; papel "Comunicação da escola (teste)", publica só na unidade). O painel local precisa estar no ar: o link do convite volta para ele.
 3. `npm run e2e` roda as baterias e limpa o que elas criaram:
 - `e2e/noticias.mjs`: login, senha errada, redator salva rascunho e não publica, publicada bloqueada para o redator, imagem com texto alternativo obrigatório, publicar, galeria, retirar do site.
 - `e2e/conteudo.mjs` (31): documentos (anexo, relação, vigência), página filha, serviço, agenda, pergunta, banner sem imagem recusado, aviso em faixa, permissões do redator e **conferência no portal**.
