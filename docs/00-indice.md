@@ -2,11 +2,11 @@
 
 | Doc | Conteúdo |
 |---|---|
-| [01-requisitos-e-viabilidade](01-requisitos-e-viabilidade.md) | Resumo do Termo de Referência, viabilidade técnica e financeira, riscos |
+| [01-requisitos-e-viabilidade](01-requisitos-e-viabilidade.md) | *Histórico (Jeriquara, parado, D-82).* Análise do primeiro termo de referência; não usar como instrução |
 | [02-arquitetura](02-arquitetura.md) | Stack, componentes, fluxo de requisições, ambientes |
 | [03-banco-de-dados](03-banco-de-dados.md) | Schema completo, papéis, RLS, busca, storage, testes |
 | [04-multiprefeitura-e-escala](04-multiprefeitura-e-escala.md) | Como várias prefeituras dividem o mesmo banco, capacidade, riscos, quando escalar |
-| [05-migracao-site-atual](05-migracao-site-atual.md) | Inventário do site atual de Jeriquara (WordPress) e plano de migração |
+| [05-migracao-site-atual](05-migracao-site-atual.md) | *Histórico (Jeriquara, parado, D-82).* Inventário de um site WordPress; o método serve de referência, os dados não |
 | [06-decisoes](06-decisoes.md) | Registro de decisões (D-01, D-02...), com data e motivo |
 | [07-pendencias](07-pendencias.md) | Pendências técnicas, perguntas para a reunião inicial, próximos passos |
 | [08-base-generica](08-base-generica.md) | Revisão do schema como base para qualquer prefeitura (D-10): correções feitas e módulos propostos |
@@ -20,8 +20,7 @@
 - `portal/`: portal público (Astro SSR, Cloudflare Workers). Como rodar e regras em `portal/README.md`.
 - `painel/`: painel administrativo (React + Vite). Como rodar, usuários de teste e regras em `painel/README.md`.
 - `migracao/`: ferramenta de migração WordPress → portal (motor genérico + mapa por prefeitura). Passo a passo em `migracao/README.md`.
-- `supabase/seed.sql`: cadastro inicial de Jeriquara.
+- `supabase/seed.sql`: cadastro inicial da primeira organização (histórico, D-82).
 - `supabase/tests/rls.test.mjs`: testes de permissão (PGlite).
-- `Inventario-Site-Atual-Jeriquara.xlsx`: inventário do site atual com a coluna Destino (RM05).
+- Arquivos de inventário e requisitos de Jeriquara: histórico (D-82), não usar como instrução.
 - `inventario-bruto.json`: dados brutos da API do WordPress, para o script de migração.
-- Requisitos originais: `Requisitos_Site_Institucional_Jeriquara.pdf`. **Salvar uma cópia em `docs/`.**

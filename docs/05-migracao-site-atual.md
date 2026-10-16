@@ -1,5 +1,7 @@
 # Site atual de Jeriquara e migração
 
+> **Histórico (D-82):** Jeriquara está fora do projeto. Este documento fica só como registro; não serve de instrução para a SMEDU nem para outra organização.
+
 *Inventário coletado em 02/10/2026 pela API pública do WordPress (`/wp-json/wp/v2`), com pausa entre requisições.*
 *O `robots.txt` bloqueia robôs genéricos (`User-agent: * Disallow: /`); por isso **usar a API** e não um crawler página por página.*
 

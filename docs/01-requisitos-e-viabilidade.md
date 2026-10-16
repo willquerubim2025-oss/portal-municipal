@@ -1,5 +1,7 @@
 # Requisitos e viabilidade
 
+> **Histórico (D-82):** Jeriquara está fora do projeto. Este documento fica só como registro; não serve de instrução para a SMEDU nem para outra organização.
+
 *Análise feita em 02/10/2026 a partir de "Especificação de Requisitos – Site Institucional de Jeriquara/SP v1.0".*
 
 ## Contrato

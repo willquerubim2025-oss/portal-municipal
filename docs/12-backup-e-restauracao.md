@@ -20,7 +20,7 @@ Workflow `.github/workflows/backup-banco.yml` (GitHub Actions), todo dia e sob d
 Retenção de 30 dias: regra de ciclo de vida do bucket no R2 (apaga sozinho).
 
 ## Configuração (uma vez)
-1. **Ativar o R2** na conta Cloudflare (*R2 Object Storage → Purchase/Enable*). O plano grátis cobre 10 GB; um backup de Jeriquara tem poucos MB.
+1. **Ativar o R2** na conta Cloudflare (*R2 Object Storage → Purchase/Enable*). O plano grátis cobre 10 GB; um backup do banco tem poucos MB.
 2. **Bucket e retenção** (a SECKE roda, logada no wrangler):
    ```bash
    npx wrangler r2 bucket create portal-municipal-backups --location enam
@@ -57,7 +57,7 @@ Retenção de 30 dias: regra de ciclo de vida do bucket no R2 (apaga sozinho).
 Conferir sempre com `contagens.txt`.
 
 ## Cópia dos arquivos do Storage (D-96)
-Workflow `.github/workflows/backup-arquivos.yml` (*Actions → Backup dos arquivos*), todo dia às 4h de Brasília e sob demanda. Usa o **rclone** pela interface S3 do Storage do Supabase:
+Workflow `.github/workflows/backup-arquivos.yml` (*Actions → Backup dos arquivos*), todo dia às 4h de Brasília e sob demanda. **Hoje a produção ainda não tem nenhum arquivo** (as fotos da SMEDU estão só na homologação); a cópia passa a ter o que guardar quando o conteúdo real for para a produção. Configurar antes da ida ao ar. Usa o **rclone** pela interface S3 do Storage do Supabase:
 1. Lista os buckets do Storage do ambiente (hoje, `midias`).
 2. Copia para `r2:<R2_BUCKET_ARQUIVOS>/<ambiente>/<bucket>/` só o que é novo ou mudou (a primeira vez copia tudo).
 3. **Nunca apaga** no R2: arquivo excluído no portal continua na cópia.
@@ -72,13 +72,11 @@ Os arquivos vão **sem criptografia**: são, na quase totalidade, os mesmos que 
    ```
    Ou pelo painel: *R2 → Create bucket*.
 2. **Token do R2:** editar o token do backup (*R2 → Manage API tokens*) e incluir o bucket `portal-municipal-arquivos` com *Object Read & Write*. Assim os segredos `R2_ACCESS_KEY_ID` e `R2_SECRET_ACCESS_KEY` servem às duas rotinas.
-3. **Chave S3 do Storage** em cada projeto Supabase: *Storage → S3 Configuration* (ligar "S3 protocol connection", se estiver desligado) → *Access keys → New access key*. Guardar o *Access key ID* e o *Secret access key* (aparece uma vez só). Repetir na branch de homologação, se quiser cópia dela também.
+3. **Chave S3 do Storage** em cada projeto Supabase: *Storage → S3 Configuration* (ligar "S3 protocol connection", se estiver desligado) → *Access keys → New access key*. Guardar o *Access key ID* e o *Secret access key* (aparece uma vez só). **Só a produção.** Não configurar a homologação: lá só há conteúdo de teste, incluindo ~7,4 GB de uma organização parada (D-82), que não deve ser copiado.
 4. **Segredos e variável no GitHub** (*Settings → Secrets and variables → Actions*):
    ```bash
    gh secret set SUPABASE_S3_ID_PRODUCAO
    gh secret set SUPABASE_S3_SEGREDO_PRODUCAO
-   gh secret set SUPABASE_S3_ID_HOMOLOGACAO        # opcional
-   gh secret set SUPABASE_S3_SEGREDO_HOMOLOGACAO   # opcional
    gh variable set R2_BUCKET_ARQUIVOS --body portal-municipal-arquivos
    ```
 5. Rodar uma vez à mão (*Actions → Backup dos arquivos → Run workflow*) e conferir as linhas "conferido".

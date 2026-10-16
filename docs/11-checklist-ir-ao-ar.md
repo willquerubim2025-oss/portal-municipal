@@ -1,6 +1,6 @@
 # Checklist: antes de colocar uma prefeitura no ar
 
-**Uso:** conferir item por item antes da troca do domínio de cada prefeitura (o primeiro caso é Jeriquara). Os itens de **conta e infraestrutura** valem uma vez para o produto; os de **prefeitura** se repetem a cada cliente.
+**Uso:** conferir item por item antes da troca do domínio de cada prefeitura (o primeiro caso é a SMEDU de Paulínia). Os itens de **conta e infraestrutura** valem uma vez para o produto; os de **prefeitura** se repetem a cada cliente.
 **Regra:** sempre que o assunto for publicação, troca de domínio ou migração final, conferir este arquivo (CLAUDE.md).
 
 ---

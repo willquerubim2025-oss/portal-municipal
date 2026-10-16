@@ -770,3 +770,4 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **Bucket separado do backup do banco** porque o do banco tem regra de expiração de 30 dias; os arquivos precisam ficar sem prazo. Sem criptografia (são os arquivos públicos do portal).
 - Motivo: o backup extra (D-34) cobria só o banco; perder o projeto do Supabase perderia as fotos e os PDFs. Também serve de base para a cópia integral de fim de contrato (RF19).
 - Configuração (chave S3 do Storage, bucket e token do R2) é do usuário: `docs/12-backup-e-restauracao.md`.
+- **Só a produção** (ajuste do mesmo dia): a homologação tem só conteúdo de teste, com ~7,4 GB de uma organização parada (D-82); copiar isso misturaria projetos e passaria do plano grátis do R2. Em 16/10/2026 a produção ainda não tinha nenhum arquivo.

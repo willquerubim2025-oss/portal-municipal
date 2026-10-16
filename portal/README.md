@@ -11,7 +11,7 @@ npm run dev             # http://localhost:4321
 ```
 - `DOMINIO_DEV` define qual município o `localhost` mostra.
 - No desenvolvimento o portal lê a **branch de homologação** (D-14), que tem conteúdo de exemplo marcado com `legado = {"exemplo": true}`.
-- Para simular outro domínio: `curl -H "Host: www.jeriquara.sp.gov.br" localhost:4321/` (o dev server aceita `*.gov.br` e `*.teste`).
+- Para simular outro domínio: `curl -H "Host: educacao.paulinia.teste" localhost:4321/` (o dev server aceita `*.gov.br` e `*.teste`).
 
 ## Estrutura
 | Arquivo | Papel |

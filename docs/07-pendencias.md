@@ -141,4 +141,5 @@ Tudo o que precisa ser levantado com a prefeitura está organizado em **[docs/re
 - 02/10/2026: módulos genéricos de prioridade alta e média (migration 0007, D-12): órgãos, perguntas frequentes, provisionamento, legislação com vigência, destaques, galeria, eventos, expiração, módulos por município. Testes: 34 → 55.
 
 ## Jeriquara (D-82): parado, sem manutenção
+- **Testes automáticos do painel (`npm run e2e`) ainda são de Jeriquara** (usuários `*.teste@exemplo.gov.br`; a bateria "estrutura" troca o slogan da organização). Não rodar. Reescrever para a SMEDU antes da ida ao ar.
 Saíram da lista em 15/10/2026, porque o site de Jeriquara não será feito: Jeriquara na homologação com o código atual; conferir os logins antigos de Jeriquara; converter os papéis antigos de Jeriquara; domínio canônico e Search Console de Jeriquara; identidade visual de Jeriquara. Os itens que falam da migração e da reunião com a prefeitura de Jeriquara ficam no histórico, mas não são mais trabalho.

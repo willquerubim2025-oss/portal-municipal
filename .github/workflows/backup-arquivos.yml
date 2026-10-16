@@ -5,7 +5,7 @@
 #
 # Segredos do repositório (Settings → Secrets and variables → Actions):
 #   SUPABASE_S3_ID_PRODUCAO, SUPABASE_S3_SEGREDO_PRODUCAO        chave S3 do Storage da produção
-#   SUPABASE_S3_ID_HOMOLOGACAO, SUPABASE_S3_SEGREDO_HOMOLOGACAO  idem, da homologação (opcional)
+#   (homologação: não configurar; só tem conteúdo de teste, ver docs/12)
 #   R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY   os mesmos do backup do banco, com escrita também neste bucket
 # Variáveis (não secretas): R2_ACCOUNT_ID (já existe), R2_BUCKET_ARQUIVOS
 #

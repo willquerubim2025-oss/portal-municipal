@@ -9,10 +9,11 @@ cp .env.example .env    # chave publicável da homologação
 npm install
 npm run dev             # http://localhost:5190
 ```
-Usuários de teste **só na homologação** (senha `Teste@Homologacao2026`):
-- `admin.teste@exemplo.gov.br`: admin de Jeriquara
-- `editor.teste@exemplo.gov.br`: editor de Jeriquara
-- `secke.teste@exemplo.gov.br`: equipe da plataforma (SECKE)
+Usuários de teste da SMEDU, **só na homologação** (senhas passadas fora do git; apagar antes da ida ao ar):
+- `admin.teste@secke.dev`: Administrador
+- `redator.teste@secke.dev`: papel "Redator (teste)", só `conteudo.editar`
+
+Os testes automáticos (`npm run e2e`) ainda estão escritos para uma organização parada (D-82) e **não devem ser rodados** até serem adaptados à SMEDU (`docs/07-pendencias.md`).
 
 ## Publicar (D-27)
 ```bash
