@@ -63,7 +63,9 @@ Workflow `.github/workflows/backup-arquivos.yml` (*Actions → Backup dos arquiv
 3. **Nunca apaga** no R2: arquivo excluído no portal continua na cópia.
 4. Confere que tudo o que está no Storage está no R2 com o mesmo tamanho; se não bater, o workflow falha e o GitHub avisa por e-mail.
 
-Os arquivos vão **sem criptografia**: são, na quase totalidade, os mesmos que o portal publica. Se um dia houver bucket privado com dado pessoal, criptografar antes (rclone `crypt`).
+Os arquivos vão **sem criptografia**, para um bucket privado (acesso público desligado). O bucket `midias` tem os arquivos que o portal publica. O `exportacoes` guarda as cópias integrais pedidas pelo painel (RF19), que não são públicas: o bucket do R2 precisa continuar privado. Se um dia houver dado pessoal sensível no Storage, criptografar antes (rclone `crypt`).
+
+**Situação (16/10/2026):** configurada na conta Cloudflare da Secke (a mesma do backup do banco), só para a produção. Primeira execução verde, com `midias` e `exportacoes` conferidos (vazios até a carga do conteúdo real).
 
 ### Configuração (uma vez; a pessoa digita os valores, não colar em chat nem em arquivo)
 1. **Bucket próprio no R2**, sem regra de expiração (o do banco apaga tudo com 30 dias; o workflow se recusa a usar o mesmo):
