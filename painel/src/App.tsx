@@ -50,11 +50,14 @@ export function App() {
           <Route element={<ExigirAcesso />}>
             <Route element={<PainelLayout />}>
               <Route index element={<Inicio />} />
-              {/* Conteúdo: papel antigo (membros) até a fase 1B (D-38). */}
-              <Route element={<ExigirAcesso papelMinimo="editor" />}>
+              {/* Notícias: conteúdo da rede ou notícias de unidade (fase 1C, D-97). */}
+              <Route element={<ExigirAcesso papelMinimo="editor" ouUnidade />}>
               <Route path="noticias" element={<ListaNoticias />} />
               <Route path="noticias/nova" element={<EditarNoticia key="nova" />} />
               <Route path="noticias/:id" element={<EditarNoticia />} />
+              </Route>
+              {/* Conteúdo: papel antigo (membros) ou permissão de conteúdo na rede (D-38, D-78). */}
+              <Route element={<ExigirAcesso papelMinimo="editor" />}>
               {MODULOS.flatMap(({ rota, Lista, Editar }) => [
                 <Route key={rota} path={rota} element={<Lista />} />,
                 <Route key={`${rota}-novo`} path={`${rota}/novo`} element={<Editar key="novo" />} />,

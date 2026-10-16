@@ -28,4 +28,6 @@ senhas*.txt
 # Modos de build do painel: só chaves publicáveis (o RLS protege os dados), versionados (D-27)
 !painel/.env.homologacao
 !painel/.env.producao
+# Modelo das contas dos testes do painel (sem senhas, D-98)
+!painel/e2e/.env.e2e.exemplo
 painel/e2e/relatorios/

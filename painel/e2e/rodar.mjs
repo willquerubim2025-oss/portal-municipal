@@ -1,8 +1,8 @@
-// Roda as baterias de teste em sequência e, mesmo se alguma falhar, limpa da homologação
+// Roda as baterias de teste em sequência (contas: e2e/.env.e2e; preparar uma vez com `node e2e/preparar.mjs`) e, mesmo se alguma falhar, limpa da homologação
 // o que os testes criaram (itens "E2E"). Uso: npm run e2e
 import { spawnSync } from 'node:child_process';
 
-const BATERIAS = ['noticias', 'conteudo', 'estrutura', 'administracao'];
+const BATERIAS = ['noticias', 'conteudo', 'estrutura', 'administracao', 'escola'];
 const falhas = [];
 for (const b of BATERIAS) {
   console.log(`\n=== ${b} ===`);

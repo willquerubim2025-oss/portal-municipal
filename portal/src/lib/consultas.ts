@@ -80,7 +80,8 @@ export async function noticia(municipioId: string, slug: string) {
       imagem:midias!publicacoes_imagem_destaque_id_municipio_id_fkey(storage_path, texto_alternativo),
       galeria:publicacao_midias(legenda, ordem, midia:midias(storage_path, texto_alternativo)),
       categorias:publicacao_categorias(categoria:categorias(nome, slug)),
-      orgao:orgaos(nome, slug)`)
+      orgao:orgaos(nome, slug),
+      unidade:unidades!publicacoes_unidade_fkey(nome)`)
     .eq('municipio_id', municipioId).eq('slug', slug).maybeSingle()) as any;
 }
 

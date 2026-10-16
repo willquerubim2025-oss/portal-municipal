@@ -3,12 +3,13 @@ import { useAuth } from '../contexts/AuthContext';
 import { ROTULO_PAPEL } from '../lib/tipos';
 
 // `papel`: nível mínimo no conteúdo (papel antigo ou permissão equivalente, D-78). `permissao`: permissões configuráveis (basta uma), D-38.
-interface ItemMenu { rotulo: string; para: string; pronto: boolean; papel?: 'editor' | 'publicador' | 'admin'; permissao?: string[] }
+// `unidade`: também aparece para quem escreve notícias de unidade (fase 1C, D-97).
+interface ItemMenu { rotulo: string; para: string; pronto: boolean; papel?: 'editor' | 'publicador' | 'admin'; permissao?: string[]; unidade?: boolean }
 
 // Módulos do painel. `pronto: false` aparece desabilitado até ser implementado (fases seguintes).
 const GRUPOS: { titulo: string; itens: ItemMenu[] }[] = [
   { titulo: 'Conteúdo', itens: [
-    { rotulo: 'Notícias e avisos', para: '/noticias', pronto: true, papel: 'editor' },
+    { rotulo: 'Notícias e avisos', para: '/noticias', pronto: true, papel: 'editor', unidade: true },
     { rotulo: 'Documentos e legislação', para: '/documentos', pronto: true, papel: 'editor' },
     { rotulo: 'Páginas', para: '/paginas', pronto: true, papel: 'editor' },
     { rotulo: 'Serviços', para: '/servicos', pronto: true, papel: 'editor' },
@@ -42,10 +43,13 @@ const GRUPOS: { titulo: string; itens: ItemMenu[] }[] = [
 ];
 
 export function PainelLayout() {
-  const { nome, atual, acessos, escolherMunicipio, isPlataforma, podePublicar, isAdmin, nivel, sair, pode } = useAuth();
+  const { nome, atual, acessos, escolherMunicipio, isPlataforma, podePublicar, isAdmin, nivel, sair, pode, noticiasUnidade } = useAuth();
   const navegar = useNavigate();
-  const permitido = (i: ItemMenu) => i.permissao ? i.permissao.some(pode)
-    : !i.papel || (i.papel === 'admin' ? isAdmin : i.papel === 'publicador' ? podePublicar : !!nivel);
+  const permitido = (i: ItemMenu) => {
+    if (i.unidade && noticiasUnidade.length > 0) return true;
+    if (i.permissao) return i.permissao.some(pode);
+    return !i.papel || (i.papel === 'admin' ? isAdmin : i.papel === 'publicador' ? podePublicar : !!nivel);
+  };
 
   return (
     <div className="painel">

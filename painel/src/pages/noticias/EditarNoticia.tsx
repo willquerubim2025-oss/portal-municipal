@@ -5,6 +5,7 @@ import { mensagemErro, supabase, urlMidia } from '../../lib/supabase';
 import { enviarMidia, type Midia } from '../../lib/midias';
 import { deInputDataHora, paraInputDataHora, SLUG_VALIDO, slugificar } from '../../lib/texto';
 import { usePortal } from '../../lib/portal';
+import { useUnidadesNoticia } from '../../lib/unidadesNoticia';
 import { EditorTexto } from '../../components/EditorTexto';
 import { CampoImagem } from '../../components/CampoImagem';
 import { BibliotecaMidias } from '../../components/BibliotecaMidias';
@@ -15,12 +16,13 @@ const CAMPOS_MIDIA = 'id, storage_path, nome_original, mime_type, texto_alternat
 
 interface Form {
   tipo: 'noticia' | 'aviso'; titulo: string; slug: string; resumo: string; corpo: string;
-  imagem: Midia | null; cats: string[]; orgaoId: string; destaque: boolean; expiraEm: string;
+  imagem: Midia | null; cats: string[]; orgaoId: string; destaque: boolean; expiraEm: string; unidadeId: string;
 }
 
 export function EditarNoticia() {
   const portal = usePortal();
   const { categorias, orgaos } = useOpcoes('publicacao');
+  const unidades = useUnidadesNoticia();
   const [slugManual, setSlugManual] = useState(false);
   const [galeria, setGaleria] = useState<ItemGaleria[]>([]);
 
@@ -30,21 +32,24 @@ export function EditarNoticia() {
     select: `*, imagem:midias!publicacoes_imagem_destaque_id_municipio_id_fkey(${CAMPOS_MIDIA}),
       cats:publicacao_categorias(categoria_id),
       galeria:publicacao_midias(legenda, ordem, midia:midias(${CAMPOS_MIDIA}))`,
-    vazio: { tipo: 'noticia', titulo: '', slug: '', resumo: '', corpo: '', imagem: null, cats: [], orgaoId: '', destaque: false, expiraEm: '' },
+    vazio: { tipo: 'noticia', titulo: '', slug: '', resumo: '', corpo: '', imagem: null, cats: [], orgaoId: '', destaque: false, expiraEm: '', unidadeId: '' },
     deLinha: (d) => ({
       tipo: d.tipo, titulo: d.titulo, slug: d.slug, resumo: d.resumo ?? '', corpo: d.corpo_html ?? '', imagem: d.imagem ?? null,
       cats: (d.cats ?? []).map((c: { categoria_id: string }) => c.categoria_id), orgaoId: d.orgao_id ?? '',
-      destaque: d.destaque, expiraEm: paraInputDataHora(d.expira_em),
+      destaque: d.destaque, expiraEm: paraInputDataHora(d.expira_em), unidadeId: d.unidade_id ?? '',
     }),
     paraLinha: (f) => ({
       tipo: f.tipo, titulo: f.titulo.trim(), slug: f.slug, resumo: f.resumo.trim() || null, corpo_html: f.corpo || null,
       imagem_destaque_id: f.imagem?.id ?? null, destaque: f.destaque, orgao_id: f.orgaoId || null, expira_em: deInputDataHora(f.expiraEm),
+      unidade_id: f.unidadeId || null,
     }),
     validar: (f) => [
       !f.titulo.trim() && 'Informe o título.',
       !SLUG_VALIDO.test(f.slug) && 'O endereço só pode ter letras minúsculas, números e hífens.',
       f.imagem && !f.imagem.texto_alternativo?.trim() && 'A imagem de destaque precisa de texto alternativo.',
+      unidades.soUnidade && !f.unidadeId && 'Escolha a unidade da notícia.',
     ].filter(Boolean) as string[],
+    podePublicarRegistro: (f) => unidades.podePublicarNa(f.unidadeId),
     aposSalvar: async (id, f) => {
       // Categorias: remove as desmarcadas e inclui as novas.
       const del = supabase.from('publicacao_categorias').delete().eq('publicacao_id', id);
@@ -62,6 +67,10 @@ export function EditarNoticia() {
 
   useEffect(() => { if (e.linha) { setSlugManual(true); setGaleria(((e.linha.galeria ?? []) as ItemGaleria[]).sort((a, b) => a.ordem - b.ordem)); } }, [e.linha]);
   useEffect(() => { if (!slugManual) mudar('slug', slugificar(f.titulo)); }, [f.titulo, slugManual, mudar]);
+  // Quem só escreve na unidade: notícia nova já vem com a primeira (ou única) unidade dele.
+  useEffect(() => {
+    if (e.nova && unidades.soUnidade && !f.unidadeId && unidades.opcoes.length) mudar('unidadeId', unidades.opcoes[0].id);
+  }, [e.nova, unidades.soUnidade, unidades.opcoes, f.unidadeId, mudar]);
 
   async function adicionarFoto(arquivo: File, alt: string, legenda: string) {
     const m = await enviarMidia(e.mid, arquivo, alt);
@@ -120,8 +129,20 @@ export function EditarNoticia() {
                 </label>
               ))}
             </fieldset>
+            {(unidades.soUnidade || unidades.todas.length > 0) && (
+              <div className="campo"><label>{unidades.soUnidade ? <Obrigatorio>Unidade</Obrigatorio> : 'Unidade (opcional)'}
+                <select value={f.unidadeId} onChange={(ev) => mudar('unidadeId', ev.target.value)} aria-describedby="ajuda-unidade">
+                  {!unidades.soUnidade && <option value="">Nenhuma: notícia da organização</option>}
+                  {unidades.soUnidade && !f.unidadeId && <option value="">Escolha…</option>}
+                  {(unidades.soUnidade ? unidades.opcoes : unidades.todas).map((u) => <option key={u.id} value={u.id}>{u.nome}</option>)}
+                </select></label>
+                <small id="ajuda-unidade">{unidades.soUnidade
+                  ? 'Você escreve as notícias da sua unidade.'
+                  : 'Marque a escola ou unidade quando a notícia for dela: a equipe da unidade passa a poder editá-la.'}</small>
+              </div>
+            )}
             <SeletorOrgao orgaos={orgaos} valor={f.orgaoId} aoMudar={(v) => mudar('orgaoId', v)} />
-            <label className="opcao"><input type="checkbox" checked={f.destaque} onChange={(ev) => mudar('destaque', ev.target.checked)} /> Destacar na página inicial</label>
+            {!unidades.soUnidade && <label className="opcao"><input type="checkbox" checked={f.destaque} onChange={(ev) => mudar('destaque', ev.target.checked)} /> Destacar na página inicial</label>}
             <div className="campo"><label>Sair das listagens em (opcional)
               <input type="datetime-local" value={f.expiraEm} onChange={(ev) => mudar('expiraEm', ev.target.value)} aria-describedby="ajuda-expira" /></label>
               <small id="ajuda-expira">Útil para avisos com prazo. Depois da data, some da home e da lista, mas o link continua funcionando.</small>

@@ -6,7 +6,7 @@ import { dataHora } from '../../lib/texto';
 import { EtiquetaSituacao } from '../../components/Situacao';
 import type { Status } from '../../lib/tipos';
 
-interface Linha { id: string; titulo: string; tipo: 'noticia' | 'aviso'; status: Status; publicado_em: string | null; atualizado_em: string; destaque: boolean }
+interface Linha { id: string; titulo: string; tipo: 'noticia' | 'aviso'; status: Status; publicado_em: string | null; atualizado_em: string; destaque: boolean; unidade: { nome: string } | null }
 const POR_PAGINA = 20;
 
 export function ListaNoticias() {
@@ -24,7 +24,7 @@ export function ListaNoticias() {
     let ativo = true;
     const agora = new Date().toISOString();
     let q = supabase.from('publicacoes')
-      .select('id, titulo, tipo, status, publicado_em, atualizado_em, destaque', { count: 'exact' })
+      .select('id, titulo, tipo, status, publicado_em, atualizado_em, destaque, unidade:unidades!publicacoes_unidade_fkey(nome)', { count: 'exact' })
       .eq('municipio_id', atual!.municipio.id)
       .order('atualizado_em', { ascending: false })
       .range((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA - 1);
@@ -35,7 +35,7 @@ export function ListaNoticias() {
     q.then(({ data, count, error }) => {
       if (!ativo) return;
       if (error) setErro(mensagemErro(error));
-      setLinhas((data ?? []) as Linha[]);
+      setLinhas((data ?? []) as unknown as Linha[]);
       setTotal(count ?? 0);
     });
     return () => { ativo = false; };
@@ -77,7 +77,7 @@ export function ListaNoticias() {
             {linhas.map((l) => (
               <tr key={l.id}>
                 <td><Link to={`/noticias/${l.id}`}>{l.titulo}</Link>{l.destaque && <span className="etiqueta etiqueta-destaque">Destaque</span>}</td>
-                <td>{l.tipo === 'aviso' ? 'Aviso' : 'Notícia'}</td>
+                <td>{l.tipo === 'aviso' ? 'Aviso' : 'Notícia'}{l.unidade && <><br /><small className="meta">{l.unidade.nome}</small></>}</td>
                 <td><EtiquetaSituacao status={l.status} publicadoEm={l.publicado_em} /></td>
                 <td>{dataHora(l.publicado_em)}</td>
                 <td>{dataHora(l.atualizado_em)}</td>

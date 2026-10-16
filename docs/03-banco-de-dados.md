@@ -43,6 +43,7 @@
 | 0023_previa_rascunho | `previas` (token temporário, 30 min, sem acesso direto); `criar_previa(tabela, id)` (quem edita) e `previa_publicacao(token, organização)` (portal), definer em `seguranca` | D-91 |
 | 0024_previa_paginas_servicos_eventos | `previas` aceita `paginas`, `servicos`, `eventos`; `previa_conteudo(token, organização)` devolve `{ tabela, dados }` | D-93 |
 | 0025_sistemas_dos_servidores | `sistemas_externos.publico` (cidadao/servidor), `sistema_papeis`, `meus_sistemas(organização)` | D-94 |
+| 0026_noticias_por_unidade | `publicacoes.unidade_id`; `conteudo.editar`/`publicar` com escopo de unidade e região; `edita_unidade`, `publica_unidade`, `conteudo_em_unidade`; policies a mais em publicacoes, categorias e galeria da notícia, midias e Storage; trava de publicação e `criar_previa` contam a unidade; destaque na home só pela rede | D-97 |
 
 ## Tabelas, em resumo
 

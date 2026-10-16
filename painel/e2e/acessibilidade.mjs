@@ -4,15 +4,14 @@
 //   PORTAL_URL=http://localhost:4321 PAINEL_URL=http://localhost:5190 node e2e/acessibilidade.mjs
 // O axe acha ~30–40% dos problemas de acessibilidade; o resto exige teste manual
 // (leitor de tela, só teclado). Ver docs/07-pendencias.md.
-import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
+import { CONTAS, abrirNavegador } from './comum.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const PORTAL = process.env.PORTAL_URL ?? 'https://portal-municipal-homologacao.willquerubim2025.workers.dev';
 const PAINEL = process.env.PAINEL_URL ?? 'https://painel-municipal-homologacao.willquerubim2025.workers.dev';
-const SENHA = 'Teste@Homologacao2026';
 const REGRAS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 const PASTA = path.join(path.dirname(fileURLToPath(import.meta.url)), 'relatorios');
 fs.mkdirSync(PASTA, { recursive: true });
@@ -38,7 +37,7 @@ async function primeiroLink(page, padrao) {
   return hrefs.find((h) => padrao.test(h ?? ''));
 }
 
-const browser = await chromium.launch();
+const browser = await abrirNavegador();
 
 // ------------------------------------------------------------------ portal
 const PAGINAS_PORTAL = ['/', '/noticias', '/documentos', '/legislacao', '/servicos', '/eventos', '/perguntas-frequentes',
@@ -81,8 +80,8 @@ await auditar(page, 'painel /entrar');
 await page.goto(`${PAINEL}/esqueci-senha`);
 await auditar(page, 'painel /esqueci-senha');
 await page.goto(`${PAINEL}/entrar`);
-await page.getByLabel('E-mail').fill('admin.teste@exemplo.gov.br');
-await page.getByLabel('Senha').fill(SENHA);
+await page.getByLabel('E-mail').fill(CONTAS.admin.email);
+await page.getByLabel('Senha').fill(CONTAS.admin.senha);
 await page.getByRole('button', { name: 'Entrar' }).click();
 await page.getByRole('heading', { level: 1, name: /Olá/ }).waitFor({ timeout: 20000 });
 

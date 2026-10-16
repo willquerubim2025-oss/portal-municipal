@@ -9,6 +9,7 @@ interface Resumo { rascunhos: number; agendadas: number; publicadas: number; sal
 
 // Quem não trabalha com conteúdo (sem papel antigo nem permissão de conteúdo, D-38/D-78) vê os módulos liberados para ele.
 const MODULOS_PERMISSAO = [
+  { para: '/noticias', rotulo: 'Notícias da unidade', permissoes: ['conteudo.editar', 'conteudo.publicar'] },
   { para: '/unidades', rotulo: 'Unidades e regiões', permissoes: ['unidades.gerenciar', 'unidades.editar'] },
   { para: '/equipe', rotulo: 'Equipe gestora', permissoes: ['equipe.gerenciar'] },
   { para: '/papeis', rotulo: 'Papéis e permissões', permissoes: ['permissoes.gerenciar'] },

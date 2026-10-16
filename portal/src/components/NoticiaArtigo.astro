@@ -21,6 +21,7 @@ const atualizado = n.atualizado_em && new Date(n.atualizado_em).getTime() - new 
         {naoPublicado ? 'Ainda não publicada' : <>Publicado em <time datetime={n.publicado_em}>{dataExtenso(n.publicado_em)}</time></>}
         {!naoPublicado && atualizado && <> · atualizado em <time datetime={n.atualizado_em}>{dataExtenso(n.atualizado_em)}</time></>}
         {n.orgao && <> · <a href={`/estrutura-organizacional/${n.orgao.slug}`}>{n.orgao.nome}</a></>}
+        {n.unidade && <> · {n.unidade.nome}</>}
       </p>
     </header>
     {img && (

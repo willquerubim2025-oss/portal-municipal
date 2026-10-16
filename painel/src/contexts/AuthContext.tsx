@@ -36,6 +36,8 @@ interface AuthValor {
   permissoesCarregadas: boolean;
   /** Tem a permissão em algum escopo? (SECKE: sempre.) O escopo exato é conferido pelo banco. */
   pode: (codigo: string) => boolean;
+  /** Notícias de unidade (fase 1C, D-97): permissões de conteúdo com escopo de unidade ou região. */
+  noticiasUnidade: MinhaPermissao[];
   /** Tem a permissão para toda a rede? */
   podeNaRede: (codigo: string) => boolean;
   entrar: (email: string, senha: string) => Promise<string | null>;
@@ -160,7 +162,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const permissoesAtuais = permissoesDe === atualMid ? permissoes : [];
-  const tem = (c: string) => permissoesAtuais.some((p) => p.permissao === c);
+  // O nível no conteúdo só vem de permissão na rede: quem a tem só na unidade escreve notícias dela (D-97).
+  const tem = (c: string) => permissoesAtuais.some((p) => p.permissao === c && p.escopo === 'rede');
+  const noticiasUnidade = permissoesAtuais.filter((p) =>
+    (p.permissao === 'conteudo.editar' || p.permissao === 'conteudo.publicar') && (p.escopo === 'unidade' || p.escopo === 'regiao'));
   const nivel: Papel | null = isPlataforma || atual?.papel === 'admin' || tem('organizacao.administrar') ? 'admin'
     : atual?.papel === 'publicador' || tem('conteudo.publicar') ? 'publicador'
     : atual?.papel === 'editor' || tem('conteudo.editar') ? 'editor' : null;
@@ -171,6 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     podePublicar: !!atual && (nivel === 'admin' || nivel === 'publicador'),
     isAdmin: !!atual && nivel === 'admin',
     permissoes: permissoesAtuais,
+    noticiasUnidade: atual ? noticiasUnidade : [],
     permissoesCarregadas: isPlataforma || (!!atualMid && permissoesDe === atualMid),
     pode, podeNaRede,
     entrar, sair, saiu,

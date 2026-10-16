@@ -28,6 +28,8 @@ export interface OpcoesEdicao<F> {
   aposSalvar?: (id: string, f: F) => Promise<void>;
   /** Mensagens de sucesso (o gênero muda por módulo: "Notícia publicada", "Documento publicado"). */
   mensagens: Record<Acao, string>;
+  /** Quem pode publicar ESTE registro, quando depende dele (notícia de unidade, D-97). Padrão: o papel na rede. */
+  podePublicarRegistro?: (f: F) => boolean;
 }
 
 export function useEdicao<F>(o: OpcoesEdicao<F>) {
@@ -35,7 +37,7 @@ export function useEdicao<F>(o: OpcoesEdicao<F>) {
   const nova = !id;
   const navegar = useNavigate();
   const local = useLocation();
-  const { atual, podePublicar } = useAuth();
+  const { atual, podePublicar: podePublicarRede } = useAuth();
   const mid = atual!.municipio.id;
 
   const [f, setF] = useState<F>(o.vazio);
@@ -70,6 +72,7 @@ export function useEdicao<F>(o: OpcoesEdicao<F>) {
   const mudar = useCallback(<K extends keyof F>(campo: K, valor: F[K]) => setF((x) => ({ ...x, [campo]: valor })), []);
 
   const sit = situacao(status, publicadoEm);
+  const podePublicar = o.podePublicarRegistro ? o.podePublicarRegistro(f) : podePublicarRede;
   /** Editor não altera conteúdo publicado (D-09): formulário só leitura. */
   const bloqueado = status === 'publicado' && !podePublicar;
 

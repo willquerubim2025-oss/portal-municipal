@@ -771,3 +771,20 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Motivo: o backup extra (D-34) cobria só o banco; perder o projeto do Supabase perderia as fotos e os PDFs. Também serve de base para a cópia integral de fim de contrato (RF19).
 - Configuração (chave S3 do Storage, bucket e token do R2) é do usuário: `docs/12-backup-e-restauracao.md`.
 - **Só a produção** (ajuste do mesmo dia): a homologação tem só conteúdo de teste, com ~7,4 GB de uma organização parada (D-82); copiar isso misturaria projetos e passaria do plano grátis do R2. Em 16/10/2026 a produção ainda não tinha nenhum arquivo. Configurada pelo William no mesmo dia; a rotina copia todos os buckets do Storage (hoje `midias` e `exportacoes`, este último com as cópias integrais, por isso o bucket do R2 fica privado).
+
+**D-97 · 16/10/2026 · Notícias das unidades (permissões, fase 1C) (pedido do usuário: "faça agora 1, 2 e 3")**
+- **O que é:** uma notícia pode ser de uma unidade (escola, creche...): `publicacoes.unidade_id` (migração 0026). As permissões `conteudo.editar` e `conteudo.publicar` passam a aceitar escopo de **unidade** e de **região**. Quem tem a permissão só na unidade (ex.: diretor ou comunicação da escola) cria, edita e, se tiver "publicar", publica **só as notícias da própria unidade**. Não vê nem mexe em páginas, documentos, serviços etc.
+- **Rede continua igual:** quem tem conteúdo na rede marca qualquer unidade ou nenhuma (notícia da organização). Marcar a unidade numa notícia da rede passa a deixar a equipe da unidade editá-la.
+- **Regras no banco** (testadas no PGlite, 257 testes): não cria notícia de outra unidade nem sem unidade; não troca a unidade; redator da unidade não publica nem exclui; quem tem a região escreve nas unidades dela; envia imagens e monta a galeria da notícia dela; gera a prévia; "Destacar na página inicial" é decisão da rede (o valor fica como estava quando quem edita é da unidade).
+- **Painel:** o nível de conteúdo (`nivel`) só vem de permissão na rede; quem só tem na unidade vê apenas "Notícias e avisos". No editor, campo "Unidade" (obrigatório e já preenchido para a escola; opcional para a rede). A lista mostra a unidade de cada notícia. **Portal:** a notícia mostra o nome da unidade.
+- **Ordem obrigatória:** rodar a 0026 nos dois bancos **antes** de publicar painel e portal (as telas consultam a coluna nova).
+
+**D-98 · 16/10/2026 · Testes automáticos do painel na SMEDU, sem senhas no código**
+- As baterias (`painel/e2e/`) deixam de usar a organização parada (D-82): rodam na organização de `E2E_ORG` (padrão SMEDU), com dados que existem nela (tipos de documento, "Sobre a Secretaria", unidades) e contas próprias criadas por `e2e/preparar.mjs` (`redator.e2e`, `escola.e2e`).
+- **Contas e senhas em `painel/e2e/.env.e2e`, fora do git** (modelo `.env.e2e.exemplo`). As senhas que estavam escritas nos testes saíram do código (D-25).
+- A bateria de estrutura **guarda e restaura** a identidade da organização (cor e slogan); a limpeza só apaga na organização de teste. Bateria nova `escola.mjs` (fase 1C).
+- Resultado em 16/10/2026: conteúdo 31, estrutura 26 e administração 19 verificações, **0 falhas**; `noticias` e `escola` rodam depois da 0026 (gravam a coluna nova).
+
+**D-99 · 16/10/2026 · Contraste de todas as cores do layout no painel**
+- Identidade visual ganha a seção **"Cores do layout"** (layout vitrine): destaque escuro (contra branco), acento (contra a cor principal), fundo dos títulos (contra o texto escuro), fundo e texto do cabeçalho (um contra o outro) e as paletas dos cards de Serviços e dos blocos (texto forte sobre o claro e branco sobre o forte). Mínimo 4,5:1; salvar fica bloqueado com a lista do que ajustar. A razão aparece arredondada para baixo (4,49 aparece 4,4, não 4,5).
+- A conferência achou a cor **coral** da SMEDU (blocos) em 4,49:1; trocada de `#c2412d` para `#bd3f2c` (4,66:1) na homologação.

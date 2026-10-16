@@ -25,6 +25,45 @@ export function contraste(a: string, b: string): number {
   return (l1 + 0.05) / (l2 + 0.05);
 }
 const COR_VALIDA = /^#[0-9a-f]{6}$/i;
+/** Razão com uma casa, arredondada para baixo: 4,49 aparece como 4,4 (e não 4,5, que passaria). */
+const fmt = (c: number) => (Math.floor(c * 10) / 10).toFixed(1);
+const TEXTO_ESCURO = '#1d2733';
+interface Paleta { nome?: string; forte: string; claro: string }
+
+/**
+ * Cores do layout vitrine (D-17, D-39) e contra o que cada uma é lida no portal.
+ * Mínimo de 4,5:1 (WCAG AA, texto comum), como as cores principais. Vazia = padrão do layout.
+ */
+function paresVitrine(t: Record<string, any>, primaria: string) {
+  return [
+    { chave: 'cor_secundaria_escura', rotulo: 'Destaque escuro (rótulos, links e botões com texto branco)', contra: '#ffffff', contraNome: 'branco' },
+    { chave: 'cor_acento', rotulo: 'Cor de acento (botão do destaque, faixa de aviso)', contra: primaria, contraNome: 'a cor principal' },
+    { chave: 'cor_regua', rotulo: 'Fundo dos títulos das seções', contra: TEXTO_ESCURO, contraNome: 'o texto escuro' },
+    { chave: 'cor_cabecalho', rotulo: 'Fundo do cabeçalho', contra: t.cor_cabecalho_texto && COR_VALIDA.test(t.cor_cabecalho_texto) ? t.cor_cabecalho_texto : '#ffffff', contraNome: 'o texto do cabeçalho' },
+    { chave: 'cor_cabecalho_texto', rotulo: 'Texto do cabeçalho', contra: t.cor_cabecalho && COR_VALIDA.test(t.cor_cabecalho) ? t.cor_cabecalho : primaria, contraNome: 'o fundo do cabeçalho' },
+  ];
+}
+/** Problemas de contraste das cores do layout e das paletas de cards (vazio = tudo certo). */
+export function problemasContraste(t: Record<string, any>, primaria: string): string[] {
+  const p: string[] = [];
+  for (const c of paresVitrine(t, primaria)) {
+    const v = t[c.chave];
+    if (!v) continue;
+    if (!COR_VALIDA.test(v)) { p.push(`${c.rotulo}: use o formato #RRGGBB.`); continue; }
+    const r = contraste(v, c.contra);
+    if (r < 4.5) p.push(`${c.rotulo}: contraste ${fmt(r)}:1 com ${c.contraNome} (mínimo 4,5:1).`);
+  }
+  for (const [chave, nome] of [['cores_cards', 'Cards de Serviços'], ['cores_vivas', 'Cores dos blocos']] as const) {
+    ((t[chave] ?? []) as Paleta[]).forEach((c, i) => {
+      const quem = `${nome}, cor ${c.nome ?? i + 1}`;
+      if (!COR_VALIDA.test(c.forte) || !COR_VALIDA.test(c.claro)) { p.push(`${quem}: use o formato #RRGGBB.`); return; }
+      const sobreClaro = contraste(c.forte, c.claro), comBranco = contraste(c.forte, '#ffffff');
+      if (sobreClaro < 4.5) p.push(`${quem}: texto forte sobre o fundo claro com contraste ${fmt(sobreClaro)}:1 (mínimo 4,5:1).`);
+      if (comBranco < 4.5) p.push(`${quem}: branco sobre a cor forte com contraste ${fmt(comBranco)}:1 (mínimo 4,5:1).`);
+    });
+  }
+  return p;
+}
 
 export function Identidade() {
   const { atual } = useAuth();
@@ -58,14 +97,17 @@ export function Identidade() {
   const secundaria = tema.cor_secundaria ?? PADRAO.secundaria;
   const cPrimaria = COR_VALIDA.test(primaria) ? contraste(primaria, '#ffffff') : 0;
   const cSecundaria = COR_VALIDA.test(secundaria) ? contraste(secundaria, '#1d2733') : 0;
+  const vitrine = tema.layout === 'vitrine';
+  const problemasLayout = vitrine ? problemasContraste(tema, primaria) : [];
   const cfg = (k: string) => (config[k] as string) ?? '';
   const setCfg = (k: string, v: unknown) => setConfig((c) => ({ ...c, [k]: v }));
 
   async function salvar(ev: FormEvent) {
     ev.preventDefault(); setErro(null); setAviso(null);
     if (!COR_VALIDA.test(primaria) || !COR_VALIDA.test(secundaria)) return setErro('As cores devem estar no formato #RRGGBB.');
-    if (cPrimaria < 4.5) return setErro(`A cor principal é clara demais: o texto branco do cabeçalho ficaria ilegível (contraste ${cPrimaria.toFixed(1)}:1; o mínimo é 4,5:1).`);
-    if (cSecundaria < 4.5) return setErro(`A cor de destaque é escura demais para o texto escuro dos botões (contraste ${cSecundaria.toFixed(1)}:1; o mínimo é 4,5:1).`);
+    if (cPrimaria < 4.5) return setErro(`A cor principal é clara demais: o texto branco do cabeçalho ficaria ilegível (contraste ${fmt(cPrimaria)}:1; o mínimo é 4,5:1).`);
+    if (cSecundaria < 4.5) return setErro(`A cor de destaque é escura demais para o texto escuro dos botões (contraste ${fmt(cSecundaria)}:1; o mínimo é 4,5:1).`);
+    if (problemasLayout.length) return setErro(`Ajuste as cores do layout: ${problemasLayout.join(' ')}`);
     if (cfg('email') && !/^\S+@\S+\.\S+$/.test(cfg('email'))) return setErro('E-mail inválido.');
     const redes = Object.fromEntries(Object.entries(config.redes ?? {}).filter(([, v]) => typeof v === 'string' && v.trim()).map(([k, v]) => [k, (v as string).trim()]));
     for (const [k, v] of Object.entries(redes)) if (!/^https:\/\//.test(v as string)) return setErro(`O link do ${k} deve começar com https://.`);
@@ -102,6 +144,45 @@ export function Identidade() {
           <CampoImagem rotulo="Imagem padrão de compartilhamento (WhatsApp, 1200 × 630)" municipioId={mid} midia={imagemOg} aoMudar={setImagemOg} />
         </div>
       </section>
+
+      {vitrine && (
+        <section className="secao-filha" aria-labelledby="t-cores-layout">
+          <h2 id="t-cores-layout">Cores do layout</h2>
+          <p className="meta">Cada cor é conferida contra o texto que aparece sobre ela no portal (mínimo 4,5:1, WCAG AA). Campo vazio usa o padrão do layout.</p>
+          <div className="grade-cores">
+            {paresVitrine(tema, primaria).map((c) => (
+              <CampoCorOpcional key={c.chave} rotulo={c.rotulo} valor={tema[c.chave] ?? ''} contra={c.contra} contraNome={c.contraNome}
+                aoMudar={(v) => setTema((t) => { const n = { ...t }; if (v) n[c.chave] = v; else delete n[c.chave]; return n; })} />
+            ))}
+          </div>
+          {(['cores_cards', 'cores_vivas'] as const).map((chave) => (tema[chave] ?? []).length > 0 && (
+            <fieldset key={chave} className="paleta-cores">
+              <legend>{chave === 'cores_cards' ? 'Cards de Serviços' : 'Cores dos blocos (Em foco, Eventos)'}</legend>
+              <table className="tabela tabela-compacta">
+                <caption className="sr-only">Contraste de cada par de cores</caption>
+                <thead><tr><th scope="col">Cor</th><th scope="col">Forte</th><th scope="col">Claro</th><th scope="col">Texto forte sobre o claro</th><th scope="col">Branco sobre o forte</th></tr></thead>
+                <tbody>{(tema[chave] as Paleta[]).map((c, i) => {
+                  const mudarPar = (campo: 'forte' | 'claro', v: string) => setTema((t) => ({ ...t, [chave]: (t[chave] as Paleta[]).map((x, j) => (j === i ? { ...x, [campo]: v } : x)) }));
+                  return (
+                    <tr key={i}>
+                      <th scope="row">{c.nome ?? i + 1}</th>
+                      {(['forte', 'claro'] as const).map((campo) => (
+                        <td key={campo}><span className="campo-cor"><input type="color" value={COR_VALIDA.test(c[campo]) ? c[campo] : '#000000'} aria-label={`${c.nome ?? i + 1}: cor ${campo}`}
+                          onChange={(e) => mudarPar(campo, e.target.value)} /> <code>{c[campo]}</code></span></td>
+                      ))}
+                      <td><Razao a={c.forte} b={c.claro} /></td>
+                      <td><Razao a={c.forte} b="#ffffff" /></td>
+                    </tr>
+                  );
+                })}</tbody>
+              </table>
+            </fieldset>
+          ))}
+          {problemasLayout.length > 0 && (
+            <div className="erro" role="status"><strong>Contraste insuficiente:</strong><ul>{problemasLayout.map((p) => <li key={p}>{p}</li>)}</ul></div>
+          )}
+        </section>
+      )}
 
       <section className="secao-filha" aria-labelledby="t-dados">
         <h2 id="t-dados">Dados da prefeitura (rodapé e Google)</h2>
@@ -164,7 +245,34 @@ function CampoCor({ rotulo, valor, contraste: c, aoMudar }: { rotulo: string; va
         <input id={id} value={valor} onChange={(e) => aoMudar(e.target.value.trim())} maxLength={7} aria-describedby={`${id}-c`} />
       </span>
       <small id={`${id}-c`} className={ok ? 'contraste-ok' : 'contraste-ruim'}>
-        Contraste {c ? c.toFixed(1) : '—'}:1 {ok ? '✓ adequado' : '✗ abaixo do mínimo de 4,5:1'}
+        Contraste {c ? fmt(c) : '—'}:1 {ok ? '✓ adequado' : '✗ abaixo do mínimo de 4,5:1'}
+      </small>
+    </div>
+  );
+}
+
+function Razao({ a, b }: { a: string; b: string }) {
+  const c = COR_VALIDA.test(a) && COR_VALIDA.test(b) ? contraste(a, b) : 0;
+  const ok = c >= 4.5;
+  return <span className={ok ? 'contraste-ok' : 'contraste-ruim'}>{c ? fmt(c) : '—'}:1 {ok ? '✓' : '✗'}<span className="sr-only">{ok ? ' adequado' : ' abaixo do mínimo de 4,5:1'}</span></span>;
+}
+
+/** Cor que pode ficar vazia (usa o padrão do layout); mostra o contraste com o que vai sobre ela. */
+function CampoCorOpcional({ rotulo, valor, contra, contraNome, aoMudar }: { rotulo: string; valor: string; contra: string; contraNome: string; aoMudar: (v: string) => void }) {
+  const id = rotulo.replace(/\W+/g, '-');
+  const valida = COR_VALIDA.test(valor);
+  const c = valida && COR_VALIDA.test(contra) ? contraste(valor, contra) : 0;
+  const ok = c >= 4.5;
+  return (
+    <div className="campo">
+      <label htmlFor={id}>{rotulo}</label>
+      <span className="campo-cor">
+        <input type="color" value={valida ? valor : '#ffffff'} onChange={(e) => aoMudar(e.target.value)} aria-label={`${rotulo}: seletor`} />
+        <input id={id} value={valor} placeholder="padrão" onChange={(e) => aoMudar(e.target.value.trim())} maxLength={7} aria-describedby={`${id}-c`} />
+        {valor && <button type="button" className="botao-link" onClick={() => aoMudar('')}>Usar o padrão<span className="sr-only"> em {rotulo}</span></button>}
+      </span>
+      <small id={`${id}-c`} className={!valor ? undefined : ok ? 'contraste-ok' : 'contraste-ruim'}>
+        {!valor ? 'Usando o padrão do layout.' : !valida ? 'Formato: #RRGGBB.' : `Contraste ${fmt(c)}:1 com ${contraNome} ${ok ? '✓ adequado' : '✗ abaixo do mínimo de 4,5:1'}`}
       </small>
     </div>
   );

@@ -699,6 +699,90 @@ espera('visitante do portal NÃO vê os sistemas de servidor', !(r.rows?.[0]?.n 
 r = await como('anon', `select count(*)::int n from meus_sistemas('${J}')`)
 espera('visitante NÃO chama meus_sistemas', !!r.erro)
 
+console.log('\nNotícias das unidades (0026, fase 1C)')
+const UN = { esc: 'a0000000-0000-4000-8000-000000000031', escred: 'a0000000-0000-4000-8000-000000000032', escreg: 'a0000000-0000-4000-8000-000000000033' }
+Object.assign(U, UN)
+await db.exec(`insert into auth.users values ${Object.values(UN).map(u => `('${u}', '${u}@x')`).join(',')}`)
+r = await db.query(`select escopos from permissoes where codigo = 'conteudo.publicar'`)
+espera('conteudo.publicar aceita escopo de unidade e região', ['unidade', 'regiao'].every((e) => r.rows[0].escopos.includes(e)))
+// Papel "Comunicação da escola": publica só na unidade; "Redator da escola": só edita na unidade.
+const papelCom = (await como('adm', `insert into papeis (municipio_id, slug, nome) values ('${J}', 'comunicacao-escola', 'Comunicação da escola') returning id`)).rows?.[0]?.id
+const papelRedEsc = (await como('adm', `insert into papeis (municipio_id, slug, nome) values ('${J}', 'redator-escola', 'Redator da escola') returning id`)).rows?.[0]?.id
+r = await como('adm', `insert into papel_permissoes (municipio_id, papel_id, permissao_codigo, ativo, escopo) values
+  ('${J}', '${papelCom}', 'conteudo.publicar', true, 'unidade'), ('${J}', '${papelRedEsc}', 'conteudo.editar', true, 'unidade') returning 1`)
+espera('Administrador liga conteúdo com escopo de unidade', r.rows?.length === 2)
+await como('adm', `insert into usuario_papeis (municipio_id, user_id, papel_id, unidade_id) values
+  ('${J}', '${UN.esc}', '${papelCom}', '${E1}'), ('${J}', '${UN.escred}', '${papelRedEsc}', '${E1}')`)
+// Na região Norte (onde fica a E1), com publicar.
+const papelRegCom = (await como('adm', `insert into papeis (municipio_id, slug, nome) values ('${J}', 'comunicacao-regiao', 'Comunicação da região') returning id`)).rows?.[0]?.id
+await como('adm', `insert into papel_permissoes (municipio_id, papel_id, permissao_codigo, ativo, escopo) values ('${J}', '${papelRegCom}', 'conteudo.publicar', true, 'regiao')`)
+await como('adm', `insert into usuario_papeis (municipio_id, user_id, papel_id, regiao_id) values ('${J}', '${UN.escreg}', '${papelRegCom}', 'c0000000-0000-4000-8000-000000000001')`)
+
+r = await como('esc', `insert into publicacoes (municipio_id, titulo, slug, unidade_id) values ('${J}', 'Feira de ciências da E1', 'feira-e1', '${E1}') returning id`)
+espera('escola cria notícia da própria unidade', r.rows?.length === 1)
+const pubE1 = r.rows?.[0]?.id
+r = await como('esc', `insert into publicacoes (municipio_id, titulo, slug, unidade_id) values ('${J}', 'Notícia da vizinha', 'noticia-vizinha', '${E2}')`)
+espera('escola NÃO cria notícia de outra unidade', !!r.erro)
+r = await como('esc', `insert into publicacoes (municipio_id, titulo, slug) values ('${J}', 'Notícia da rede', 'noticia-rede-esc')`)
+espera('escola NÃO cria notícia da organização (sem unidade)', !!r.erro)
+r = await como('esc', `update publicacoes set status = 'publicado', publicado_em = now() - interval '1 minute' where id = '${pubE1}' returning 1`)
+espera('escola com "publicar" na unidade publica a notícia dela', r.rows?.length === 1)
+r = await como('esc', `update publicacoes set unidade_id = '${E2}' where id = '${pubE1}' returning 1`)
+espera('escola NÃO passa a notícia para outra unidade', !!r.erro || !r.rows?.length)
+r = await como('esc', `update publicacoes set unidade_id = null where id = '${pubE1}' returning 1`)
+espera('escola NÃO tira a unidade da notícia', !!r.erro || !r.rows?.length)
+r = await como('esc', `select count(*)::int n from publicacoes where status <> 'publicado'`)
+espera('escola NÃO vê rascunhos da rede nem de outras unidades', r.rows?.[0]?.n === 0)
+r = await como('esc', `update publicacoes set titulo = 'invadiu' where id = '${pubRed}' returning 1`)
+espera('escola NÃO altera notícia da rede', !!r.erro || !r.rows?.length)
+r = await como('esc', `insert into paginas (municipio_id, titulo, caminho) values ('${J}', 'Página da escola', 'pagina-escola')`)
+espera('escola NÃO cria páginas (só notícias)', !!r.erro)
+r = await como('esc', `insert into midias (municipio_id, storage_path, nome_original, mime_type, tamanho_bytes, texto_alternativo) values ('${J}', '${J}/2026/10/foto-e1.jpg', 'foto-e1.jpg', 'image/jpeg', 10, 'Alunos na feira') returning id`)
+espera('escola envia imagem para a notícia', r.rows?.length === 1)
+const midE1 = r.rows?.[0]?.id
+r = await como('esc', `insert into storage.objects (bucket_id, name) values ('midias', '${J}/2026/10/foto-e1.jpg') returning 1`)
+espera('escola envia o arquivo ao Storage da organização', r.rows?.length === 1)
+r = await como('esc', `insert into storage.objects (bucket_id, name) values ('midias', '${O}/2026/10/invasao.jpg')`)
+espera('escola NÃO envia arquivo para outra organização', !!r.erro)
+r = await como('esc', `insert into publicacao_midias (municipio_id, publicacao_id, midia_id, ordem) values ('${J}', '${pubE1}', '${midE1}', 1) returning 1`)
+espera('escola monta a galeria da notícia dela', r.rows?.length === 1)
+r = await como('esc', `select criar_previa('publicacoes', '${pubE1}') t`)
+espera('escola gera prévia da notícia dela', !!r.rows?.[0]?.t)
+r = await como('esc', `select criar_previa('publicacoes', '${pubRed}') t`)
+espera('escola NÃO gera prévia de notícia da rede', !!r.erro)
+
+r = await como('esc', `insert into publicacoes (municipio_id, titulo, slug, unidade_id, destaque) values ('${J}', 'Quer destaque', 'quer-destaque', '${E1}', true) returning destaque`)
+espera('escola NÃO coloca a notícia em destaque na página inicial', r.rows?.[0]?.destaque === false)
+await como('admin', `update publicacoes set destaque = true where slug = 'quer-destaque'`)
+r = await como('esc', `update publicacoes set titulo = 'Quer destaque (editada)', destaque = false where slug = 'quer-destaque' returning destaque`)
+espera('escola edita a notícia que a rede destacou, e o destaque fica', r.rows?.[0]?.destaque === true)
+r = await como('escred', `insert into publicacoes (municipio_id, titulo, slug, unidade_id) values ('${J}', 'Rascunho da E1', 'rascunho-e1', '${E1}') returning id`)
+espera('redator da escola cria rascunho da unidade', r.rows?.length === 1)
+const rascE1 = r.rows?.[0]?.id
+r = await como('escred', `update publicacoes set status = 'publicado', publicado_em = now() where id = '${rascE1}'`)
+espera('redator da escola NÃO publica', !!r.erro)
+r = await como('escred', `update publicacoes set titulo = 'mudou' where id = '${pubE1}' returning 1`)
+espera('redator da escola NÃO altera notícia já publicada', !!r.erro || !r.rows?.length)
+r = await como('escred', `delete from publicacoes where id = '${rascE1}' returning 1`)
+espera('redator da escola NÃO exclui', !!r.erro || !r.rows?.length)
+
+r = await como('escreg', `select count(*)::int n from publicacoes where id in ('${pubE1}', '${rascE1}')`)
+espera('quem tem a região vê as notícias das unidades dela', r.rows?.[0]?.n === 2)
+r = await como('escreg', `insert into publicacoes (municipio_id, titulo, slug, unidade_id) values ('${J}', 'Fora da região', 'fora-regiao', '${E2}')`)
+espera('quem tem a região NÃO escreve em unidade fora dela', !!r.erro)
+
+r = await como('editor', `select count(*)::int n from publicacoes where id = '${rascE1}'`)
+espera('editor da rede vê o rascunho da escola', r.rows?.[0]?.n === 1)
+r = await como('admin', `insert into publicacoes (municipio_id, titulo, slug, unidade_id) values ('${J}', 'Rede marca a escola', 'rede-marca-escola', '${E2}') returning 1`)
+espera('quem é da rede marca qualquer unidade', r.rows?.length === 1)
+r = await como('admin', `insert into publicacoes (municipio_id, titulo, slug, unidade_id) values ('${J}', 'Unidade de outra org', 'unidade-outra-org', '${EO}')`)
+espera('notícia NÃO aponta unidade de outra organização', !!r.erro)
+r = await como('anon', `select unidade_id from publicacoes where id = '${pubE1}'`)
+espera('o portal vê a notícia publicada da escola, com a unidade', r.rows?.[0]?.unidade_id === E1)
+await como('adm', `update papel_permissoes set ativo = false where papel_id = '${papelCom}'`)
+r = await como('esc', `insert into publicacoes (municipio_id, titulo, slug, unidade_id) values ('${J}', 'Depois de desligar', 'depois-desligar-esc', '${E1}')`)
+espera('desligar o papel da escola vale na hora', !!r.erro)
+
 console.log('\nExclusão de organização com permissões')
 r = await como('plat', `delete from municipios where slug = 'org-nova-papeis' returning 1`)
 espera('SECKE exclui organização com papéis (cascata não trava)', r.rows?.length === 1)

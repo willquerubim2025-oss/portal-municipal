@@ -13,7 +13,7 @@ Usuários de teste da SMEDU, **só na homologação** (senhas passadas fora do g
 - `admin.teste@secke.dev`: Administrador
 - `redator.teste@secke.dev`: papel "Redator (teste)", só `conteudo.editar`
 
-Os testes automáticos (`npm run e2e`) ainda estão escritos para uma organização parada (D-82) e **não devem ser rodados** até serem adaptados à SMEDU (`docs/07-pendencias.md`).
+Os testes automáticos usam contas próprias (`redator.e2e`, `escola.e2e`), criadas por `node e2e/preparar.mjs` (seção "Teste ponta a ponta").
 
 ## Publicar (D-27)
 ```bash
@@ -46,14 +46,15 @@ O painel é estático: as variáveis entram no build (por isso um build por ambi
 - **Texto de ajuda fica fora do `<label>`** (bloco `campo` + `<small id>` + `aria-describedby`). Dentro do rótulo, ele vira parte do nome do campo no leitor de tela.
 - Módulo novo: usar `useEdicao` + `ListaConteudo` + componentes de `Edicao.tsx`, registrar em `MODULOS` (`App.tsx`) e marcar `pronto: true` no menu.
 
-## Teste ponta a ponta (Playwright)
-Com o painel (`npm run dev`, porta 5190) **e o portal** (porta 4321) rodando contra a homologação:
-```bash
-npm run e2e
-```
-- `e2e/noticias.mjs` (19 verificações): login, senha errada, editor salva rascunho e não publica, publicado bloqueado para o editor, imagem com texto alternativo obrigatório, publicar, galeria, despublicar.
-- `e2e/estrutura.mjs` (24 verificações): órgão, menu (com menu padrão), item em seção vazia da Central, sistema externo, identidade (contraste recusado, cor aplicada no portal e restaurada), categoria, redirecionamento (301 de um salto no portal), editor barrado.
-- `e2e/administracao.mjs` (25 verificações): convite, convidado cria a senha pelo link e entra com o papel certo, troca de papel, desativação, chamado com nota interna e consumo do saldo, auditoria. Usa também `secke.teste@exemplo.gov.br` (equipe da plataforma, só na homologação).
-- `e2e/conteudo.mjs` (30 verificações): documentos (anexo, relação, vigência), página filha, serviço, agenda, pergunta, banner sem imagem recusado, alerta, permissões do editor e **conferência no portal** do que foi publicado.
-- Os testes criam itens com "E2E" no nome na homologação; o `npm run e2e` **limpa tudo ao final**, mesmo se algum teste falhar (`e2e/limpar-homologacao.mjs`, que só roda na homologação). Limpeza avulsa: `npm run e2e:limpar`. Para tirar também o conteúdo fictício de exemplo: `node e2e/limpar-homologacao.mjs --exemplos --aplicar` (mantém os órgãos de exemplo).
+## Teste ponta a ponta (Playwright, D-98)
+Rodam na **homologação**, na organização de `E2E_ORG` (padrão: a SMEDU), com o painel (`npx vite --mode homologacao --port 5190`) **e o portal** (porta 4321, `DOMINIO_DEV` da mesma organização) locais.
+1. Copie `e2e/.env.e2e.exemplo` para `e2e/.env.e2e` (fora do git) e preencha as senhas. **Nenhuma senha fica no código** (D-25).
+2. Uma vez: `node e2e/preparar.mjs` cria as contas `redator.e2e` (papel "Redator (teste)", conteúdo na rede) e `escola.e2e` (papel "Comunicação da escola (teste)", publica só na unidade; precisa da migração 0026).
+3. `npm run e2e` roda as baterias e limpa o que elas criaram:
+- `e2e/noticias.mjs`: login, senha errada, redator salva rascunho e não publica, publicada bloqueada para o redator, imagem com texto alternativo obrigatório, publicar, galeria, retirar do site.
+- `e2e/conteudo.mjs` (31): documentos (anexo, relação, vigência), página filha, serviço, agenda, pergunta, banner sem imagem recusado, aviso em faixa, permissões do redator e **conferência no portal**.
+- `e2e/estrutura.mjs` (26): órgão, menu, item da Transparência, sistemas, identidade (contraste das cores principais e do layout, cor aplicada no portal e **identidade original restaurada**), categoria, redirecionamento manual e **em lote** (301 e 410 no portal), redator barrado.
+- `e2e/administracao.mjs` (19): convite por Vínculos, convidado cria a senha e entra com o papel certo, suspensão do acesso, chamado com nota interna da SECKE, auditoria.
+- `e2e/escola.mjs`: notícia da unidade (fase 1C, D-97): a escola só vê Notícias, a notícia já vem com a unidade, publica, a lista só tem as da unidade, o portal mostra o nome da unidade; para a rede a unidade é opcional.
+- Limpeza (`e2e/limpar-homologacao.mjs`): só na homologação e **só na organização de teste**; apaga os itens "E2E", os redirecionamentos de teste e os vínculos dos convidados. Avulsa: `npm run e2e:limpar`.
 - Para encontrar campos, usar o papel acessível (`getByRole('textbox' | 'combobox', { name, exact: true })`): é como o leitor de tela enxerga a tela.
