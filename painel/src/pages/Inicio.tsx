@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { usePortal } from '../lib/portal';
+import { MeusSistemas } from '../components/MeusSistemas';
 
 interface Resumo { rascunhos: number; agendadas: number; publicadas: number; saldo: number | null; limite: number | null }
 
@@ -23,8 +24,9 @@ export function Inicio() {
         <h1>Olá{nome ? `, ${nome.split(' ')[0]}` : ''}</h1>
         <p>Você está no painel da <strong>{atual!.municipio.nome}</strong>{atual!.papeis.length > 0 && <> como {atual!.papeis.join(', ')}</>}.</p>
         {!permissoesCarregadas ? <p role="status">Carregando…</p> : modulos.length === 0
-          ? <p>Seu papel ainda não tem nenhuma permissão ligada. Fale com o administrador da organização.</p>
+          ? <p>Seu papel ainda não tem nenhuma permissão de conteúdo ou de cadastro no painel.</p>
           : <ul className="lista-escolha">{modulos.map((m) => <li key={m.para}><Link className="botao-secundario" to={m.para}>{m.rotulo}</Link></li>)}</ul>}
+        <MeusSistemas municipioId={atual!.municipio.id} />
       </>
     );
   }
@@ -71,6 +73,7 @@ function InicioConteudo() {
         )}
         <p><Link className="botao" to="/noticias/nova">Nova notícia</Link> <Link to="/noticias">Ver todas</Link></p>
       </section>
+      <MeusSistemas municipioId={mid} />
     </>
   );
 }

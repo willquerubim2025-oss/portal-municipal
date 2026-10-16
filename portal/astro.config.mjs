@@ -27,6 +27,8 @@ export default defineConfig({
       SUPABASE_PUBLISHABLE_KEY: envField.string({ context: 'server', access: 'secret' }),
       // Só no desenvolvimento: força o domínio usado para descobrir o município (localhost não está cadastrado).
       DOMINIO_DEV: envField.string({ context: 'server', access: 'secret', optional: true }),
+      // Endereço do painel administrativo deste ambiente: link "Acesso do servidor" no rodapé (D-94).
+      PAINEL_URL: envField.string({ context: 'server', access: 'secret', optional: true }),
     },
   },
 });

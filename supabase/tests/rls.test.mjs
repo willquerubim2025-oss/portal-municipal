@@ -677,6 +677,28 @@ espera('admin de outra organização NÃO gera link de evento', !!r.erro)
 r = await como('editor', `select criar_previa('documentos', '${evPrev}') t`)
 espera('tabela fora da lista NÃO gera link', !!r.erro)
 
+console.log('\nSistemas dos servidores (0025)')
+const papelDir = await papel(J, 'diretor')
+r = await como('admin', `insert into sistemas_externos (municipio_id, nome, url, publico) values
+  ('${J}', 'Sistema de todos os servidores', 'https://todos.exemplo', 'servidor'),
+  ('${J}', 'Sistema só de diretores', 'https://diretores.exemplo', 'servidor'),
+  ('${J}', 'Portal público', 'https://publico.exemplo', 'cidadao') returning id, nome`)
+const sisDir = r.rows?.find((x) => x.nome === 'Sistema só de diretores')?.id
+r = await como('admin', `insert into sistema_papeis (municipio_id, sistema_id, papel_id) values ('${J}', '${sisDir}', '${papelDir}') returning 1`)
+espera('admin restringe um sistema a um papel', r.rows?.length === 1)
+r = await como('outro', `insert into sistema_papeis (municipio_id, sistema_id, papel_id) values ('${J}', '${sisDir}', '${papelDir}')`)
+espera('admin de outra organização NÃO mexe nos sistemas', !!r.erro)
+const meus = async (quem) => ((await como(quem, `select nome from meus_sistemas('${J}') order by nome`)).rows ?? []).map((x) => x.nome)
+espera('Diretor vê o sistema de todos e o dos diretores', JSON.stringify(await meus('dir')) === JSON.stringify(['Sistema de todos os servidores', 'Sistema só de diretores']))
+espera('Redator vê só o sistema de todos', JSON.stringify(await meus('red')) === JSON.stringify(['Sistema de todos os servidores']))
+espera('admin antigo vê todos os sistemas de servidor', (await meus('admin')).length === 2)
+espera('link público não entra em "Meus sistemas"', !(await meus('admin')).includes('Portal público'))
+espera('quem é de outra organização não vê nenhum', (await meus('outro')).length === 0)
+r = await como('anon', `select string_agg(nome, ',') n from sistemas_externos where municipio_id = '${J}'`)
+espera('visitante do portal NÃO vê os sistemas de servidor', !(r.rows?.[0]?.n ?? '').includes('Sistema') && (r.rows?.[0]?.n ?? '').includes('Portal público'))
+r = await como('anon', `select count(*)::int n from meus_sistemas('${J}')`)
+espera('visitante NÃO chama meus_sistemas', !!r.erro)
+
 console.log('\nExclusão de organização com permissões')
 r = await como('plat', `delete from municipios where slug = 'org-nova-papeis' returning 1`)
 espera('SECKE exclui organização com papéis (cascata não trava)', r.rows?.length === 1)

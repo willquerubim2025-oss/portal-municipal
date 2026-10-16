@@ -1,4 +1,5 @@
 ---
+import { getSecret } from 'astro:env/server';
 // Layout de todas as páginas do portal: acessibilidade (eMAG), SEO (D-15) e
 // identidade visual do município (municipios.tema / config). Nada de prefeitura
 // específica aqui (D-10).
@@ -157,6 +158,8 @@ const classeHtml = vitrine
   ? ['vitrine', tema.filtro_destaque === 'neutro' && 'v-filtro-neutro', claro && 'v-claro', claro && fonte(tema.fonte_cabecalho) && 'v-fonte-cab'].filter(Boolean).join(' ')
   : undefined;
 const caminhoAtual = Astro.url.pathname;
+// "Acesso do servidor" (D-94): leva ao painel deste ambiente (PAINEL_URL do Worker). Sem a variável, não aparece.
+const painelUrl = (() => { try { return getSecret('PAINEL_URL') || null; } catch { return null; } })();
 ---
 <!doctype html>
 <html lang="pt-BR" class={classeHtml} style={estiloTema || undefined}>
@@ -417,6 +420,7 @@ const caminhoAtual = Astro.url.pathname;
       <div class="container v-rod-faixa-linha">
         <a href="/mapa-do-site">Mapa do site</a>
         {sitePrefeitura && <a href={sitePrefeitura}>Site da Prefeitura</a>}
+        {painelUrl && <a href={painelUrl} rel="nofollow">Acesso do servidor</a>}
         {cfg.radar_transparencia !== false && (
           <a href="https://radardatransparencia.atricon.org.br/" rel="noopener" target="_blank">Radar da Transparência Pública<span class="sr-only"> (abre em nova aba)</span></a>
         )}
@@ -459,6 +463,7 @@ const caminhoAtual = Astro.url.pathname;
       <div class="rodape-base">
         <div class="container rodape-base-linha">
           <a href="/mapa-do-site">Mapa do site</a>
+          {painelUrl && <a href={painelUrl} rel="nofollow">Acesso do servidor</a>}
           {cfg.radar_transparencia !== false && (
             <a class="radar-transparencia" href="https://radardatransparencia.atricon.org.br/" rel="noopener" target="_blank">
               Radar da Transparência Pública<span class="sr-only"> (abre em nova aba)</span>
@@ -578,5 +583,16 @@ const caminhoAtual = Astro.url.pathname;
       b.parentElement?.addEventListener('focusout', (e) => { if (!b.parentElement!.contains(e.relatedTarget as Node)) fechar(); });
     });
   </script>
+  {moduloAtivo(m, 'vlibras') && (
+    <>
+      {/* VLibras (Governo Federal): tradução do conteúdo para Libras, pedida pela especificação (seção 9) e pelo eMAG.
+          Desligável por organização em config.modulos.vlibras = false. */}
+      <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+      </div>
+      <script is:inline defer src="https://vlibras.gov.br/app/vlibras-plugin.js" onload="new window.VLibras.Widget('https://vlibras.gov.br/app')"></script>
+    </>
+  )}
 </body>
 </html>

@@ -6,7 +6,7 @@ import { mensagemErro, supabase } from '../../lib/supabase';
 import { slugificar } from '../../lib/texto';
 import { Obrigatorio } from '../../components/Edicao';
 
-interface Sistema { id: string; nome: string; fornecedor: string | null; categoria: string; url: string; descricao: string | null; ativo: boolean }
+interface Sistema { id: string; nome: string; fornecedor: string | null; categoria: string; url: string; descricao: string | null; ativo: boolean; publico: 'cidadao' | 'servidor' }
 interface ItemT {
   id: string; secao_id: string; titulo: string; descricao: string | null; url: string | null; pagina_id: string | null; categoria_id: string | null;
   sistema_id: string | null; ordem: number; ativo: boolean;
@@ -220,14 +220,15 @@ function Sistemas() {
   }
   return (
     <section role="tabpanel">
-      <p className="meta">Sistemas oficiais do município (Fiorilli, Betha, IPM, Governo Federal...). A Central e os serviços apontam para eles.</p>
+      <p className="meta">Sistemas oficiais (Fiorilli, Betha, IPM, Governo Federal...). Os <strong>públicos</strong> aparecem como link na Central de Transparência e nos serviços do portal. Os <strong>de servidores</strong> aparecem só no painel, em "Meus sistemas", para os papéis escolhidos (D-94).</p>
       {erro && <p className="erro" role="alert">{erro}</p>}
       {!lista ? <p role="status">Carregando…</p> : (
         <table className="tabela">
-          <thead><tr><th scope="col">Sistema</th><th scope="col">Tipo</th><th scope="col">Endereço</th><th scope="col">Situação</th><th scope="col"><span className="sr-only">Ações</span></th></tr></thead>
+          <thead><tr><th scope="col">Sistema</th><th scope="col">Para</th><th scope="col">Tipo</th><th scope="col">Endereço</th><th scope="col">Situação</th><th scope="col"><span className="sr-only">Ações</span></th></tr></thead>
           <tbody>{lista.map((s) => (
             <tr key={s.id}>
               <td>{s.nome}{s.fornecedor && <span className="meta"> · {s.fornecedor}</span>}</td>
+              <td>{s.publico === 'servidor' ? 'Servidores' : 'Público'}</td>
               <td>{CATEGORIAS_SISTEMA[s.categoria]}</td>
               <td><a href={s.url} target="_blank" rel="noopener">{s.url.replace(/^https?:\/\//, '').slice(0, 45)}</a></td>
               <td>{s.ativo ? 'Ativo' : 'Inativo'}</td>
@@ -251,14 +252,33 @@ function FormSistema({ sistema, mid, aoFechar }: { sistema: Sistema | null; mid:
   const [categoria, setCategoria] = useState(sistema?.categoria ?? 'transparencia');
   const [url, setUrl] = useState(sistema?.url ?? '');
   const [ativo, setAtivo] = useState(sistema?.ativo ?? true);
+  const [descricao, setDescricao] = useState(sistema?.descricao ?? '');
+  const [publico, setPublico] = useState<'cidadao' | 'servidor'>(sistema?.publico ?? 'cidadao');
+  const [papeis, setPapeis] = useState<{ id: string; nome: string }[]>([]);
+  const [marcados, setMarcados] = useState<Set<string>>(new Set());
   const [erro, setErro] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.from('papeis').select('id, nome').eq('municipio_id', mid).eq('ativo', true).order('nome').then(({ data }) => setPapeis(data ?? []));
+    if (sistema) supabase.from('sistema_papeis').select('papel_id').eq('sistema_id', sistema.id).then(({ data }) => setMarcados(new Set((data ?? []).map((x) => x.papel_id))));
+  }, [mid, sistema]);
+  const marcar = (id: string, sim: boolean) => setMarcados((m) => { const n = new Set(m); if (sim) n.add(id); else n.delete(id); return n; });
   async function salvar(ev: FormEvent) {
     ev.preventDefault();
     if (!nome.trim()) return setErro('Informe o nome.');
     if (!/^https?:\/\//.test(url.trim())) return setErro('O endereço deve começar com http:// ou https://.');
-    const linha = { municipio_id: mid, nome: nome.trim(), fornecedor: fornecedor.trim() || null, categoria, url: url.trim(), ativo };
-    const r = sistema ? await supabase.from('sistemas_externos').update(linha).eq('id', sistema.id) : await supabase.from('sistemas_externos').insert(linha);
+    const linha = { municipio_id: mid, nome: nome.trim(), fornecedor: fornecedor.trim() || null, categoria, url: url.trim(), ativo, publico, descricao: descricao.trim() || null };
+    const r = sistema
+      ? await supabase.from('sistemas_externos').update(linha).eq('id', sistema.id).select('id').single()
+      : await supabase.from('sistemas_externos').insert(linha).select('id').single();
     if (r.error) return setErro(mensagemErro(r.error));
+    // Papéis que veem o sistema em "Meus sistemas" (nenhum marcado = todos os servidores).
+    const id = r.data.id as string;
+    const apagar = await supabase.from('sistema_papeis').delete().eq('sistema_id', id);
+    if (apagar.error) return setErro(mensagemErro(apagar.error));
+    if (publico === 'servidor' && marcados.size) {
+      const ins = await supabase.from('sistema_papeis').insert([...marcados].map((papel_id) => ({ municipio_id: mid, sistema_id: id, papel_id })));
+      if (ins.error) return setErro(mensagemErro(ins.error));
+    }
     aoFechar(true);
   }
   return (
@@ -270,6 +290,21 @@ function FormSistema({ sistema, mid, aoFechar }: { sistema: Sistema | null; mid:
       </div>
       <label>Tipo<select value={categoria} onChange={(e) => setCategoria(e.target.value)}>{Object.entries(CATEGORIAS_SISTEMA).map(([v, r]) => <option key={v} value={v}>{r}</option>)}</select></label>
       <label><Obrigatorio>Endereço</Obrigatorio><input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://" /></label>
+      <label>Descrição (opcional)<input value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Ex.: matrícula e fila das creches" /></label>
+      <fieldset>
+        <legend>Para quem</legend>
+        <label className="opcao"><input type="radio" name="publico" checked={publico === 'cidadao'} onChange={() => setPublico('cidadao')} /> Público: link no portal (Transparência e serviços)</label>
+        <label className="opcao"><input type="radio" name="publico" checked={publico === 'servidor'} onChange={() => setPublico('servidor')} /> Servidores: atalho no painel, em "Meus sistemas"</label>
+      </fieldset>
+      {publico === 'servidor' && (
+        <fieldset>
+          <legend>Quais papéis veem este sistema</legend>
+          <p className="meta">Nenhum marcado: todos os servidores da organização. O Administrador vê sempre.</p>
+          {papeis.map((p) => (
+            <label key={p.id} className="opcao"><input type="checkbox" checked={marcados.has(p.id)} onChange={(e) => marcar(p.id, e.target.checked)} /> {p.nome}</label>
+          ))}
+        </fieldset>
+      )}
       <label className="opcao"><input type="checkbox" checked={ativo} onChange={(e) => setAtivo(e.target.checked)} /> Ativo</label>
       {erro && <p className="erro" role="alert">{erro}</p>}
       <p className="acoes-linha"><button className="botao">Salvar sistema</button><button type="button" className="botao-secundario" onClick={() => aoFechar(false)}>Cancelar</button></p>

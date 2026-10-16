@@ -88,7 +88,7 @@ export interface Config {
 
 export type Modulo =
   | 'estrutura_organizacional' | 'perguntas_frequentes' | 'agenda' | 'galeria'
-  | 'destaques' | 'legislacao' | 'carta_servicos' | 'equipe_gestora';
+  | 'destaques' | 'legislacao' | 'carta_servicos' | 'equipe_gestora' | 'vlibras';
 
 export interface Municipio {
   id: string;

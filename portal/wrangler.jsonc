@@ -27,7 +27,8 @@
       "images": { "binding": "IMAGES" },
       "vars": {
         "SUPABASE_URL": "https://kvilgamsyneenjtlllcf.supabase.co",
-        "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_Be47d2VktOMB_5vhUi8Y7A_oQU9yTsv"
+        "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_Be47d2VktOMB_5vhUi8Y7A_oQU9yTsv",
+        "PAINEL_URL": "https://painel-municipal-homologacao.willquerubim2025.workers.dev"
       }
     }
   }
