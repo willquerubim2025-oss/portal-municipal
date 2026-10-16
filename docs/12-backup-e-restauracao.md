@@ -39,6 +39,7 @@ Retenção de 30 dias: regra de ciclo de vida do bucket no R2 (apaga sozinho).
    gh variable set R2_BUCKET --body portal-municipal-backups
    ```
    **Sem a `BACKUP_SENHA` não há como abrir nenhum backup.** Ela precisa existir fora do GitHub.
+   *16/10/2026:* a senha original não tinha sido guardada; foi trocada e guardada no gerenciador de senhas do William. Os backups gravados **antes de 16/10/2026** usam a senha antiga e não abrem (somem sozinhos até 15/11/2026, pela regra de 30 dias). Para esse período, usar o backup do próprio Supabase.
 6. Rodar uma vez à mão (*Actions → Backup do banco → Run workflow*) e conferir o passo "Teste de restauração".
 
 ## Restaurar
