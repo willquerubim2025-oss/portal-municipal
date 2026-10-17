@@ -65,6 +65,12 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 - [ ] **Conta Cloudflare da produção:** decidir em qual conta fica a produção (checklist de ir ao ar; a homologação está na conta pessoal, D-80).
 - [x] **Permissões, fase 1C (D-97):** feito em 16/10/2026. 0026 aplicada pelo William na homologação e na produção (conferida nas duas); painel e portal da homologação publicados; baterias `noticias` (20) e `escola` (15) com 0 falhas. Falta só a resposta da SMEDU sobre quem escreve/publica pelas escolas (item 19 de `smedu-pendencias.md`).
 - [ ] **Antes da ida ao ar:** apagar as contas e papéis de teste da homologação e da produção (lista na D-98).
+- [ ] **Revisão das páginas internas (17/10/2026, homologação, computador e celular):** funcionam, são acessíveis e seguem o cabeçalho e o rodapé, mas estão "secas" perto da página inicial. Achados, aguardando o William decidir:
+  1. **Vazias:** Documentos e Legislação (0 documentos), Perguntas frequentes (nenhuma; a Transparência aponta para ela) e as páginas dos órgãos (só o nome, sem texto nem responsável).
+  2. **Layout de texto:** nas páginas institucionais e de serviço, o texto ocupa a metade esquerda e a direita fica vazia no computador. Proposta: coluna lateral ("Nesta seção", atalhos, contato).
+  3. **Fotos:** nenhuma página institucional tem imagem. Proposta: foto de capa opcional por página (campo novo), com foto livre provisória até a autorização de imagens (item 9 da SMEDU).
+  4. **Carta de Serviços:** lista simples sob o título "Outros serviços" (nenhum serviço tem categoria) e um item "Secretaria de Educação" que só leva à estrutura organizacional. Proposta: cards como os da página inicial, separados em Cidadão e Servidor.
+  5. **Notícia:** o resumo repete o primeiro parágrafo (carga inicial) e, no celular, empurra a foto para baixo.
 - [x] **Testes automáticos do painel na SMEDU (D-98):** feito em 16/10/2026 (conteúdo, estrutura e administração com 0 falhas).
 - [x] **Contraste de todas as cores do layout no painel (D-99):** feito em 16/10/2026.
 - [x] ~~**Painel:** telas de papéis e permissões, vínculos de usuários, unidades e equipe gestora (D-38); registro de permissões no código + script de sincronização; menu montado por `minhas_permissoes()`~~ (D-77, 15/10/2026); publicado na homologação e catálogo igual na produção (D-83).
