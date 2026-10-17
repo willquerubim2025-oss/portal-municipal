@@ -807,7 +807,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
    Foto de capa opcional, conteúdo com coluna lateral (Nesta seção, Mais procurados, Atendimento)
    e Carta de Serviços em cards. Só no layout vitrine. */
 .v-capa { margin: -0.5rem 0 2rem; border-radius: var(--v-raio); overflow: hidden; background: var(--v-faixa-neutra); }
-.v-capa img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 5.6; object-fit: cover; }
+.v-capa img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 4.2; object-fit: cover; }
 @media (max-width: 700px) { .v-capa img { aspect-ratio: 16 / 9; } }
 .v-com-lateral { display: grid; gap: 2.5rem 3.5rem; align-items: start; }
 @media (min-width: 1000px) { .v-com-lateral { grid-template-columns: minmax(0, 1fr) 300px; } }
