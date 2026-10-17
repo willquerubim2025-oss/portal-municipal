@@ -100,7 +100,11 @@ const orgLd = {
   ...(cfg.endereco && { address: { '@type': 'PostalAddress', streetAddress: cfg.endereco, addressRegion: m.uf, addressCountry: 'BR' } }),
   ...(cfg.redes && { sameAs: Object.values(cfg.redes) }),
 };
-const migalhaLd = migalhas.length ? {
+// Trilha de navegação (Início › ...): a organização pode desligar (config.migalhas = false, D-102).
+// Desligada, sai também o BreadcrumbList do JSON-LD: o Google pede que os dados estruturados
+// descrevam o que o visitante vê.
+const comMigalhas = cfg.migalhas !== false && migalhas.length > 0;
+const migalhaLd = comMigalhas ? {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [{ nome: 'Início', href: '/' }, ...migalhas].map((x, i) => ({
@@ -370,7 +374,7 @@ const painelUrl = (() => { try { return getSecret('PAINEL_URL') || null; } catch
     </section>
   )}
 
-  {migalhas.length > 0 && (
+  {comMigalhas && (
     <nav class="container migalhas" aria-label="Você está em">
       <ol>
         <li><a href="/">Início</a></li>
@@ -381,7 +385,7 @@ const painelUrl = (() => { try { return getSecret('PAINEL_URL') || null; } catch
     </nav>
   )}
 
-  <main id="conteudo" tabindex="-1">
+  <main id="conteudo" tabindex="-1" class={comMigalhas || !migalhas.length ? undefined : "sem-migalhas"}>
     <slot />
   </main>
 

@@ -220,6 +220,12 @@ export function Identidade() {
         </div>
       </section>
 
+      <section className="secao-filha" aria-labelledby="t-navegacao">
+        <h2 id="t-navegacao">Navegação</h2>
+        <label className="opcao"><input type="checkbox" checked={config.migalhas !== false} onChange={(e) => setCfg('migalhas', e.target.checked ? undefined : false)} />
+          {' '}Mostrar a trilha de navegação no topo das páginas internas (Início › Serviços › …)</label>
+      </section>
+
       <section className="secao-filha" aria-labelledby="t-google">
         <h2 id="t-google">Google</h2>
         <div className="campo">

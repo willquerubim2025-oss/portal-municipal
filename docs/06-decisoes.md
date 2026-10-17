@@ -803,3 +803,8 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 **D-101 · 17/10/2026 · Faixa cinza do topo das páginas internas mais baixa (pedido do William)**
 - A faixa com migalhas, título e resumo empurrava a foto de capa para baixo. Menos espaço em cima e embaixo, traço sob o título mais perto, resumo sem limite de largura (cabe numa linha no computador) e um pouco menor; no celular, título e resumo menores.
 - Medido na Área do Estudante: 235 → 159 px no computador e 262 → 181 px no celular; a foto de capa subiu 156 px no computador e 92 px no celular. Vale para todas as páginas internas.
+
+**D-102 · 17/10/2026 · Trilha de navegação ("Início › ...") pode ser desligada; desligada na SMEDU (pedido do William)**
+- A trilha no alto das páginas internas **não é exigência** (legislação, PNTP ou WCAG AA: "mostrar onde o visitante está" é o critério 2.4.8, nível AAA, e há outros meios: menu com a página atual marcada, título e a coluna lateral "Nesta seção"). É boa prática de orientação e o Google pode usá-la para mostrar o caminho no resultado.
+- Nova opção por organização, `config.migalhas` (padrão: mostra). Painel → Identidade visual e dados → Navegação. Desligada, sai também o `BreadcrumbList` do JSON-LD (o Google pede que os dados estruturados descrevam o que está visível); o título ganha o respiro do alto da faixa.
+- SMEDU: desligada na homologação em 17/10/2026. Outras organizações seguem com a trilha.

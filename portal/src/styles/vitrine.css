@@ -413,6 +413,9 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .vitrine .cabecalho-pagina h1::after { content: ""; display: block; width: 3.5rem; height: 5px; border-radius: 3px; background: var(--v-acento, var(--cor-secundaria)); margin-top: .45rem; }
 /* Faixa compacta (pedido do William, 17/10/2026): o resumo ocupa a largura toda e cabe numa linha no computador. */
 .vitrine .cabecalho-pagina p { max-width: none; font-size: 1rem; margin: .55rem 0 0; }
+/* Sem a trilha de navegação (D-102), o título ganha o respiro que ela dava no alto da faixa. */
+.vitrine main.sem-migalhas .cabecalho-pagina { padding-top: 1.4rem; }
+@media (max-width: 700px) { .vitrine main.sem-migalhas .cabecalho-pagina { padding-top: 1.1rem; } }
 @media (max-width: 700px) {
   .vitrine .cabecalho-pagina { padding: .4rem 0 1rem; margin-bottom: 1.25rem; }
   .vitrine .cabecalho-pagina h1 { font-size: 1.45rem; }

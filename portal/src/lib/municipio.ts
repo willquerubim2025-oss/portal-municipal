@@ -72,6 +72,7 @@ export interface Config {
   legislacao_categorias?: string[];    // slugs das categorias de documento listadas em /legislacao
   seo?: { google_site_verification?: string; imagem_compartilhamento_path?: string };
   radar_transparencia?: boolean;      // botão do Radar da Transparência no rodapé (PNTP 2.9); padrão: mostra
+  migalhas?: boolean;                 // trilha "Início › ..." no topo das páginas internas (D-102); padrão: mostra
   /** Texto da marca no cabeçalho. Padrão: "Prefeitura de" + nome curto. */
   marca?: { linha1?: string; linha2?: string };
   /** Site do ente ao qual a organização pertence (ex.: a Prefeitura de uma secretaria): barra "Voltar ao site". */
