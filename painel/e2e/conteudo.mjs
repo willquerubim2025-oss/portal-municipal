@@ -99,7 +99,9 @@ espera('banner sem imagem NÃO é publicado (mensagem clara)', await ve(page.get
 await page.getByLabel(/Alerta em faixa/).check();
 await page.getByLabel('Texto', { exact: true }).fill('teste automático de aviso');
 await page.getByRole('combobox', { name: 'Nível', exact: true }).selectOption('informativo');
-espera('aviso em faixa publicado', await publicar('No ar'));
+const avisoNoAr = await publicar('No ar');
+if (!avisoNoAr) console.log('    tela:', await page.getByRole('alert').allInnerTexts(), await page.getByRole('status').allInnerTexts());
+espera('aviso em faixa publicado', avisoNoAr);
 
 console.log('\nRedator (permissões)');
 await sair(page);
