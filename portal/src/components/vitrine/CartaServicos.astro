@@ -1,0 +1,37 @@
+---
+// Carta de Serviços no layout vitrine (D-100): os mesmos cards da página inicial (ícone, título,
+// uma linha e "Acessar"), com as cores da paleta dos cards. Serviço "em breve" não é link.
+import Icone from '../Icone.astro';
+interface Props { servicos: any[] }
+const { servicos } = Astro.props;
+const { municipio: m } = Astro.locals.contexto;
+const tema = (m.tema ?? {}) as Record<string, any>;
+const hex = (v: unknown) => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v);
+const cartoes = ((tema.cores_cards ?? []) as any[]).filter((c) => hex(c?.forte) && hex(c?.claro));
+const cores = (tema.cores_vivas ?? []).length;
+const estilo = (i: number) => cartoes.length ? `--forte:${cartoes[i % cartoes.length].forte};--claro:${cartoes[i % cartoes.length].claro}` : undefined;
+const cor = (i: number) => `v-cor-${cores > 1 ? 1 + (i % (cores - 1)) : 0}`;
+---
+<ul class="v-servicos v-carta">
+  {servicos.map((s, i) => (
+    <li>
+      {s.href ? (
+        <a class={`v-servico ${cor(i)}`} style={estilo(i)} href={s.href} target={s.externo ? '_blank' : undefined} rel={s.externo ? 'noopener' : undefined}>
+          <span class="v-servico-icone"><Icone nome={s.icone} /></span>
+          <h3>{s.titulo}</h3>
+          {s.descricao && <p>{s.descricao}</p>}
+          <span class="v-servico-ir">Acessar{s.externo && <span class="sr-only"> (abre em nova aba)</span>}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </span>
+        </a>
+      ) : (
+        <div class={`v-servico v-servico-breve ${cor(i)}`} style={estilo(i)}>
+          <span class="v-chip">Em breve</span>
+          <span class="v-servico-icone"><Icone nome={s.icone} /></span>
+          <h3>{s.titulo}</h3>
+          {s.descricao && <p>{s.descricao}</p>}
+        </div>
+      )}
+    </li>
+  ))}
+</ul>

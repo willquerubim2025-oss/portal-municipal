@@ -11,12 +11,17 @@ const { n, previa = false } = Astro.props;
 const naoPublicado = previa && n.status !== 'publicado';
 const img = urlMidia(n.imagem?.storage_path);
 const galeria = (n.galeria ?? []).sort((a: any, b: any) => a.ordem - b.ordem);
+// Muitas notícias trazem o resumo copiado do 1º parágrafo: aí ele não se repete no topo da página
+// (continua na descrição do Google e na prévia do WhatsApp).
+const plano = (t: string) => t.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+const inicioCorpo = plano(n.corpo_html ?? '').slice(0, 400);
+const resumoRepetido = !!n.resumo && inicioCorpo.startsWith(plano(n.resumo).replace(/[.…]+$/, '').slice(0, 80));
 const atualizado = n.atualizado_em && new Date(n.atualizado_em).getTime() - new Date(n.publicado_em).getTime() > 3600_000;
 ---
   <article class="container">
     <header class="cabecalho-pagina">
       <h1>{n.titulo}</h1>
-      {n.resumo && <p>{n.resumo}</p>}
+      {n.resumo && !resumoRepetido && <p>{n.resumo}</p>}
       <p class="meta">
         {naoPublicado ? 'Ainda não publicada' : <>Publicado em <time datetime={n.publicado_em}>{dataExtenso(n.publicado_em)}</time></>}
         {!naoPublicado && atualizado && <> · atualizado em <time datetime={n.atualizado_em}>{dataExtenso(n.atualizado_em)}</time></>}

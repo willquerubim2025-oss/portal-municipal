@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import { categorias, servicos } from '../../lib/consultas';
 import { moduloAtivo } from '../../lib/municipio';
+import CartaServicos from '../../components/vitrine/CartaServicos.astro';
 
 const { municipio: m } = Astro.locals.contexto;
 if (!moduloAtivo(m, 'carta_servicos')) return Astro.rewrite('/404');
@@ -11,12 +12,16 @@ const [lista, cats] = await Promise.all([servicos(m.id, { categoria, termo }), c
 const catAtual = cats.find((c) => c.slug === categoria);
 if (categoria && !catAtual) return Astro.rewrite('/404');
 
-// Agrupa por categoria quando não há filtro.
+const vitrine = (m.tema as any)?.layout === 'vitrine';
+// Agrupa por categoria quando não há filtro (na ordem das categorias). Com um grupo só, sem subtítulo.
 const grupos = new Map<string, any[]>();
-for (const s of lista) {
+const ordenada = [...lista].sort((a, b) => (a.categoria?.ordem ?? 999) - (b.categoria?.ordem ?? 999));
+for (const s of ordenada) {
   const nome = s.categoria?.nome ?? 'Outros serviços';
   grupos.set(nome, [...(grupos.get(nome) ?? []), s]);
 }
+// Só os públicos com serviço viram filtro.
+const catsComServico = cats.filter((c) => lista.some((s) => s.categoria?.slug === c.slug) || c.slug === categoria);
 const titulo = catAtual ? `Serviços: ${catAtual.nome}` : 'Carta de Serviços';
 ---
 <Base titulo={titulo} noindex={!!termo}
@@ -32,26 +37,26 @@ const titulo = catAtual ? `Serviços: ${catAtual.nome}` : 'Carta de Serviços';
       {categoria && <input type="hidden" name="categoria" value={categoria} />}
       <button class="botao" type="submit">Buscar</button>
     </form>
-    {cats.length > 1 && (
+    {catsComServico.length > 1 && (
       <nav aria-label="Público">
         <ul class="chips">
           <li><a href="/servicos" aria-current={!categoria ? 'true' : undefined}>Todos</a></li>
-          {cats.map((c) => <li><a href={`/servicos?categoria=${c.slug}`} aria-current={c.slug === categoria ? 'true' : undefined}>{c.nome}</a></li>)}
+          {catsComServico.map((c) => <li><a href={`/servicos?categoria=${c.slug}`} aria-current={c.slug === categoria ? 'true' : undefined}>{c.nome}</a></li>)}
         </ul>
       </nav>
     )}
     {lista.length === 0 && <p>Nenhum serviço encontrado.</p>}
     {[...grupos].map(([nome, itens]) => (
       <section>
-        {!categoria && <h2>{nome}</h2>}
-        <ul class="lista-simples">
+        {!categoria && grupos.size > 1 && <h2>{nome}</h2>}
+        {vitrine ? <CartaServicos servicos={itens} /> : <ul class="lista-simples">
           {itens.map((s) => (
             <li>
               <h3><a href={`/servicos/${s.slug}`}>{s.titulo}</a></h3>
               {s.descricao && <p>{s.descricao}</p>}
             </li>
           ))}
-        </ul>
+        </ul>}
       </section>
     ))}
   </div>

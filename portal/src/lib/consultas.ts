@@ -171,11 +171,17 @@ export async function documento(municipioId: string, slug: string) {
 // ---------------------------------------------------------------- serviços, perguntas, órgãos
 export async function servicos(municipioId: string, opcoes: { categoria?: string; termo?: string } = {}) {
   let q = supabase().from('servicos')
-    .select(`id, titulo, slug, descricao, categoria:categorias${opcoes.categoria ? '!inner' : ''}(nome, slug)`)
+    .select(`id, titulo, slug, descricao, icone, em_breve, url_externa, sistema:sistemas_externos(url, ativo), categoria:categorias${opcoes.categoria ? '!inner' : ''}(nome, slug, ordem)`)
     .eq('municipio_id', municipioId).order('titulo');
   if (opcoes.categoria) q = q.eq('categoria.slug', opcoes.categoria);
   if (opcoes.termo) q = q.textSearch('busca', semAcento(opcoes.termo), { type: 'websearch', config: 'portuguese' });
-  return erro(await q) as any[];
+  return (erro(await q) as any[]).map(comLink);
+}
+
+/** Endereço do card de um serviço: o link próprio (interno ou externo), o do sistema ou a página do serviço. */
+function comLink(s: any) {
+  const destino = s.url_externa ?? (s.sistema?.ativo ? s.sistema.url : null);
+  return { ...s, href: s.em_breve ? null : destino ?? `/servicos/${s.slug}`, externo: !s.em_breve && /^https?:/.test(destino ?? '') };
 }
 
 /** Cards da Área de Serviços da página inicial (0020): publicados e "em breve", na ordem do painel. */
@@ -183,11 +189,7 @@ export async function servicosHome(municipioId: string) {
   const linhas = erro(await supabase().from('servicos')
     .select('id, titulo, slug, descricao, icone, ordem, em_breve, url_externa, sistema:sistemas_externos(url, ativo)')
     .eq('municipio_id', municipioId).eq('na_home', true).order('ordem').order('titulo')) as any[];
-  return linhas.map((s) => ({
-    ...s,
-    href: s.em_breve ? null : s.url_externa ?? (s.sistema?.ativo ? s.sistema.url : null) ?? `/servicos/${s.slug}`,
-    externo: !s.em_breve && /^https?:/.test(s.url_externa ?? (s.sistema?.ativo ? s.sistema.url : '') ?? ''),
-  }));
+  return linhas.map(comLink);
 }
 
 /** Equipe gestora visível (0019): o RLS já esconde os ocultos e a seção desligada. */
@@ -207,9 +209,18 @@ export async function buscarUnidade(municipioId: string, termo: string) {
 }
 
 export async function servico(municipioId: string, slug: string) {
-  return erro(await supabase().from('servicos')
+  const s = erro(await supabase().from('servicos')
     .select('*, categoria:categorias(nome, slug), orgao:orgaos(nome, slug, telefone, email, endereco, horario_atendimento)')
     .eq('municipio_id', municipioId).eq('slug', slug).maybeSingle()) as any;
+  if (s) s.imagem = await midiaPorId(s.imagem_id);
+  return s;
+}
+
+/** Foto de capa (0027) buscada à parte: funciona também antes da coluna existir (imagem_id indefinido). */
+async function midiaPorId(id: string | null | undefined) {
+  if (!id) return null;
+  const { data } = await supabase().from('midias').select('storage_path, texto_alternativo').eq('id', id).maybeSingle();
+  return data;
 }
 
 export async function perguntas(municipioId: string) {
@@ -252,11 +263,21 @@ export async function centralTransparencia(municipioId: string) {
 
 export async function pagina(municipioId: string, caminho: string) {
   const p = erro(await supabase().from('paginas')
-    .select('id, titulo, caminho, resumo, corpo_html, publicado_em, atualizado_em, parent_id')
-    .eq('municipio_id', municipioId).eq('caminho', caminho).maybeSingle()) as any;
+    .select('*').eq('municipio_id', municipioId).eq('caminho', caminho).maybeSingle()) as any;
   if (!p) return null;
-  p.filhas = erro(await supabase().from('paginas').select('titulo, caminho, resumo')
-    .eq('municipio_id', municipioId).eq('parent_id', p.id).order('ordem').order('titulo'));
+  const [filhas, mae, imagem] = await Promise.all([
+    supabase().from('paginas').select('titulo, caminho, resumo').eq('municipio_id', municipioId).eq('parent_id', p.id).order('ordem').order('titulo'),
+    p.parent_id ? supabase().from('paginas').select('titulo, caminho').eq('id', p.parent_id).maybeSingle() : Promise.resolve({ data: null }),
+    midiaPorId(p.imagem_id),
+  ]);
+  p.filhas = filhas.data ?? [];
+  p.mae = mae.data;
+  p.imagem = imagem;
+  if (p.mae) {
+    p.irmas = erro(await supabase().from('paginas').select('titulo, caminho')
+      .eq('municipio_id', municipioId).eq('parent_id', p.parent_id).order('ordem').order('titulo'));
+  }
+  delete p.busca; delete p.legado;
   return p;
 }
 

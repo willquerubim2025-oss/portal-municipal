@@ -783,6 +783,24 @@ await como('adm', `update papel_permissoes set ativo = false where papel_id = '$
 r = await como('esc', `insert into publicacoes (municipio_id, titulo, slug, unidade_id) values ('${J}', 'Depois de desligar', 'depois-desligar-esc', '${E1}')`)
 espera('desligar o papel da escola vale na hora', !!r.erro)
 
+console.log('\nFoto de capa de páginas e serviços (0027)')
+r = await como('admin', `insert into midias (municipio_id, storage_path, nome_original, mime_type, texto_alternativo) values ('${J}', '${J}/2026/10/capa.jpg', 'capa.jpg', 'image/jpeg', 'Fachada da escola') returning id`)
+const capa = r.rows?.[0]?.id
+r = await como('admin', `insert into paginas (municipio_id, titulo, caminho, imagem_id) values ('${J}', 'Página com capa', 'pagina-com-capa', '${capa}') returning id`)
+const pagCapa = r.rows?.[0]?.id
+espera('página guarda a foto de capa', !!pagCapa)
+r = await como('anon', `select count(*)::int n from midias where id = '${capa}'`)
+espera('capa de página em rascunho NÃO é pública', r.rows?.[0]?.n === 0)
+await como('admin', `update paginas set status = 'publicado', publicado_em = now() - interval '1 minute' where id = '${pagCapa}'`)
+r = await como('anon', `select count(*)::int n from midias where id = '${capa}'`)
+espera('capa de página publicada é pública', r.rows?.[0]?.n === 1)
+r = await db.query(`insert into midias (municipio_id, storage_path, nome_original, mime_type) values ('${O}', '${O}/2026/10/de-outra.jpg', 'de-outra.jpg', 'image/jpeg') returning id`)
+r = await como('admin', `update servicos set imagem_id = '${r.rows[0].id}' where municipio_id = '${J}' returning 1`)
+espera('serviço NÃO usa foto de outra organização', !!r.erro)
+r = await como('editor', `select criar_previa('paginas', '${pagCapa}') t`)
+r = await como('anon', `select previa_conteudo('${r.rows?.[0]?.t}', '${J}') c`)
+espera('pré-visualização da página traz a capa', r.rows?.[0]?.c?.dados?.imagem?.texto_alternativo === 'Fachada da escola')
+
 console.log('\nExclusão de organização com permissões')
 r = await como('plat', `delete from municipios where slug = 'org-nova-papeis' returning 1`)
 espera('SECKE exclui organização com papéis (cascata não trava)', r.rows?.length === 1)

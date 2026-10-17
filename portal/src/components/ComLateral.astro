@@ -1,0 +1,14 @@
+---
+// Conteúdo das páginas internas com a coluna lateral do layout vitrine (D-100).
+// No layout clássico, só o conteúdo.
+import Lateral from './vitrine/Lateral.astro';
+interface Props { secao?: { titulo: string; links: { titulo: string; href: string }[] } | null }
+const { municipio: m } = Astro.locals.contexto;
+const vitrine = (m.tema as any)?.layout === 'vitrine';
+---
+{vitrine ? (
+  <div class="v-com-lateral">
+    <div class="v-com-lateral-principal"><slot /></div>
+    <Lateral secao={Astro.props.secao} />
+  </div>
+) : <slot />}

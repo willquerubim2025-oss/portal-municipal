@@ -6,6 +6,7 @@ import { urlMidia } from '../../lib/supabase';
 import { urlImagem, srcsetImagem } from '../../lib/imagens';
 import { htmlSeguro } from '../../lib/html';
 import { resumir } from '../../lib/formato';
+import ComLateral from '../../components/ComLateral.astro';
 
 const { municipio: m, dominioPrincipal } = Astro.locals.contexto;
 if (!moduloAtivo(m, 'estrutura_organizacional')) return Astro.rewrite('/404');
@@ -36,6 +37,7 @@ const ld = {
     <header class="cabecalho-pagina">
       <h1>{o.nome}{o.sigla && ` (${o.sigla})`}</h1>
     </header>
+    <ComLateral secao={{ titulo: 'Estrutura organizacional', links: [{ titulo: 'Todos os setores', href: '/estrutura-organizacional' }, ...todos.filter((x) => !x.parent_id || x.parent_id === o.parent_id).map((x) => ({ titulo: x.nome, href: `/estrutura-organizacional/${x.slug}` }))] }}>
     {o.responsavel_nome && (
       <section class="evento" aria-label="Responsável">
         {foto && <img src={urlImagem(o.foto.storage_path, 320)} alt={o.foto?.texto_alternativo ?? `Foto de ${o.responsavel_nome}`} width="120" height="150" style="border-radius:8px;object-fit:cover" />}
@@ -58,5 +60,6 @@ const ld = {
         <ul>{subordinados.map((s) => <li><a href={`/estrutura-organizacional/${s.slug}`}>{s.nome}</a></li>)}</ul>
       </section>
     )}
+    </ComLateral>
   </article>
 </Base>

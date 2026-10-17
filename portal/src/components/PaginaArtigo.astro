@@ -1,20 +1,31 @@
 ---
 // Corpo da página institucional. Usado pela página publicada e pela pré-visualização (D-93).
+// No layout vitrine: foto de capa opcional e coluna lateral (D-100).
 import { htmlSeguro } from '../lib/html';
+import Capa from './vitrine/Capa.astro';
+import ComLateral from './ComLateral.astro';
 interface Props { p: any }
 const { p } = Astro.props;
+// "Nesta seção": a página-mãe e as irmãs; ou, se ela tem filhas, ela e as filhas.
+const secao = p.mae && p.irmas?.length
+  ? { titulo: p.mae.titulo, links: [{ titulo: p.mae.titulo, href: `/${p.mae.caminho}` }, ...p.irmas.map((x: any) => ({ titulo: x.titulo, href: `/${x.caminho}` }))] }
+  : p.filhas?.length ? { titulo: p.titulo, links: [{ titulo: p.titulo, href: `/${p.caminho}` }, ...p.filhas.map((x: any) => ({ titulo: x.titulo, href: `/${x.caminho}` }))] }
+  : null;
 ---
   <article class="container">
     <header class="cabecalho-pagina">
       <h1>{p.titulo}</h1>
       {p.resumo && <p>{p.resumo}</p>}
     </header>
-    <div class="conteudo" set:html={htmlSeguro(p.corpo_html)} />
-    {p.filhas?.length > 0 && (
-      <nav aria-label={`Páginas em ${p.titulo}`}>
-        <ul class="lista-simples">
-          {p.filhas.map((f: any) => <li><h2><a href={`/${f.caminho}`}>{f.titulo}</a></h2>{f.resumo && <p>{f.resumo}</p>}</li>)}
-        </ul>
-      </nav>
-    )}
+    <Capa imagem={p.imagem} />
+    <ComLateral secao={secao}>
+      <div class="conteudo" set:html={htmlSeguro(p.corpo_html)} />
+      {p.filhas?.length > 0 && (
+        <nav aria-label={`Páginas em ${p.titulo}`}>
+          <ul class="lista-simples">
+            {p.filhas.map((f: any) => <li><h2><a href={`/${f.caminho}`}>{f.titulo}</a></h2>{f.resumo && <p>{f.resumo}</p>}</li>)}
+          </ul>
+        </nav>
+      )}
+    </ComLateral>
   </article>

@@ -802,3 +802,30 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 /* D-87: cabeçalho branco 15% mais alto no computador (a pedido do usuário): de 116 para 133 px. No celular e
    em telas até 1180 px (menu em duas linhas ou no botão "Menu") a altura não muda. */
 @media (min-width: 1181px) { .v-cab-claro .v-cab-linha { min-height: 133px; } }
+
+/* ---------------------------------------------------------------- páginas internas (D-100)
+   Foto de capa opcional, conteúdo com coluna lateral (Nesta seção, Mais procurados, Atendimento)
+   e Carta de Serviços em cards. Só no layout vitrine. */
+.v-capa { margin: -0.5rem 0 2rem; border-radius: var(--v-raio); overflow: hidden; background: var(--v-faixa-neutra); }
+.v-capa img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 5.6; object-fit: cover; }
+@media (max-width: 700px) { .v-capa img { aspect-ratio: 16 / 9; } }
+.v-com-lateral { display: grid; gap: 2.5rem 3.5rem; align-items: start; }
+@media (min-width: 1000px) { .v-com-lateral { grid-template-columns: minmax(0, 1fr) 300px; } }
+.v-com-lateral-principal { min-width: 0; }
+.v-com-lateral-principal > .conteudo, .v-com-lateral-principal .conteudo { max-width: 75ch; }
+.v-lateral { display: grid; gap: 1.25rem; }
+@media (min-width: 1000px) { .v-lateral { position: sticky; top: 1.5rem; } }
+.v-lateral-bloco { background: #fff; border: 1px solid color-mix(in srgb, var(--cor-primaria) 12%, #fff); border-radius: var(--v-raio); padding: 1.1rem 1.2rem; box-shadow: var(--v-sombra); }
+.v-lateral-bloco h2 { font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--v-secundaria-escura); margin: 0 0 .7rem; }
+.v-lateral-links, .v-lateral-atalhos { list-style: none; margin: 0; padding: 0; display: grid; gap: .1rem; }
+.v-lateral-links a { display: block; padding: .45rem .6rem; border-radius: 8px; color: var(--cor-texto, #1d2733); text-decoration: none; line-height: 1.35; }
+.v-lateral-links a:hover, .v-lateral-links a:focus-visible { background: var(--v-faixa-neutra); color: var(--cor-primaria); text-decoration: underline; }
+.v-lateral-links a[aria-current="page"] { background: var(--v-faixa-neutra); color: var(--cor-primaria); font-weight: 700; box-shadow: inset 3px 0 0 var(--cor-secundaria); }
+.v-lateral-atalhos a { display: flex; align-items: center; gap: .65rem; padding: .4rem .3rem; color: var(--cor-primaria); font-weight: 600; text-decoration: none; line-height: 1.3; }
+.v-lateral-atalhos a:hover, .v-lateral-atalhos a:focus-visible { text-decoration: underline; }
+.v-lateral-icone { flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--v-faixa-neutra); color: var(--cor-primaria); }
+.v-lateral-icone svg { width: 18px; height: 18px; }
+.v-lateral-contato p { margin: .25rem 0; font-size: .95rem; }
+.v-lateral-contato a:not(.v-botao) { color: var(--cor-primaria); font-weight: 600; overflow-wrap: anywhere; }
+.v-lateral-contato .v-botao { margin-top: .6rem; }
+.vitrine .v-carta { max-width: none; margin: 1.5rem 0 2.5rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 1.25rem; }

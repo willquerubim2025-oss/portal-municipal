@@ -1,0 +1,55 @@
+---
+// Coluna lateral das páginas internas no layout vitrine (D-100):
+//  - "Nesta seção": as páginas irmãs/filhas, ou o grupo do menu principal em que a página está;
+//  - "Mais procurados": os atalhos de serviço da página inicial (servicos.na_home);
+//  - "Atendimento": contatos da organização (municipios.config).
+// No celular, vem depois do conteúdo.
+import { menu, servicosHome, type ItemMenu } from '../../lib/consultas';
+import Icone from '../Icone.astro';
+interface Link { titulo: string; href: string }
+interface Props { secao?: { titulo: string; links: Link[] } | null }
+const { municipio: m } = Astro.locals.contexto;
+const cfg = (m.config ?? {}) as Record<string, any>;
+const aqui = Astro.url.pathname.replace(/\/+$/, '') || '/';
+
+let secao = Astro.props.secao ?? null;
+const [principal, atalhos] = await Promise.all([secao ? Promise.resolve([] as ItemMenu[]) : menu(m.id, 'principal'), servicosHome(m.id)]);
+if (!secao) {
+  const contem = (i: ItemMenu): boolean => i.href === aqui || i.filhos.some(contem);
+  const grupo = principal.find((i) => i.filhos.length > 0 && contem(i));
+  if (grupo) secao = { titulo: grupo.rotulo, links: grupo.filhos.filter((f) => f.href).map((f) => ({ titulo: f.rotulo, href: f.href! })) };
+}
+const maisProcurados = atalhos.filter((s) => s.href && s.href !== aqui).slice(0, 5);
+const botao = cfg.cabecalho?.botao as { rotulo?: string; url?: string } | undefined;
+---
+<aside class="v-lateral" aria-label="Navegação e atendimento">
+  {secao && secao.links.length > 1 && (
+    <nav class="v-lateral-bloco" aria-labelledby="lat-secao">
+      <h2 id="lat-secao">{secao.titulo}</h2>
+      <ul class="v-lateral-links">
+        {secao.links.map((l) => <li><a href={l.href} aria-current={l.href === aqui ? 'page' : undefined}>{l.titulo}</a></li>)}
+      </ul>
+    </nav>
+  )}
+  {maisProcurados.length > 0 && (
+    <nav class="v-lateral-bloco" aria-labelledby="lat-atalhos">
+      <h2 id="lat-atalhos">Mais procurados</h2>
+      <ul class="v-lateral-atalhos">
+        {maisProcurados.map((s) => (
+          <li><a href={s.href} target={s.externo ? '_blank' : undefined} rel={s.externo ? 'noopener' : undefined}>
+            <span class="v-lateral-icone"><Icone nome={s.icone} /></span>{s.titulo}{s.externo && <span class="sr-only"> (abre em nova aba)</span>}
+          </a></li>
+        ))}
+      </ul>
+    </nav>
+  )}
+  {(cfg.telefone || cfg.email || cfg.horario) && (
+    <section class="v-lateral-bloco v-lateral-contato" aria-labelledby="lat-contato">
+      <h2 id="lat-contato">Atendimento</h2>
+      {cfg.telefone && <p><a href={`tel:${String(cfg.telefone).replace(/\D/g, '')}`}>{cfg.telefone}</a></p>}
+      {cfg.email && <p><a href={`mailto:${cfg.email}`}>{cfg.email}</a></p>}
+      {cfg.horario && <p>{cfg.horario}</p>}
+      {botao?.url && botao?.rotulo && <p><a class="v-botao" href={botao.url}>{botao.rotulo}</a></p>}
+    </section>
+  )}
+</aside>

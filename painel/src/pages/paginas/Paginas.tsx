@@ -7,6 +7,8 @@ import { supabase } from '../../lib/supabase';
 import { slugificar, SLUG_VALIDO } from '../../lib/texto';
 import { usePortal } from '../../lib/portal';
 import { EditorTexto } from '../../components/EditorTexto';
+import { CampoImagem } from '../../components/CampoImagem';
+import type { Midia } from '../../lib/midias';
 import { BarraAcoes, CabecalhoEdicao, CarregandoOuAusente, MensagensEdicao, Obrigatorio } from '../../components/Edicao';
 
 export function ListaPaginas() {
@@ -21,7 +23,7 @@ export function ListaPaginas() {
   );
 }
 
-interface Form { parentId: string; segmento: string; titulo: string; resumo: string; corpo: string; ordem: string }
+interface Form { parentId: string; segmento: string; titulo: string; resumo: string; corpo: string; ordem: string; capa: Midia | null }
 interface Opcao { id: string; titulo: string; caminho: string }
 
 export function EditarPagina() {
@@ -32,16 +34,17 @@ export function EditarPagina() {
   const e = useEdicao<Form>({
     tabela: 'paginas',
     rotaBase: '/paginas',
-    select: '*',
-    vazio: { parentId: '', segmento: '', titulo: '', resumo: '', corpo: '', ordem: '0' },
-    deLinha: (d) => ({ parentId: d.parent_id ?? '', segmento: d.caminho.split('/').pop(), titulo: d.titulo, resumo: d.resumo ?? '', corpo: d.corpo_html ?? '', ordem: String(d.ordem ?? 0) }),
+    select: '*, capa:midias!paginas_imagem_fkey(id, storage_path, nome_original, mime_type, texto_alternativo)',
+    vazio: { parentId: '', segmento: '', titulo: '', resumo: '', corpo: '', ordem: '0', capa: null },
+    deLinha: (d) => ({ parentId: d.parent_id ?? '', segmento: d.caminho.split('/').pop(), titulo: d.titulo, resumo: d.resumo ?? '', corpo: d.corpo_html ?? '', ordem: String(d.ordem ?? 0), capa: d.capa ?? null }),
     paraLinha: (f) => ({
       parent_id: f.parentId || null, caminho: caminhoDe(f), titulo: f.titulo.trim(), resumo: f.resumo.trim() || null,
-      corpo_html: f.corpo || null, ordem: Number(f.ordem) || 0,
+      corpo_html: f.corpo || null, ordem: Number(f.ordem) || 0, imagem_id: f.capa?.id ?? null,
     }),
     validar: (f) => [
       !f.titulo.trim() && 'Informe o título.',
       !SLUG_VALIDO.test(f.segmento) && 'O endereço só pode ter letras minúsculas, números e hífens.',
+      f.capa && !f.capa.texto_alternativo?.trim() && 'A foto de capa precisa de texto alternativo.',
     ].filter(Boolean) as string[],
     mensagens: { salvar: 'Alterações salvas.', publicar: 'Página publicada.', agendar: 'Publicação agendada para', despublicar: 'Página retirada do site.' },
   });
@@ -78,6 +81,7 @@ export function EditarPagina() {
             </div>
           </div>
           <div className="coluna-lateral">
+            <CampoImagem rotulo="Foto de capa (opcional)" municipioId={e.mid} midia={f.capa} aoMudar={(m) => mudar('capa', m)} desabilitado={e.bloqueado} />
             <div className="campo"><label>Página-mãe
               <select value={f.parentId} disabled={e.jaPublicado} onChange={(ev) => mudar('parentId', ev.target.value)} aria-describedby="ajuda-mae">
                 <option value="">Nenhuma (primeiro nível)</option>

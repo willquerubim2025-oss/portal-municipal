@@ -5,6 +5,8 @@ import { useEdicao, useOpcoes } from '../../lib/edicao';
 import { SLUG_VALIDO, slugificar } from '../../lib/texto';
 import { usePortal } from '../../lib/portal';
 import { EditorTexto } from '../../components/EditorTexto';
+import { CampoImagem } from '../../components/CampoImagem';
+import type { Midia } from '../../lib/midias';
 import { BarraAcoes, CabecalhoEdicao, CampoSlug, CarregandoOuAusente, MensagensEdicao, Obrigatorio, SeletorOrgao } from '../../components/Edicao';
 
 export function ListaServicos() {
@@ -22,7 +24,7 @@ export function ListaServicos() {
 
 interface Form {
   categoriaId: string; titulo: string; slug: string; descricao: string; publicoAlvo: string; requisitos: string; etapas: string;
-  prazo: string; custo: string; canal: string; localHorario: string; urlExterna: string; orgaoId: string;
+  prazo: string; custo: string; canal: string; localHorario: string; urlExterna: string; orgaoId: string; capa: Midia | null;
 }
 
 export function EditarServico() {
@@ -32,23 +34,25 @@ export function EditarServico() {
   const e = useEdicao<Form>({
     tabela: 'servicos',
     rotaBase: '/servicos',
-    select: '*',
-    vazio: { categoriaId: '', titulo: '', slug: '', descricao: '', publicoAlvo: '', requisitos: '', etapas: '', prazo: '', custo: '', canal: '', localHorario: '', urlExterna: '', orgaoId: '' },
+    select: '*, capa:midias!servicos_imagem_fkey(id, storage_path, nome_original, mime_type, texto_alternativo)',
+    vazio: { categoriaId: '', titulo: '', slug: '', descricao: '', publicoAlvo: '', requisitos: '', etapas: '', prazo: '', custo: '', canal: '', localHorario: '', urlExterna: '', orgaoId: '', capa: null },
     deLinha: (d) => ({
       categoriaId: d.categoria_id ?? '', titulo: d.titulo, slug: d.slug, descricao: d.descricao ?? '', publicoAlvo: d.publico_alvo ?? '',
       requisitos: d.requisitos_html ?? '', etapas: d.etapas_html ?? '', prazo: d.prazo ?? '', custo: d.custo ?? '', canal: d.canal_atendimento ?? '',
-      localHorario: d.local_horario ?? '', urlExterna: d.url_externa ?? '', orgaoId: d.orgao_id ?? '',
+      localHorario: d.local_horario ?? '', urlExterna: d.url_externa ?? '', orgaoId: d.orgao_id ?? '', capa: d.capa ?? null,
     }),
     paraLinha: (f) => ({
       categoria_id: f.categoriaId || null, titulo: f.titulo.trim(), slug: f.slug, descricao: f.descricao.trim() || null,
       publico_alvo: f.publicoAlvo.trim() || null, requisitos_html: f.requisitos || null, etapas_html: f.etapas || null,
       prazo: f.prazo.trim() || null, custo: f.custo.trim() || null, canal_atendimento: f.canal.trim() || null,
       local_horario: f.localHorario.trim() || null, url_externa: f.urlExterna.trim() || null, orgao_id: f.orgaoId || null,
+      imagem_id: f.capa?.id ?? null,
     }),
     validar: (f) => [
       !f.titulo.trim() && 'Informe o nome do serviço.',
       !SLUG_VALIDO.test(f.slug) && 'O endereço só pode ter letras minúsculas, números e hífens.',
-      f.urlExterna.trim() && !/^https?:\/\//.test(f.urlExterna.trim()) && 'O link do serviço on-line deve começar com https://.',
+      f.urlExterna.trim() && !/^(https?:\/\/|\/)/.test(f.urlExterna.trim()) && 'O link do serviço deve começar com https:// (site externo) ou / (página do portal).',
+      f.capa && !f.capa.texto_alternativo?.trim() && 'A foto de capa precisa de texto alternativo.',
     ].filter(Boolean) as string[],
     mensagens: { salvar: 'Alterações salvas.', publicar: 'Serviço publicado.', agendar: 'Publicação agendada para', despublicar: 'Serviço retirado do site.' },
   });
@@ -81,6 +85,7 @@ export function EditarServico() {
             </div>
           </div>
           <div className="coluna-lateral">
+            <CampoImagem rotulo="Foto de capa (opcional)" municipioId={e.mid} midia={f.capa} aoMudar={(m) => mudar('capa', m)} desabilitado={e.bloqueado} />
             <label>Público
               <select value={f.categoriaId} onChange={(ev) => mudar('categoriaId', ev.target.value)}>
                 <option value="">—</option>
@@ -92,7 +97,7 @@ export function EditarServico() {
             {texto('custo', 'Custo', 'Ex.: gratuito, taxa de R$ 20,00')}
             {texto('canal', 'Canal de atendimento', 'Ex.: internet, presencial, telefone')}
             {texto('localHorario', 'Local e horário')}
-            <label>Link do serviço on-line<input type="url" value={f.urlExterna} onChange={(ev) => mudar('urlExterna', ev.target.value)} placeholder="https://" /></label>
+            <label>Link do serviço on-line<input inputMode="url" value={f.urlExterna} onChange={(ev) => mudar('urlExterna', ev.target.value)} placeholder="https://" /></label>
           </div>
         </fieldset>
         <BarraAcoes e={e} />
