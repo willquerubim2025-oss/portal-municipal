@@ -799,3 +799,7 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **Notícia:** quando o resumo é o começo do texto, ele não se repete no topo (continua na descrição para o Google e o WhatsApp).
 - **0027 aplicada pelo William nos dois bancos (17/10/2026, conferida).** Capa com proporção 16:4,2 no computador (~340 px; a primeira versão, com 450 px, empurrava o texto para baixo da dobra) e 16:9 no celular. Capas provisórias (fotos que já estavam na biblioteca): Sobre a Secretaria (vista aérea de escola, foto da Prefeitura), Área do Estudante e Matrícula Escolar (fotos livres do Em foco). Acessibilidade (axe) sem violações nas páginas novas.
 - **Conteúdo provisório** (dados públicos, `legado.provisorio`): 9 perguntas frequentes, 5 leis federais de referência em "Leis e Decretos da Área" (LDB, ECA, Fundeb, PNAE, Lei 13.460, com o texto oficial do Planalto) e as competências dos 4 órgãos.
+
+**D-101 · 17/10/2026 · Faixa cinza do topo das páginas internas mais baixa (pedido do William)**
+- A faixa com migalhas, título e resumo empurrava a foto de capa para baixo. Menos espaço em cima e embaixo, traço sob o título mais perto, resumo sem limite de largura (cabe numa linha no computador) e um pouco menor; no celular, título e resumo menores.
+- Medido na Área do Estudante: 235 → 159 px no computador e 262 → 181 px no celular; a foto de capa subiu 156 px no computador e 92 px no celular. Vale para todas as páginas internas.

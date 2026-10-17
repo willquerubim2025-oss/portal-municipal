@@ -407,11 +407,17 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 /* Migalhas e cabeçalho da página numa faixa neutra (cor primária bem clara) de ponta a ponta, com o traço do acento sob o título. */
 .vitrine { --v-faixa-neutra: color-mix(in srgb, var(--cor-primaria) 6%, #fff); }
 .vitrine .migalhas, .vitrine .cabecalho-pagina { background: var(--v-faixa-neutra); box-shadow: 0 0 0 100vmax var(--v-faixa-neutra); clip-path: inset(0 -100vmax); }
-.vitrine .migalhas ol { padding-block: 1.1rem 0; }
-.vitrine .cabecalho-pagina { padding: 1.2rem 0 2rem; margin-bottom: 2rem; }
+.vitrine .migalhas ol { padding-block: .75rem 0; }
+.vitrine .cabecalho-pagina { padding: .6rem 0 1.3rem; margin-bottom: 1.75rem; }
 .vitrine .cabecalho-pagina h1 { margin-top: 0; }
-.vitrine .cabecalho-pagina h1::after { content: ""; display: block; width: 3.5rem; height: 5px; border-radius: 3px; background: var(--v-acento, var(--cor-secundaria)); margin-top: .7rem; }
-.vitrine .cabecalho-pagina p { max-width: 65ch; font-size: 1.06rem; }
+.vitrine .cabecalho-pagina h1::after { content: ""; display: block; width: 3.5rem; height: 5px; border-radius: 3px; background: var(--v-acento, var(--cor-secundaria)); margin-top: .45rem; }
+/* Faixa compacta (pedido do William, 17/10/2026): o resumo ocupa a largura toda e cabe numa linha no computador. */
+.vitrine .cabecalho-pagina p { max-width: none; font-size: 1rem; margin: .55rem 0 0; }
+@media (max-width: 700px) {
+  .vitrine .cabecalho-pagina { padding: .4rem 0 1rem; margin-bottom: 1.25rem; }
+  .vitrine .cabecalho-pagina h1 { font-size: 1.45rem; }
+  .vitrine .cabecalho-pagina p { font-size: .93rem; line-height: 1.45; }
+}
 .vitrine .cartao { border: 0; border-radius: var(--v-raio); box-shadow: var(--v-sombra); transition: transform .25s ease, box-shadow .25s ease; }
 .vitrine .cartao:hover, .vitrine .cartao:focus-within { transform: translateY(-4px); box-shadow: var(--v-sombra-alta); }
 .vitrine .cartao-titulo { font-family: var(--v-fonte-titulos); }
