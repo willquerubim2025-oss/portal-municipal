@@ -17,6 +17,8 @@ export interface Tema {
   cor_acento?: string;
   /** Fundo da régua de título das seções (D-46); padrão: a cor secundária bem clara. */
   cor_regua?: string;
+  /** Moldura em volta do carrossel de destaque da página inicial (D-108); vazia = sem moldura. */
+  moldura_destaque?: string;
   /** Cabeçalho do vitrine (D-54): fundo e cor do texto; padrão: cor primária com texto branco. */
   cor_cabecalho?: string;
   cor_cabecalho_texto?: string;
