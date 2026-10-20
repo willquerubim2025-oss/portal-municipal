@@ -17,6 +17,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 | Ida ao ar (domínio, produção, treinamento, aceite) | ~10% | quase tudo depende da reunião |
 
 ## Próximos passos
+- [ ] **Homologação pausada sozinha (20/10/2026).** O banco da homologação é uma branch do Supabase (`homologacao`, `kvilgamsyneenjtlllcf`) criada como **não persistente**: depois de alguns dias sem uso ela pausa, e o portal da homologação passa a dar erro 500 em tudo (imagens e páginas), menos na página inicial guardada no cache. Reativada em 20/10 pelo MCP (`restore_project`). **Para não repetir:** no Supabase, projeto Portal Municipal → Branches → `homologacao` → tornar persistente (*Make persistent*), se o plano permitir; senão, reativar quando acontecer (Branches → homologacao → Restore). A produção (`main`) não é afetada.
 - [x] ~~**Fonte única na SMEDU**~~: Raleway em todo o portal da SMEDU aprovada pelo usuário em 15/10/2026 ("a troca da fonte eu quero"), D-88. Falta repetir na produção quando a SMEDU for criada lá.
 - [ ] **Portal Educação Paulínia (layout vitrine, D-39), feito em 12/10/2026 na homologação.** Pendências:
   - publicar o portal de homologação na Cloudflare com o código novo, para ver no navegador. Até lá, testar com `DOMINIO_DEV=educacao.paulinia.teste` no `.env` do `portal/`;
