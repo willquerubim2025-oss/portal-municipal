@@ -19,7 +19,8 @@
   "images": { "binding": "IMAGES" },
   "vars": {
     "SUPABASE_URL": "https://qgywucdnaeheqndcxtho.supabase.co",
-    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_5hNTishJduD5ApO7MTuUqQ_lqbfTMOF"
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_5hNTishJduD5ApO7MTuUqQ_lqbfTMOF",
+    "PAINEL_URL": "https://painel-municipal.willquerubim2025.workers.dev"
   },
   "env": {
     "homologacao": {

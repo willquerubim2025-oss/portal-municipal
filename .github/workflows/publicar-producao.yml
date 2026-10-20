@@ -1,0 +1,97 @@
+# Publica o painel e/ou o portal de PRODUÇÃO na Cloudflare (D-105), com um botão:
+# Actions → "Publicar produção" → Run workflow. Desde 20/10/2026 não há mais branch de
+# homologação no Supabase: tudo roda na produção (banco qgywucdnaeheqndcxtho).
+# Antes de publicar, conferir docs/11-checklist-ir-ao-ar.md.
+#
+# Segredos do repositório (Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_API_TOKEN   token da Cloudflare com o modelo "Edit Cloudflare Workers"
+#   CLOUDFLARE_ACCOUNT_ID  ID da conta (página inicial da conta na Cloudflare)
+#
+# As chaves do Supabase usadas aqui são publicáveis e já estão versionadas
+# (painel/.env.producao e o topo de portal/wrangler.jsonc).
+name: Publicar produção
+
+on:
+  workflow_dispatch:
+    inputs:
+      alvo:
+        description: 'O que publicar'
+        type: choice
+        options: [painel e portal, painel, portal]
+        default: painel e portal
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publicar-producao
+  cancel-in-progress: false
+
+jobs:
+  painel:
+    if: inputs.alvo != 'portal'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: painel
+    steps:
+      - uses: actions/checkout@v4
+      # Tira espaços e quebras de linha que vêm junto ao colar os segredos (a Cloudflare recusa).
+      - name: Credenciais da Cloudflare
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CONTA: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          token=$(printf '%s' "$TOKEN" | tr -d '[:space:]'); conta=$(printf '%s' "$CONTA" | tr -d '[:space:]')
+          echo "::add-mask::$token"; echo "::add-mask::$conta"
+          echo "CLOUDFLARE_API_TOKEN=$token" >> "$GITHUB_ENV"
+          echo "CLOUDFLARE_ACCOUNT_ID=$conta" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: painel/package-lock.json
+      - run: npm ci
+      # Build com painel/.env.producao + Worker painel-municipal.
+      - name: Build do painel (produção)
+        run: npm run build:producao
+      - name: Conferir que o build aponta para a produção
+        run: |
+          grep -rq 'qgywucdnaeheqndcxtho' dist/assets
+          ! grep -rq 'kvilgamsyneenjtlllcf' dist/assets
+      - run: npx wrangler deploy
+
+  portal:
+    if: inputs.alvo != 'painel'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: portal
+    steps:
+      - uses: actions/checkout@v4
+      # Tira espaços e quebras de linha que vêm junto ao colar os segredos (a Cloudflare recusa).
+      - name: Credenciais da Cloudflare
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CONTA: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          token=$(printf '%s' "$TOKEN" | tr -d '[:space:]'); conta=$(printf '%s' "$CONTA" | tr -d '[:space:]')
+          echo "::add-mask::$token"; echo "::add-mask::$conta"
+          echo "CLOUDFLARE_API_TOKEN=$token" >> "$GITHUB_ENV"
+          echo "CLOUDFLARE_ACCOUNT_ID=$conta" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: portal/package-lock.json
+      - run: npm ci
+      # Sem CLOUDFLARE_ENV: entra o topo do wrangler.jsonc (Worker portal-municipal, banco de produção).
+      - run: npx astro build
+      - name: Conferir que o build aponta para a produção
+        run: |
+          grep -q '"name":"portal-municipal"' dist/server/wrangler.json
+          grep -q 'qgywucdnaeheqndcxtho' dist/server/wrangler.json
+          ! grep -q 'kvilgamsyneenjtlllcf' dist/server/wrangler.json
+      - run: npx wrangler deploy
