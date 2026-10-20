@@ -22,14 +22,17 @@ const blocos: [string, string | null][] = [
     </header>
     <Capa imagem={s.imagem} />
     <ComLateral>
-    {s.url_externa && (interno
-      ? <p><a class="botao" href={s.url_externa}>Acessar</a></p>
-      : <p><a class="botao" href={s.url_externa} target="_blank" rel="noopener">Acessar o serviço on-line<span class="sr-only"> (abre em nova aba)</span></a></p>)}
-    <dl class="ficha">
-      {blocos.filter(([, v]) => v).map(([r, v]) => <><dt>{r}</dt><dd>{v}</dd></>)}
-      {s.orgao && <><dt>Órgão responsável</dt><dd><a href={`/estrutura-organizacional/${s.orgao.slug}`}>{s.orgao.nome}</a>{s.orgao.telefone && ` · ${s.orgao.telefone}`}</dd></>}
-    </dl>
-    {s.requisitos_html && <section class="conteudo"><h2>Documentos e requisitos</h2><div set:html={htmlSeguro(s.requisitos_html)} /></section>}
-    {s.etapas_html && <section class="conteudo"><h2>Como solicitar</h2><div set:html={htmlSeguro(s.etapas_html)} /></section>}
+    <section class="v-bloco v-bloco-ficha" aria-labelledby="t-resumo">
+      <h2 id="t-resumo" class="v-bloco-titulo">Informações do serviço</h2>
+      <dl class="ficha">
+        {blocos.filter(([, v]) => v).map(([r, v]) => <div><dt>{r}</dt><dd>{v}</dd></div>)}
+        {s.orgao && <div><dt>Órgão responsável</dt><dd><a href={`/estrutura-organizacional/${s.orgao.slug}`}>{s.orgao.nome}</a>{s.orgao.telefone && ` · ${s.orgao.telefone}`}</dd></div>}
+      </dl>
+      {s.url_externa && (interno
+        ? <p class="v-bloco-acao"><a class="botao" href={s.url_externa}>Acessar</a></p>
+        : <p class="v-bloco-acao"><a class="botao" href={s.url_externa} target="_blank" rel="noopener">Acessar o serviço on-line<span class="sr-only"> (abre em nova aba)</span></a></p>)}
+    </section>
+    {s.requisitos_html && <section class="v-bloco conteudo" aria-labelledby="t-requisitos"><h2 id="t-requisitos" class="v-bloco-titulo">Documentos e requisitos</h2><div set:html={htmlSeguro(s.requisitos_html)} /></section>}
+    {s.etapas_html && <section class="v-bloco conteudo v-bloco-passos" aria-labelledby="t-etapas"><h2 id="t-etapas" class="v-bloco-titulo">Como solicitar</h2><div set:html={htmlSeguro(s.etapas_html)} /></section>}
     </ComLateral>
   </article>

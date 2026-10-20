@@ -838,3 +838,37 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .v-lateral-contato a:not(.v-botao) { color: var(--cor-primaria); font-weight: 600; overflow-wrap: anywhere; }
 .v-lateral-contato .v-botao { margin-top: .6rem; }
 .vitrine .v-carta { max-width: none; margin: 1.5rem 0 2.5rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 1.25rem; }
+
+/* Seções em cartão (D-103): o texto da página fica dentro de blocos delimitados, com fundo
+   levemente tingido, em vez de solto na página. Começou pela página do serviço. */
+.vitrine .v-bloco { background: color-mix(in srgb, var(--cor-primaria) 3%, #fff); border: 1px solid color-mix(in srgb, var(--cor-primaria) 11%, #fff);
+  border-radius: var(--v-raio); padding: 1.5rem 1.75rem 1.6rem; margin: 0 0 1.5rem; max-width: none; }
+.vitrine .v-bloco > :last-child, .vitrine .v-bloco > div > :last-child { margin-bottom: 0; }
+.vitrine .v-bloco-titulo { display: flex; align-items: center; gap: .6rem; font-size: 1.3rem; margin: 0 0 1.1rem; padding-bottom: .8rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--cor-primaria) 11%, #fff); }
+.vitrine .v-bloco-titulo::before { content: ""; flex: none; width: 5px; height: 1.25em; border-radius: 3px; background: var(--v-acento, var(--cor-secundaria)); }
+.vitrine .v-bloco h3 { font-size: 1.05rem; margin: 1.4rem 0 .5rem; }
+.vitrine .v-bloco h3:first-child { margin-top: 0; }
+.vitrine .v-bloco p, .vitrine .v-bloco li { max-width: none; }
+/* Ficha do serviço: uma linha por informação, com separador. */
+.vitrine .v-bloco-ficha { background: #fff; box-shadow: var(--v-sombra); }
+.vitrine .v-bloco-ficha .ficha { display: block; margin: 0; }
+.vitrine .v-bloco-ficha .ficha > div { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: .25rem 1.25rem; padding: .75rem 0;
+  border-top: 1px solid color-mix(in srgb, var(--cor-primaria) 8%, #fff); }
+.vitrine .v-bloco-ficha .ficha > div:first-child { border-top: 0; padding-top: 0; }
+.vitrine .v-bloco-ficha .ficha dt { color: var(--cor-primaria); }
+.vitrine .v-bloco-acao { margin: 1.2rem 0 0; }
+/* "Como solicitar": lista numerada com marcador em círculo. */
+.vitrine .v-bloco-passos ol { list-style: none; counter-reset: passo; padding: 0; margin: 0 0 1rem; display: grid; gap: .9rem; }
+.vitrine .v-bloco-passos ol > li { counter-increment: passo; position: relative; padding-left: 2.6rem; }
+.vitrine .v-bloco-passos ol > li::before { content: counter(passo); position: absolute; left: 0; top: -.1rem; width: 1.8rem; height: 1.8rem; border-radius: 50%;
+  display: grid; place-items: center; background: var(--cor-primaria); color: #fff; font-weight: 700; font-size: .9rem; }
+@media (max-width: 700px) {
+  .vitrine .v-bloco { padding: 1.1rem 1rem 1.2rem; border-radius: 12px; }
+  .vitrine .v-bloco-titulo { font-size: 1.15rem; }
+  .vitrine .v-bloco-ficha .ficha > div { grid-template-columns: 1fr; }
+}
+:root.contraste.vitrine .v-bloco, :root.contraste.vitrine .v-bloco-ficha { background: #000; border-color: #fff; box-shadow: none; }
+:root.contraste.vitrine .v-bloco-titulo, :root.contraste.vitrine .v-bloco-ficha .ficha > div { border-color: #fff; }
+:root.contraste.vitrine .v-bloco-ficha .ficha dt { color: #ff0; }
+:root.contraste.vitrine .v-bloco-passos ol > li::before { background: #ff0; color: #000; }
