@@ -842,4 +842,5 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 
 **D-108 · 20/10/2026 · Moldura opcional no carrossel de destaque; na SMEDU, verde quase preto (pedido do William)**
 - "Pôr uma moldura no destaque... parece que tá faltando alguma coisa... enjoado de tanto verde, mas o azul ia ficar estranho; tenta um verde bem escuro." Campo novo do tema, **`tema.moldura_destaque`** (cor; vazia = sem moldura, como antes), no painel em Identidade visual e dados, com a checagem de contraste contra o fundo branco. Borda de 8 px (5 px abaixo de 800 px de largura) com sombra suave na mesma cor; no alto contraste, amarela.
+- **Ajuste no mesmo dia:** "pode manter essa cor, mas deixa ela fininha": borda de **2 px** em todas as larguras (era 8 px; 5 px no celular).
 - SMEDU: `#0f2a1f` (verde quase preto, mais escuro e menos saturado que o petróleo `#004348` do cabeçalho). Testado antes na página publicada.

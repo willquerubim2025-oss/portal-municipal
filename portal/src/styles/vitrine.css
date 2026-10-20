@@ -891,7 +891,6 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 /* D-108: moldura opcional do carrossel de destaque (tema.moldura_destaque). Sem a cor no tema, nada muda.
    A foto e os controles ficam por dentro da borda (posições relativas ao conteúdo do destaque). */
 .vitrine .v-destaque { border: var(--v-moldura-espessura, 0) solid var(--v-moldura-destaque, transparent); }
-.vitrine[style*="--v-moldura-destaque"] { --v-moldura-espessura: 8px; }
+.vitrine[style*="--v-moldura-destaque"] { --v-moldura-espessura: 2px; }   /* fina (D-108, ajuste) */
 .vitrine[style*="--v-moldura-destaque"] .v-destaque { box-shadow: 0 10px 28px color-mix(in srgb, var(--v-moldura-destaque) 25%, transparent); }
-@media (max-width: 799.98px) { .vitrine[style*="--v-moldura-destaque"] { --v-moldura-espessura: 5px; } }
 :root.contraste.vitrine .v-destaque { border-color: #ff0; box-shadow: none; }
