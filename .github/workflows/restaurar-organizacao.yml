@@ -1,0 +1,196 @@
+# Restaura o CONTEÚDO de uma organização a partir de um backup do banco (D-106), com um botão:
+# Actions → "Restaurar organização" → Run workflow.
+# Uso que motivou: a branch de homologação foi apagada em 20/10/2026 e o conteúdo da SMEDU
+# só existia lá; o backup homologacao/2026-10-19 no R2 tem tudo (menos os arquivos das fotos).
+#
+# Como funciona:
+#   1. baixa o backup do R2, abre com a BACKUP_SENHA e restaura num Postgres descartável;
+#   2. extrai as linhas da organização (tabelas de conteúdo, tema e config);
+#   3. na PRODUÇÃO, numa transação só: apaga o conteúdo atual dessa organização e grava o do backup.
+#      Com "aplicar" desmarcado (padrão), a transação é DESFEITA no fim: só mostra o que mudaria.
+# Não mexe em: usuários e papéis (membros, usuario_papeis, papeis, perfis), auditoria, chamados,
+# contratos, domínios (municipio_dominios), nem nos arquivos do Storage.
+# Segredos: os mesmos do backup (SUPABASE_DB_URL_PRODUCAO, R2_*, BACKUP_SENHA).
+name: Restaurar organização
+
+on:
+  workflow_dispatch:
+    inputs:
+      backup:
+        description: 'Backup no R2 (<ambiente>/<data>)'
+        default: homologacao/2026-10-19
+      organizacao:
+        description: 'Slug da organização'
+        default: paulinia-educacao
+      aplicar:
+        description: 'Gravar na produção (desmarcado = só simula e desfaz)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: restaurar-organizacao
+  cancel-in-progress: false
+
+jobs:
+  restaurar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      origem:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: teste
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DESTINO: ${{ secrets.SUPABASE_DB_URL_PRODUCAO }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      R2_ENDPOINT: https://${{ vars.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+      R2_BUCKET: ${{ vars.R2_BUCKET }}
+      BACKUP_SENHA: ${{ secrets.BACKUP_SENHA }}
+      BACKUP: ${{ inputs.backup }}
+      ORG: ${{ inputs.organizacao }}
+      APLICAR: ${{ inputs.aplicar }}
+      PGPASSWORD: teste
+      ORIGEM: postgresql://postgres@localhost:5432/postgres
+    steps:
+      - name: Conferir entradas
+        run: |
+          for v in DESTINO AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY BACKUP_SENHA R2_BUCKET; do
+            if [ -z "${!v}" ]; then echo "::error::Falta o segredo/variável $v"; exit 1; fi
+          done
+          case "$BACKUP" in */20[0-9][0-9]-[01][0-9]-[0-3][0-9]) ;; *) echo "::error::backup deve ser <ambiente>/<AAAA-MM-DD>"; exit 1 ;; esac
+          case "$ORG" in *[!a-z0-9-]*|'') echo "::error::slug inválido"; exit 1 ;; esac
+
+      - name: Instalar o cliente do Postgres 17
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSo /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client-17
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+
+      - name: Baixar e abrir o backup
+        run: |
+          set -euo pipefail
+          aws s3 cp "s3://$R2_BUCKET/$BACKUP/backup.tar.gpg" backup.tar.gpg --endpoint-url "$R2_ENDPOINT" --only-show-errors
+          mkdir -p saida
+          gpg --batch --quiet --decrypt --passphrase "$BACKUP_SENHA" backup.tar.gpg | tar -C saida -xf -
+          ls -la saida; cat saida/contagens.txt
+
+      - name: Restaurar no banco descartável
+        run: |
+          set -uo pipefail
+          # Mesmo preparo do teste de restauração (backup-banco.yml).
+          psql "$ORIGEM" -q -v ON_ERROR_STOP=1 <<'SQL'
+            create role anon nologin; create role authenticated nologin; create role service_role nologin bypassrls;
+            create role supabase_admin nologin; create role supabase_auth_admin nologin; create role supabase_storage_admin nologin;
+            create schema extensions; create schema auth; create schema storage;
+            create extension unaccent schema extensions; create extension pg_trgm schema extensions;
+            create function auth.uid() returns uuid language sql stable as $$ select null::uuid $$;
+            create function auth.role() returns text language sql stable as $$ select null::text $$;
+            create function auth.jwt() returns jsonb language sql stable as $$ select null::jsonb $$;
+            create function storage.foldername(name text) returns text[] language sql immutable as $$ select (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1] $$;
+          SQL
+          psql "$ORIGEM" -q -f saida/auth-storage-estrutura.sql > /dev/null 2>&1 || true
+          pg_restore -d "$ORIGEM" --data-only --disable-triggers saida/auth-storage.dump 2> /dev/null || true
+          pg_restore -d "$ORIGEM" --no-owner --no-privileges saida/banco.dump 2> restauracao.log || true
+          echo "Organização no backup:"
+          psql "$ORIGEM" -At -c "select id, nome from public.municipios where slug = '$ORG'"
+
+      - name: Extrair o conteúdo da organização
+        run: |
+          set -euo pipefail
+          M=$(psql "$ORIGEM" -At -c "select id from public.municipios where slug = '$ORG'")
+          [ -n "$M" ] || { echo "::error::$ORG não existe no backup"; exit 1; }
+          M_DESTINO=$(psql "$DESTINO" -At -c "select id from public.municipios where slug = '$ORG'")
+          [ -n "$M_DESTINO" ] || { echo "::error::$ORG não existe na produção (criar antes pelo painel)"; exit 1; }
+          echo "id no backup: $M · id na produção: $M_DESTINO"
+          echo "M=$M_DESTINO" >> "$GITHUB_ENV"
+          mkdir -p dados
+          # Ordem de gravação (dependências primeiro). A remoção na produção usa a ordem inversa.
+          echo "midias categorias orgaos regioes unidades paginas servicos sistemas_externos menus menu_itens transparencia_secoes transparencia_itens publicacoes publicacao_midias documentos documento_relacoes eventos destaques perguntas_frequentes equipe redirecionamentos pntp_atendimento" > dados/tabelas.txt
+          for t in $(cat dados/tabelas.txt); do
+            psql "$ORIGEM" -q -c "\copy (select * from public.$t where municipio_id = '$M') to 'dados/$t.csv' csv header"
+          done
+          psql "$ORIGEM" -q -c "\copy (select pc.* from public.publicacao_categorias pc join public.publicacoes p on p.id = pc.publicacao_id where p.municipio_id = '$M') to 'dados/publicacao_categorias.csv' csv header"
+          psql "$ORIGEM" -q -c "\copy (select da.* from public.documento_arquivos da join public.documentos d on d.id = da.documento_id where d.municipio_id = '$M') to 'dados/documento_arquivos.csv' csv header"
+          psql "$ORIGEM" -q -c "\copy (select tema, config from public.municipios where id = '$M') to 'dados/municipio.csv' csv header"
+          # Ids diferentes nos dois bancos: troca o id da organização em tudo (colunas e caminhos dos arquivos, "<id>/...").
+          if [ "$M" != "$M_DESTINO" ]; then sed -i "s/$M/$M_DESTINO/g" dados/*.csv; fi
+          echo "Linhas por tabela no backup:"; for f in dados/*.csv; do echo "  $(basename $f .csv): $(( $(python3 -c "import csv,sys; print(sum(1 for _ in csv.reader(open(sys.argv[1], encoding='utf-8'))))" $f) - 1 ))"; done
+          echo "Arquivos (midias) da organização no backup:"
+          psql "$ORIGEM" -At -F ' | ' -c "select storage_path, coalesce(texto_alternativo, ''), coalesce(legado::text, '') from public.midias where municipio_id = '$M' order by storage_path"
+
+      - name: Gravar na produção (ou simular)
+        run: |
+          set -euo pipefail
+          FIM=rollback; [ "$APLICAR" = "true" ] && FIM=commit
+          {
+            echo '\set ON_ERROR_STOP 1'
+            echo 'begin;'
+            # Carga genérica: staging em texto com as colunas do CSV; grava só as colunas que existem
+            # nos dois lados (sem as geradas); referências a usuários que não existem na produção
+            # viram null; autorreferências (página-mãe, órgão superior...) entram depois.
+            cat <<'SQL'
+          create function pg_temp.carregar(t text) returns bigint language plpgsql as $f$
+          declare
+            cols text; sel text; selfcols text[]; c text; n bigint;
+          begin
+            for c in
+              select a.attname from pg_constraint k
+                join pg_attribute a on a.attrelid = k.conrelid and a.attnum = any (k.conkey)
+               where k.conrelid = ('public.' || t)::regclass and k.contype = 'f' and k.confrelid = 'auth.users'::regclass
+                 and exists (select 1 from pg_attribute b where b.attrelid = ('pg_temp.s_' || t)::regclass and b.attname = a.attname)
+            loop
+              execute format('update pg_temp.%I s set %I = null where %I is not null and not exists (select 1 from auth.users u where u.id = s.%I::uuid)',
+                             's_' || t, c, c, c);
+            end loop;
+            select coalesce(array_agg(distinct a.attname), '{}') into selfcols
+              from pg_constraint k join pg_attribute a on a.attrelid = k.conrelid and a.attnum = any (k.conkey)
+             where k.conrelid = ('public.' || t)::regclass and k.contype = 'f' and k.confrelid = k.conrelid
+               and a.attname not in ('id', 'municipio_id');
+            select string_agg(format('%I', a.attname), ', ' order by a.attnum),
+                   string_agg(case when a.attname = any (selfcols) then 'null'
+                                   else format('s.%I::%s', a.attname, format_type(a.atttypid, a.atttypmod)) end, ', ' order by a.attnum)
+              into cols, sel
+              from pg_attribute a
+             where a.attrelid = ('public.' || t)::regclass and a.attnum > 0 and not a.attisdropped and a.attgenerated = ''
+               and exists (select 1 from pg_attribute b where b.attrelid = ('pg_temp.s_' || t)::regclass and b.attname = a.attname);
+            execute format('insert into public.%I (%s) select %s from pg_temp.%I s', t, cols, sel, 's_' || t);
+            get diagnostics n = row_count;
+            foreach c in array selfcols loop
+              execute format('update public.%I p set %I = s.%I::uuid from pg_temp.%I s where p.id = s.id::uuid and s.%I is not null',
+                             t, c, c, 's_' || t, c);
+            end loop;
+            return n;
+          end $f$;
+          SQL
+            # Remove o conteúdo atual da organização, dependentes primeiro.
+            echo "delete from public.publicacao_categorias pc using public.publicacoes p where pc.publicacao_id = p.id and p.municipio_id = '$M';"
+            echo "delete from public.documento_arquivos da using public.documentos d where da.documento_id = d.id and d.municipio_id = '$M';"
+            for t in $(tr ' ' '\n' < dados/tabelas.txt | tac); do
+              echo "delete from public.$t where municipio_id = '$M';"
+            done
+            # Grava o do backup.
+            for t in $(cat dados/tabelas.txt) publicacao_categorias documento_arquivos; do
+              cab=$(head -1 "dados/$t.csv")
+              def=$(echo "$cab" | tr ',' '\n' | sed 's/^"//; s/"$//' | awk '{printf "%s\"%s\" text", (NR>1?", ":""), $0}')
+              echo "create temp table s_$t ($def) on commit drop;"
+              echo "\\copy s_$t from 'dados/$t.csv' csv header"
+              echo "select '$t' as tabela, pg_temp.carregar('$t') as gravadas;"
+            done
+            echo "create temp table s_municipio (tema text, config text) on commit drop;"
+            echo "\\copy s_municipio from 'dados/municipio.csv' csv header"
+            echo "update public.municipios m set tema = s.tema::jsonb, config = s.config::jsonb from s_municipio s where m.id = '$M';"
+            echo "select 'conferência' as etapa, (select count(*) from public.paginas where municipio_id = '$M') paginas, (select count(*) from public.servicos where municipio_id = '$M') servicos, (select count(*) from public.publicacoes where municipio_id = '$M') noticias, (select count(*) from public.midias where municipio_id = '$M') midias, (select jsonb_array_length(coalesce(config->'home'->'foco', '[]')) from public.municipios where id = '$M') foco;"
+            echo "$FIM;"
+          } > carga.sql
+          echo "Modo: $FIM"
+          psql "$DESTINO" -X -f carga.sql
