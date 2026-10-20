@@ -19,6 +19,8 @@ export interface Tema {
   cor_regua?: string;
   /** Moldura em volta do carrossel de destaque da página inicial (D-108); vazia = sem moldura. */
   moldura_destaque?: string;
+  /** Fundo dos dias com evento no calendário da página inicial (D-109); padrão: o da régua. */
+  cor_calendario?: string;
   /** Cabeçalho do vitrine (D-54): fundo e cor do texto; padrão: cor primária com texto branco. */
   cor_cabecalho?: string;
   cor_cabecalho_texto?: string;

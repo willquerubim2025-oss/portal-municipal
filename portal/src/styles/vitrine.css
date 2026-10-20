@@ -894,3 +894,11 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .vitrine[style*="--v-moldura-destaque"] { --v-moldura-espessura: 2px; }   /* fina (D-108, ajuste) */
 .vitrine[style*="--v-moldura-destaque"] .v-destaque { box-shadow: 0 10px 28px color-mix(in srgb, var(--v-moldura-destaque) 25%, transparent); }
 :root.contraste.vitrine .v-destaque { border-color: #ff0; box-shadow: none; }
+
+/* D-109: cor própria para os dias com evento do calendário (tema.cor_calendario). Sem ela, segue a régua (D-46).
+   O pontinho vira um tom mais escuro da mesma cor, para não sumir sobre fundos claros como o amarelo. */
+.vitrine[style*="--v-cal-fundo"] .v-cal-tem, .vitrine[style*="--v-cal-fundo"] .v-cal-marca { background: var(--v-cal-fundo); }
+.vitrine[style*="--v-cal-fundo"] .v-cal-tem::after { background: color-mix(in srgb, var(--v-cal-fundo), #000 45%); }
+.vitrine[style*="--v-cal-fundo"] .v-cal-tem:hover, .vitrine[style*="--v-cal-fundo"] .v-cal-tem:focus-visible { background: var(--cor-secundaria); }
+.vitrine[style*="--v-cal-fundo"] .v-cal-tem.v-cal-escolhido { background: var(--cor-primaria); }
+:root.contraste.vitrine .v-cal-tem { background: #ff0; }
