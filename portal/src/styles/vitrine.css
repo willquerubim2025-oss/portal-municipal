@@ -902,3 +902,10 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .vitrine[style*="--v-cal-fundo"] .v-cal-tem:hover, .vitrine[style*="--v-cal-fundo"] .v-cal-tem:focus-visible { background: var(--cor-secundaria); }
 .vitrine[style*="--v-cal-fundo"] .v-cal-tem.v-cal-escolhido { background: var(--cor-primaria); }
 :root.contraste.vitrine .v-cal-tem { background: #ff0; }
+
+/* D-110: fundo da página inicial (tema.cor_fundo_pagina). No cabeçalho claro cada faixa da home pinta o próprio
+   branco (.v-secao), então a cor vai no corpo da página inicial e nessas faixas. Mantêm a cor própria: a faixa de
+   Serviços, cards, blocos do "Em foco", calendário, avisos, cabeçalho e rodapé. Só na página inicial (:has). */
+.vitrine[style*="--v-fundo-pagina"] body:has(.v-destaque, .v-bloco-noticias) { background: var(--v-fundo-pagina); }
+.vitrine.v-claro[style*="--v-fundo-pagina"] .v-secao:not(.v-bloco-servicos) { background: var(--v-fundo-pagina); }
+:root.contraste.vitrine body, :root.contraste.vitrine.v-claro .v-secao { background: #000; }

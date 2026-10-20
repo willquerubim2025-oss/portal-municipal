@@ -21,6 +21,8 @@ export interface Tema {
   moldura_destaque?: string;
   /** Fundo dos dias com evento no calendário da página inicial (D-109); padrão: o da régua. */
   cor_calendario?: string;
+  /** Fundo da página inicial atrás das seções (D-110); vazio = branco. Cards, blocos com cor própria, cabeçalho e rodapé não mudam. */
+  cor_fundo_pagina?: string;
   /** Cabeçalho do vitrine (D-54): fundo e cor do texto; padrão: cor primária com texto branco. */
   cor_cabecalho?: string;
   cor_cabecalho_texto?: string;
