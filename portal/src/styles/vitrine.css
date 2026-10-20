@@ -572,7 +572,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .v-claro .v-aviso-linha { padding: .55rem .6rem .55rem 1rem; }
 
 /* Destaque compacto: mais baixo, com setas, pausa redonda e indicadores numerados */
-.vitrine .v-destaque-compacto { min-height: clamp(290px, 22vw, 340px); }   /* ≈ 1290 × 330 px, como na PBH */
+.vitrine .v-destaque-compacto { min-height: clamp(334px, 25.3vw, 391px); }   /* ≈ 1290 × 380 px (D-104: 15% mais alto que o da PBH) */
 @media (min-width: 800px) { .vitrine .v-destaque-compacto { width: var(--v-largura-topo); } }
 .v-destaque-compacto .v-slide-texto { gap: .7rem; padding-block: 2rem 3.4rem; }
 .vitrine .v-destaque-compacto .v-miolo { width: calc(100% - 2 * clamp(1.25rem, 5.5vw, 5.5rem)); }
