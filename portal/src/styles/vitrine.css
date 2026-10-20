@@ -909,3 +909,6 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .vitrine[style*="--v-fundo-pagina"] body:has(.v-destaque, .v-bloco-noticias) { background: var(--v-fundo-pagina); }
 .vitrine.v-claro[style*="--v-fundo-pagina"] .v-secao:not(.v-bloco-servicos) { background: var(--v-fundo-pagina); }
 :root.contraste.vitrine body, :root.contraste.vitrine.v-claro .v-secao { background: #000; }
+
+/* D-111: cor própria da barra de acessibilidade do topo (tema.cor_barra_acessibilidade), com texto branco. */
+.vitrine[style*="--v-topo-fundo"] .v-topo { background: var(--v-topo-fundo); color: #fff; }

@@ -23,6 +23,8 @@ export interface Tema {
   cor_calendario?: string;
   /** Fundo da página inicial atrás das seções (D-110); vazio = branco. Cards, blocos com cor própria, cabeçalho e rodapé não mudam. */
   cor_fundo_pagina?: string;
+  /** Fundo da barra de acessibilidade do topo (D-111), com texto branco; vazio = cor do cabeçalho ou a principal. */
+  cor_barra_acessibilidade?: string;
   /** Cabeçalho do vitrine (D-54): fundo e cor do texto; padrão: cor primária com texto branco. */
   cor_cabecalho?: string;
   cor_cabecalho_texto?: string;
