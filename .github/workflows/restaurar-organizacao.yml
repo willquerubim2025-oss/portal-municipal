@@ -127,6 +127,13 @@ jobs:
           echo "Linhas por tabela no backup:"; for f in dados/*.csv; do echo "  $(basename $f .csv): $(( $(python3 -c "import csv,sys; print(sum(1 for _ in csv.reader(open(sys.argv[1], encoding='utf-8'))))" $f) - 1 ))"; done
           echo "Arquivos (midias) da organização no backup:"
           psql "$ORIGEM" -At -F ' | ' -c "select storage_path, coalesce(texto_alternativo, ''), coalesce(legado::text, '') from public.midias where municipio_id = '$M' order by storage_path"
+          # Lista de arquivos a reenviar: caminhos das midias e os citados em tema/config (brasão, fotos do "Em foco"...),
+          # com a origem registrada em legado (quando houver). Caminho já com o id da produção.
+          psql "$ORIGEM" -At -F '|' -c "
+            select storage_path, coalesce(legado->>'origem', '') from public.midias where municipio_id = '$M'
+            union
+            select m[1], '' from public.municipios x, regexp_matches(x.tema::text || x.config::text, '($M/[^\"]+)', 'g') m where x.id = '$M'
+            order by 1" | sed "s/$M/$M_DESTINO/g" > dados/arquivos.txt
 
       - name: Gravar na produção (ou simular)
         run: |
@@ -194,3 +201,48 @@ jobs:
           } > carga.sql
           echo "Modo: $FIM"
           psql "$DESTINO" -X -f carga.sql
+
+      # Os arquivos (fotos) não estão no backup do banco. Busca cada um na origem conhecida e envia ao
+      # Storage da produção pela interface S3 (chave do backup-arquivos.yml). Só com "aplicar".
+      - name: Repositório de material (Portais-Publicos)
+        uses: actions/checkout@v4
+        with:
+          repository: willquerubim2025-oss/Portais-Publicos
+          path: material
+
+      - name: Reenviar os arquivos ao Storage (ou listar)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.SUPABASE_S3_ID_PRODUCAO }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SUPABASE_S3_SEGREDO_PRODUCAO }}
+          AWS_DEFAULT_REGION: sa-east-1
+          S3: https://qgywucdnaeheqndcxtho.storage.supabase.co/storage/v1/s3
+        run: |
+          set -uo pipefail
+          mkdir -p arquivos; faltam=0; ok=0
+          while IFS='|' read -r caminho origem; do
+            nome=$(basename "$caminho"); local="arquivos/$nome"; fonte=""
+            case "$origem" in
+              *raw.githubusercontent.com/willquerubim2025-oss/Portais-Publicos/*) fonte="material/docs/${origem#*/docs/}" ;;
+              http*) fonte="$origem" ;;
+            esac
+            if [ -z "$fonte" ]; then
+              case "$nome" in
+                foco-bolsa-2.jpg)     fonte=material/docs/design/fotos/foco-bolsa.jpg ;;
+                foco-matricula-2.jpg) fonte=material/docs/design/fotos/foco-matricula.jpg ;;
+                brasao-*.png|logo-*.png) fonte="material/docs/design/marca/$nome" ;;
+                ficticio-men-*.jpg)   fonte="https://randomuser.me/api/portraits/men/$(echo "$nome" | sed 's/[^0-9]//g').jpg" ;;
+                ficticio-women-*.jpg) fonte="https://randomuser.me/api/portraits/women/$(echo "$nome" | sed 's/[^0-9]//g').jpg" ;;
+              esac
+            fi
+            case "$fonte" in
+              http*) curl -fsSL --max-time 60 -o "$local" "$fonte" || fonte="" ;;
+              material/*) [ -f "$fonte" ] && cp "$fonte" "$local" || fonte="" ;;
+            esac
+            if [ -z "$fonte" ] || [ ! -s "$local" ]; then echo "SEM ORIGEM: $caminho"; faltam=$((faltam+1)); continue; fi
+            echo "ok: $caminho  <-  $fonte ($(stat -c %s "$local") bytes)"; ok=$((ok+1))
+            if [ "$APLICAR" = "true" ]; then
+              tipo=$(file -b --mime-type "$local")
+              aws s3 cp "$local" "s3://midias/$caminho" --endpoint-url "$S3" --content-type "$tipo" --only-show-errors || { echo "::error::falha ao enviar $caminho"; exit 1; }
+            fi
+          done < dados/arquivos.txt
+          echo "Arquivos encontrados: $ok; sem origem: $faltam. Enviados: $([ "$APLICAR" = "true" ] && echo sim || echo 'não (simulação)')."
