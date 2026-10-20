@@ -873,9 +873,17 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 :root.contraste.vitrine .v-bloco-ficha .ficha dt { color: #ff0; }
 :root.contraste.vitrine .v-bloco-passos ol > li::before { background: #ff0; color: #000; }
 
-/* D-107: brasão bem maior no cabeçalho claro (computador e tablet). Ocupa quase toda a altura da linha (116 px)
-   e pode passar um pouco da margem esquerda do conteúdo. No celular, os tamanhos de D-73 continuam. */
+/* D-107: brasão bem maior no cabeçalho claro. Ocupa quase toda a altura da linha e, em telas largas, passa um pouco
+   da margem esquerda do conteúdo. Seletor com .marca porque `.marca img` (global.css, 64 px) vencia todas as regras de
+   tamanho do brasão acima. No celular continuam os tamanhos de D-73. */
 @media (min-width: 701px) {
   .vitrine .v-cab-claro .marca { padding-block: .35rem; gap: .85rem; }
-  .v-cab-claro-brasao { width: 104px; height: 104px; margin-left: -.9rem; }
+  .v-cab-claro .marca .v-cab-claro-brasao { flex: none; width: 84px; height: 84px; }
+}
+@media (min-width: 1181px) {
+  .vitrine .v-cab-claro .marca { padding-block: .25rem; }
+  .v-cab-claro .marca .v-cab-claro-brasao { width: 118px; height: 118px; }
+}
+@media (min-width: 1360px) {
+  .v-cab-claro .marca .v-cab-claro-brasao { margin-left: -1rem; }
 }
