@@ -872,3 +872,10 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 :root.contraste.vitrine .v-bloco-titulo, :root.contraste.vitrine .v-bloco-ficha .ficha > div { border-color: #fff; }
 :root.contraste.vitrine .v-bloco-ficha .ficha dt { color: #ff0; }
 :root.contraste.vitrine .v-bloco-passos ol > li::before { background: #ff0; color: #000; }
+
+/* D-107: brasão bem maior no cabeçalho claro (computador e tablet). Ocupa quase toda a altura da linha (116 px)
+   e pode passar um pouco da margem esquerda do conteúdo. No celular, os tamanhos de D-73 continuam. */
+@media (min-width: 701px) {
+  .vitrine .v-cab-claro .marca { padding-block: .35rem; gap: .85rem; }
+  .v-cab-claro-brasao { width: 104px; height: 104px; margin-left: -.9rem; }
+}
