@@ -976,3 +976,6 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .vitrine .v-videos .v-bloco-titulo { border-bottom-color: color-mix(in srgb, var(--cor-primaria) 14%, #fff); }
 @media (max-width: 700px) { .vitrine .v-videos { padding: 1.1rem 1rem 1.3rem; border-radius: 12px; } }
 :root.contraste.vitrine .v-videos { background: #000; border-color: #fff; }
+/* D-117 (ajuste): o título geral da caixa precisa ser maior que o título de cada vídeo. */
+.vitrine .v-videos .v-bloco-titulo { font-size: clamp(1.4rem, 1.15rem + .7vw, 1.75rem); font-weight: 800; }
+.v-video figcaption { font-size: clamp(1.05rem, .98rem + .25vw, 1.2rem); }
