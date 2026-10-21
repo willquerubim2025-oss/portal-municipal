@@ -979,3 +979,27 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 /* D-117 (ajuste): o título geral da caixa precisa ser maior que o título de cada vídeo. */
 .vitrine .v-videos .v-bloco-titulo { font-size: clamp(1.4rem, 1.15rem + .7vw, 1.75rem); font-weight: 800; }
 .v-video figcaption { font-size: clamp(1.05rem, .98rem + .25vw, 1.2rem); }
+
+/* D-118: texto de apoio ao lado de cada vídeo (o do 1º à esquerda, o do 2º à direita), com título, texto e links;
+   o 1º link é botão, os demais são links simples. Telas médias: cada par numa linha; celular: texto em cima do vídeo. */
+.v-video-par { display: flex; align-items: center; gap: 1.5rem; }
+.v-apoio-direita { flex-direction: row-reverse; }
+.v-video-apoio { flex: 1 1 0; min-width: 0; display: grid; gap: .7rem; align-content: center; }
+.v-video-apoio h3 { margin: 0; font-family: var(--v-fonte-titulos); font-size: 1.15rem; font-weight: 800; line-height: 1.25; color: var(--cor-primaria); }
+.v-video-apoio p { margin: 0; color: var(--cor-texto); line-height: 1.55; }
+.v-video-links { list-style: none; margin: .35rem 0 0; padding: 0; display: grid; gap: .6rem; justify-items: start; }
+.v-video-botao { border-radius: 999px; padding: .7rem 1.2rem; font-weight: 700; }
+.v-video-link { color: var(--v-secundaria-escura, var(--cor-primaria)); font-weight: 600; }
+.v-videos-com-apoio { flex-wrap: nowrap; justify-content: space-between; gap: 2rem; }
+.v-videos-com-apoio .v-video-par { flex: 1 1 0; min-width: 0; }
+.v-videos-com-apoio .v-video { flex: 0 0 320px; }
+@media (max-width: 1099.98px) {
+  .v-videos-com-apoio { flex-direction: column; align-items: stretch; }
+  .v-videos-com-apoio .v-video-par { max-width: 720px; margin-inline: auto; width: 100%; }
+}
+@media (max-width: 700px) {
+  .v-video-par, .v-apoio-direita { flex-direction: column; align-items: stretch; }
+  .v-videos-com-apoio .v-video { flex: 0 1 auto; width: 100%; max-width: 360px; margin-inline: auto; }
+}
+:root.contraste.vitrine .v-video-apoio h3, :root.contraste.vitrine .v-video-apoio p { color: #fff; }
+:root.contraste.vitrine .v-video-link { color: #ff0; }

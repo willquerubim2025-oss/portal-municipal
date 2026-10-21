@@ -2,28 +2,66 @@
 // Vídeos explicativos do serviço (D-116, migração 0028), logo depois da foto de capa. Os arquivos ficam no bucket
 // público "midias", na pasta da organização (o banco recusa outra pasta; aqui conferimos de novo). Sem baixar nada
 // antes do clique (preload="none"); a capa é a imagem mostrada enquanto o vídeo não toca.
+// D-118: cada vídeo pode ter um texto de apoio ao lado (apoio: título, texto e links). Os textos ficam por fora:
+// o do 1º vídeo à esquerda dele, o do 2º à direita, e assim por diante. No celular, cada texto fica junto do seu vídeo.
 import { urlMidia } from '../../lib/supabase';
-interface Video { titulo: string; caminho: string; capa?: string }
+interface Link { rotulo: string; url: string }
+interface Apoio { titulo?: string; texto?: string; links?: Link[] }
+interface Video { titulo: string; caminho: string; capa?: string; apoio?: Apoio }
 interface Props { videos?: Video[] | null; titulo?: string | null; municipioId: string }
 const { videos, titulo, municipioId } = Astro.props;
 const daOrganizacao = (c?: string) => typeof c === 'string' && c.startsWith(`${municipioId}/`) && !c.includes('..');
 const lista = (Array.isArray(videos) ? videos : []).filter((v) => v?.titulo && daOrganizacao(v.caminho));
+// Só endereços da web ou do próprio portal (o dado vem do banco).
+const urlValida = (u?: string) => typeof u === 'string' && (/^https?:\/\//i.test(u) || (u.startsWith('/') && !u.startsWith('//')));
+const externo = (u: string) => /^https?:\/\//i.test(u);
+const apoioDe = (v: Video) => {
+  const a = v.apoio;
+  if (!a || typeof a !== 'object') return null;
+  const links = (Array.isArray(a.links) ? a.links : []).filter((l) => l?.rotulo && urlValida(l.url));
+  return a.titulo || a.texto || links.length ? { titulo: a.titulo, texto: a.texto, links } : null;
+};
+const comApoio = lista.some((v) => apoioDe(v));
 ---
 {lista.length > 0 && (
   <section class="v-videos" aria-labelledby="t-videos">
     <h2 id="t-videos" class="v-bloco-titulo">{titulo?.trim() || (lista.length > 1 ? 'Vídeos explicativos' : 'Vídeo explicativo')}</h2>
     <p class="v-videos-nota">Os vídeos têm legenda. Prefere ler? As mesmas informações estão logo abaixo.</p>
-    <div class="v-videos-grade">
-      {lista.map((v, i) => (
-        <figure class="v-video">
-          <figcaption id={`t-video-${i}`}>{v.titulo}</figcaption>
-          <video controls preload="none" playsinline aria-labelledby={`t-video-${i}`}
-                 poster={daOrganizacao(v.capa) ? urlMidia(v.capa) ?? undefined : undefined}>
-            <source src={urlMidia(v.caminho)!} type="video/mp4" />
-            <a href={urlMidia(v.caminho)!}>Baixar o vídeo: {v.titulo}</a>
-          </video>
-        </figure>
-      ))}
+    <div class={comApoio ? 'v-videos-grade v-videos-com-apoio' : 'v-videos-grade'}>
+      {lista.map((v, i) => {
+        const a = apoioDe(v);
+        const lado = i % 2 === 0 ? 'v-apoio-esquerda' : 'v-apoio-direita';
+        return (
+          <div class={`v-video-par ${lado}`}>
+            {a && (
+              <div class="v-video-apoio">
+                {a.titulo && <h3>{a.titulo}</h3>}
+                {a.texto && <p>{a.texto}</p>}
+                {a.links.length > 0 && (
+                  <ul class="v-video-links">
+                    {a.links.map((l, j) => (
+                      <li>
+                        <a class={j === 0 ? 'botao v-video-botao' : 'v-video-link'} href={l.url}
+                           target={externo(l.url) ? '_blank' : undefined} rel={externo(l.url) ? 'noopener' : undefined}>
+                          {l.rotulo}{externo(l.url) && <span class="sr-only"> (abre em nova aba)</span>}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+            <figure class="v-video">
+              <figcaption id={`t-video-${i}`}>{v.titulo}</figcaption>
+              <video controls preload="none" playsinline aria-labelledby={`t-video-${i}`}
+                     poster={daOrganizacao(v.capa) ? urlMidia(v.capa) ?? undefined : undefined}>
+                <source src={urlMidia(v.caminho)!} type="video/mp4" />
+                <a href={urlMidia(v.caminho)!}>Baixar o vídeo: {v.titulo}</a>
+              </video>
+            </figure>
+          </div>
+        );
+      })}
     </div>
   </section>
 )}
