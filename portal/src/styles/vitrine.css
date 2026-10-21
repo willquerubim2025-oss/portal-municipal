@@ -1003,3 +1003,11 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 }
 :root.contraste.vitrine .v-video-apoio h3, :root.contraste.vitrine .v-video-apoio p { color: #fff; }
 :root.contraste.vitrine .v-video-link { color: #ff0; }
+
+/* D-119: linha divisória entre os pares de vídeo (vertical lado a lado; horizontal quando ficam um embaixo do outro),
+   formando duas áreas dentro da caixa maior. */
+.v-videos-com-apoio .v-video-par + .v-video-par { border-left: 2px solid color-mix(in srgb, var(--cor-primaria) 18%, #fff); padding-left: 2rem; }
+@media (max-width: 1099.98px) {
+  .v-videos-com-apoio .v-video-par + .v-video-par { border-left: 0; padding-left: 0; border-top: 2px solid color-mix(in srgb, var(--cor-primaria) 18%, #fff); padding-top: 1.75rem; }
+}
+:root.contraste.vitrine .v-videos-com-apoio .v-video-par + .v-video-par { border-color: #fff; }
