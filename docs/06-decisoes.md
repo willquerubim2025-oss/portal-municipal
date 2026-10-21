@@ -898,3 +898,6 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 
 **D-119 · 21/10/2026 · Linha divisória entre os dois vídeos (pedido do William)**
 - "Coloca um risco vertical separando os dois vídeos... gera duas caixinhas dentro da caixa maior. Altera só isso." Linha de 2 px (cor principal a 18% sobre branco) entre os pares vídeo + texto quando estão lado a lado; quando ficam um embaixo do outro (< 1100 px), a linha fica horizontal. Vale para qualquer serviço com vídeos e texto de apoio (D-118).
+
+**D-120 · 21/10/2026 · Padrão da seção de vídeos: vídeo à esquerda, texto e botão à direita (pedido do William)**
+- "Vamos criar um padrão para essa seção: do lado esquerdo fica o vídeo, do lado direito a descrição com o botão." Substitui a alternância de D-118 (texto do 1º à esquerda, do 2º à direita): agora todos os pares são vídeo → texto, com a linha divisória de D-119 entre eles. No celular, o texto fica embaixo do vídeo.

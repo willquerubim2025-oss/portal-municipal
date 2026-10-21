@@ -1011,3 +1011,6 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
   .v-videos-com-apoio .v-video-par + .v-video-par { border-left: 0; padding-left: 0; border-top: 2px solid color-mix(in srgb, var(--cor-primaria) 18%, #fff); padding-top: 1.75rem; }
 }
 :root.contraste.vitrine .v-videos-com-apoio .v-video-par + .v-video-par { border-color: #fff; }
+/* D-120: padrão vídeo à esquerda e texto à direita em todos os pares (sem alternar). */
+.v-videos-com-apoio .v-video-par { flex-direction: row; }
+@media (max-width: 700px) { .v-videos-com-apoio .v-video-par { flex-direction: column; } }
