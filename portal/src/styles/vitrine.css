@@ -912,3 +912,12 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 
 /* D-111: cor própria da barra de acessibilidade do topo (tema.cor_barra_acessibilidade), com texto branco. */
 .vitrine[style*="--v-topo-fundo"] .v-topo { background: var(--v-topo-fundo); color: #fff; }
+
+/* D-113: brasão ~30% maior (118 → 154 px; tablet 84 → 110 px) sem mudar a altura do cabeçalho: as margens
+   negativas tiram o excesso do cálculo da linha e o brasão sai um pouco para cima e para baixo da faixa branca. */
+@media (min-width: 701px) {
+  .v-cab-claro .marca .v-cab-claro-brasao { width: 110px; height: 110px; margin-block: -13px; position: relative; z-index: 3; }
+}
+@media (min-width: 1181px) {
+  .v-cab-claro .marca .v-cab-claro-brasao { width: 154px; height: 154px; margin-block: -18px; }
+}
