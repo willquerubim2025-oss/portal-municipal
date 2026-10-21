@@ -2,9 +2,11 @@
 // Corpo da página do serviço (Carta de Serviços). Usado pela página publicada e pela pré-visualização (D-93).
 import { htmlSeguro } from '../lib/html';
 import Capa from './vitrine/Capa.astro';
+import Videos from './vitrine/Videos.astro';
 import ComLateral from './ComLateral.astro';
 interface Props { s: any }
 const { s } = Astro.props;
+const municipioId: string = s.municipio_id;
 // Link próprio do serviço: página do portal abre na mesma aba; site externo, em nova aba.
 const interno = typeof s.url_externa === 'string' && s.url_externa.startsWith('/');
 const blocos: [string, string | null][] = [
@@ -21,6 +23,7 @@ const blocos: [string, string | null][] = [
       {s.descricao && <p>{s.descricao}</p>}
     </header>
     <Capa imagem={s.imagem} />
+    <Videos videos={s.videos} municipioId={municipioId} />
     <ComLateral>
     <section class="v-bloco v-bloco-ficha" aria-labelledby="t-resumo">
       <h2 id="t-resumo" class="v-bloco-titulo">Informações do serviço</h2>

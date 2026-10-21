@@ -949,3 +949,13 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 @media (min-width: 1181px) {
   .v-cab-claro .marca .v-cab-claro-brasao { width: 126px; height: 126px; margin-top: -8px; margin-bottom: -8px; }
 }
+
+/* D-116: vídeos explicativos do serviço, entre a foto de capa e as informações. Vídeos verticais (celular) lado a lado,
+   centralizados; no celular, um embaixo do outro. */
+.v-videos { margin-bottom: 2rem; }
+.v-videos-nota { margin: -.25rem 0 1.25rem; color: var(--v-texto-suave); font-size: .95rem; }
+.v-videos-grade { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem 2.5rem; }
+.v-video { margin: 0; flex: 0 1 320px; display: grid; gap: .65rem; }
+.v-video video { display: block; width: 100%; aspect-ratio: 9 / 16; max-height: 70vh; object-fit: contain; background: #0f2a1f; border-radius: var(--v-raio); box-shadow: var(--v-sombra); }
+.v-video figcaption { font-family: var(--v-fonte-titulos); font-weight: 700; color: var(--cor-primaria); text-align: center; font-size: 1.05rem; }
+:root.contraste.vitrine .v-video figcaption, :root.contraste.vitrine .v-videos-nota { color: #fff; }
