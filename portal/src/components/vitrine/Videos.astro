@@ -10,18 +10,18 @@ const daOrganizacao = (c?: string) => typeof c === 'string' && c.startsWith(`${m
 const lista = (Array.isArray(videos) ? videos : []).filter((v) => v?.titulo && daOrganizacao(v.caminho));
 ---
 {lista.length > 0 && (
-  <section class="v-bloco v-videos" aria-labelledby="t-videos">
+  <section class="v-videos" aria-labelledby="t-videos">
     <h2 id="t-videos" class="v-bloco-titulo">{lista.length > 1 ? 'Vídeos explicativos' : 'Vídeo explicativo'}</h2>
     <p class="v-videos-nota">Os vídeos têm legenda. Prefere ler? As mesmas informações estão logo abaixo.</p>
     <div class="v-videos-grade">
       {lista.map((v, i) => (
         <figure class="v-video">
+          <figcaption id={`t-video-${i}`}>{v.titulo}</figcaption>
           <video controls preload="none" playsinline aria-labelledby={`t-video-${i}`}
                  poster={daOrganizacao(v.capa) ? urlMidia(v.capa) ?? undefined : undefined}>
             <source src={urlMidia(v.caminho)!} type="video/mp4" />
             <a href={urlMidia(v.caminho)!}>Baixar o vídeo: {v.titulo}</a>
           </video>
-          <figcaption id={`t-video-${i}`}>{v.titulo}</figcaption>
         </figure>
       ))}
     </div>

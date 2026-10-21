@@ -959,3 +959,13 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .v-video video { display: block; width: 100%; aspect-ratio: 9 / 16; max-height: 70vh; object-fit: contain; background: #0f2a1f; border-radius: var(--v-raio); box-shadow: var(--v-sombra); }
 .v-video figcaption { font-family: var(--v-fonte-titulos); font-weight: 700; color: var(--cor-primaria); text-align: center; font-size: 1.05rem; }
 :root.contraste.vitrine .v-video figcaption, :root.contraste.vitrine .v-videos-nota { color: #fff; }
+/* D-116 (ajuste): cada vídeo numa caixa própria, com o título em cima e em destaque; a seção deixa de ser uma caixa. */
+.v-videos { margin: 0 0 2.25rem; }
+.v-videos .v-bloco-titulo { margin-bottom: .6rem; }
+.v-videos-grade { gap: 1.75rem 2rem; }
+.v-video { flex: 0 1 360px; gap: 1rem; padding: 1.25rem 1.25rem 1.4rem; background: #fff; border: 1px solid color-mix(in srgb, var(--cor-primaria) 12%, #fff);
+  border-radius: var(--v-raio); box-shadow: var(--v-sombra); align-content: start; }
+.v-video figcaption { order: -1; text-align: left; font-size: clamp(1.15rem, 1rem + .4vw, 1.35rem); font-weight: 800; line-height: 1.25;
+  padding-left: .8rem; border-left: 4px solid var(--v-acento, var(--cor-secundaria)); }
+.v-video video { box-shadow: none; }
+:root.contraste.vitrine .v-video { background: #000; border-color: #fff; }
