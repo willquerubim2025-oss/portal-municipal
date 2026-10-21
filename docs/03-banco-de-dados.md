@@ -31,6 +31,7 @@
 | 0013_exportacao | Bucket privado `exportacoes` (admin do município lê a própria pasta; ninguém grava pela API); uma exportação em andamento por município; `disparar_rotinas()` passa a chamar a exportação | RF19, D-32 |
 | 0014_verificacao_concluir_trava | `verificacao_concluir()` trava a verificação (FOR UPDATE): duas execuções simultâneas não duplicam os problemas | D-31 |
 | 0015_pntp_2026 | `pntp_criterios` ganha matriz, código, classificação, aspectos e sugestão de evidência; carga dos 181 critérios oficiais do ciclo 2026; `pntp_atendimento.evidencia_url` | RF11, D-35 |
+| 0031_sistemas_em_breve | `sistemas_externos.em_breve`; `url` opcional só quando em breve (CHECK); visitante lê sistemas ativos do cidadão ou marcados `na_home` (inclusive de servidores); `midia_publica()` inclui logo desses | D-122 |
 | 0030_sistemas_na_home | `sistemas_externos` ganha `na_home`, `ordem`, `icone`, `logo_id` (FK composta para `midias`); `midia_publica()` inclui logo de sistema ativo do cidadão | D-121 |
 | 0029_titulo_dos_videos | `servicos.videos_titulo` (título da seção de vídeos; vazio = "Vídeos explicativos") | D-117 |
 | 0028_videos_dos_servicos | `servicos.videos` (jsonb `[{titulo, caminho, capa?}]`, até 6; CHECK: arquivos na pasta da organização e título obrigatório) | D-116 |

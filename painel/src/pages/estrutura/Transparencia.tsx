@@ -8,8 +8,8 @@ import { Obrigatorio } from '../../components/Edicao';
 import { CampoImagem } from '../../components/CampoImagem';
 import type { Midia } from '../../lib/midias';
 
-interface Sistema { id: string; nome: string; fornecedor: string | null; categoria: string; url: string; descricao: string | null; ativo: boolean; publico: 'cidadao' | 'servidor';
-  na_home: boolean; ordem: number; icone: string | null; logo: Midia | null }
+interface Sistema { id: string; nome: string; fornecedor: string | null; categoria: string; url: string | null; descricao: string | null; ativo: boolean; publico: 'cidadao' | 'servidor';
+  na_home: boolean; em_breve: boolean; ordem: number; icone: string | null; logo: Midia | null }
 
 /** Ícones de reserva do bloco "Sistemas" da página inicial (mesmos nomes do portal, components/Icone.astro). */
 const ICONES_SISTEMA: Record<string, string> = {
@@ -251,9 +251,9 @@ function Sistemas() {
               <td>{s.nome}{s.fornecedor && <span className="meta"> · {s.fornecedor}</span>}</td>
               <td>{s.publico === 'servidor' ? 'Servidores' : 'Público'}</td>
               <td>{CATEGORIAS_SISTEMA[s.categoria]}</td>
-              <td><a href={s.url} target="_blank" rel="noopener">{s.url.replace(/^https?:\/\//, '').slice(0, 45)}</a></td>
+              <td>{s.url ? <a href={s.url} target="_blank" rel="noopener">{s.url.replace(/^https?:\/\//, '').slice(0, 45)}</a> : <span className="meta">sem endereço</span>}{s.em_breve && <span className="meta"> · em breve</span>}</td>
               <td>{s.ativo ? 'Ativo' : 'Inativo'}</td>
-              <td>{s.na_home && s.publico === 'cidadao' ? `Sim (ordem ${s.ordem})` : 'Não'}</td>
+              <td>{s.na_home ? `Sim (ordem ${s.ordem})` : 'Não'}</td>
               <td className="acoes-linha">
                 <button type="button" className="botao-link" onClick={() => setEdit(s)}>Editar<span className="sr-only"> {s.nome}</span></button>
                 <button type="button" className="botao-link" onClick={() => excluir(s)}>Excluir<span className="sr-only"> {s.nome}</span></button>
@@ -274,6 +274,7 @@ function FormSistema({ sistema, mid, aoFechar }: { sistema: Sistema | null; mid:
   const [categoria, setCategoria] = useState(sistema?.categoria ?? 'transparencia');
   const [url, setUrl] = useState(sistema?.url ?? '');
   const [ativo, setAtivo] = useState(sistema?.ativo ?? true);
+  const [emBreve, setEmBreve] = useState(sistema?.em_breve ?? false);
   const [descricao, setDescricao] = useState(sistema?.descricao ?? '');
   const [publico, setPublico] = useState<'cidadao' | 'servidor'>(sistema?.publico ?? 'cidadao');
   const [naHome, setNaHome] = useState(sistema?.na_home ?? false);
@@ -291,10 +292,11 @@ function FormSistema({ sistema, mid, aoFechar }: { sistema: Sistema | null; mid:
   async function salvar(ev: FormEvent) {
     ev.preventDefault();
     if (!nome.trim()) return setErro('Informe o nome.');
-    if (!/^https?:\/\//.test(url.trim())) return setErro('O endereço deve começar com http:// ou https://.');
+    if (!url.trim() && !emBreve) return setErro('Informe o endereço ou marque "Ainda não está no ar".');
+    if (url.trim() && !/^https?:\/\//.test(url.trim())) return setErro('O endereço deve começar com http:// ou https://.');
     if (logo && !logo.texto_alternativo?.trim()) return setErro('O logo precisa de texto alternativo.');
-    const linha = { municipio_id: mid, nome: nome.trim(), fornecedor: fornecedor.trim() || null, categoria, url: url.trim(), ativo, publico, descricao: descricao.trim() || null,
-      na_home: publico === 'cidadao' && naHome, ordem: Number.parseInt(ordem, 10) || 0, icone: icone || null, logo_id: logo?.id ?? null };
+    const linha = { municipio_id: mid, nome: nome.trim(), fornecedor: fornecedor.trim() || null, categoria, url: url.trim() || null, em_breve: emBreve, ativo, publico, descricao: descricao.trim() || null,
+      na_home: naHome, ordem: Number.parseInt(ordem, 10) || 0, icone: icone || null, logo_id: logo?.id ?? null };
     const r = sistema
       ? await supabase.from('sistemas_externos').update(linha).eq('id', sistema.id).select('id').single()
       : await supabase.from('sistemas_externos').insert(linha).select('id').single();
@@ -317,28 +319,27 @@ function FormSistema({ sistema, mid, aoFechar }: { sistema: Sistema | null; mid:
         <label>Fornecedor<input value={fornecedor} onChange={(e) => setFornecedor(e.target.value)} placeholder="Ex.: Fiorilli" /></label>
       </div>
       <label>Tipo<select value={categoria} onChange={(e) => setCategoria(e.target.value)}>{Object.entries(CATEGORIAS_SISTEMA).map(([v, r]) => <option key={v} value={v}>{r}</option>)}</select></label>
-      <label><Obrigatorio>Endereço</Obrigatorio><input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://" /></label>
+      <label>{emBreve ? 'Endereço (opcional enquanto não está no ar)' : <Obrigatorio>Endereço</Obrigatorio>}<input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://" /></label>
+      <label className="opcao"><input type="checkbox" checked={emBreve} onChange={(e) => setEmBreve(e.target.checked)} /> Ainda não está no ar: o portal mostra "Em breve", sem link</label>
       <label>Descrição (opcional)<input value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Ex.: matrícula e fila das creches" /></label>
       <fieldset>
         <legend>Para quem</legend>
         <label className="opcao"><input type="radio" name="publico" checked={publico === 'cidadao'} onChange={() => setPublico('cidadao')} /> Público: link no portal (Transparência e serviços)</label>
         <label className="opcao"><input type="radio" name="publico" checked={publico === 'servidor'} onChange={() => setPublico('servidor')} /> Servidores: atalho no painel, em "Meus sistemas"</label>
       </fieldset>
-      {publico === 'cidadao' && (
-        <fieldset>
-          <legend>Página inicial do portal</legend>
-          <label className="opcao"><input type="checkbox" checked={naHome} onChange={(e) => setNaHome(e.target.checked)} /> Mostrar no bloco "Sistemas" da página inicial</label>
-          {naHome && (
-            <>
-              <div className="linha-campos">
-                <label>Ordem<input type="number" value={ordem} onChange={(e) => setOrdem(e.target.value)} min={0} /></label>
-                <label>Ícone (usado quando não há logo)<select value={icone} onChange={(e) => setIcone(e.target.value)}>{Object.entries(ICONES_SISTEMA).map(([v, r]) => <option key={v} value={v}>{r}</option>)}</select></label>
-              </div>
-              <CampoImagem rotulo="Logo do sistema (opcional; fica num círculo branco)" municipioId={mid} midia={logo} aoMudar={setLogo} />
-            </>
-          )}
-        </fieldset>
-      )}
+      <fieldset>
+        <legend>Página inicial do portal</legend>
+        <label className="opcao"><input type="checkbox" checked={naHome} onChange={(e) => setNaHome(e.target.checked)} /> Mostrar no bloco "Sistemas" da página inicial{publico === 'servidor' && ' (com a etiqueta "Servidores"; o visitante vê o nome e a descrição)'}</label>
+        {naHome && (
+          <>
+            <div className="linha-campos">
+              <label>Ordem<input type="number" value={ordem} onChange={(e) => setOrdem(e.target.value)} min={0} /></label>
+              <label>Ícone (usado quando não há logo)<select value={icone} onChange={(e) => setIcone(e.target.value)}>{Object.entries(ICONES_SISTEMA).map(([v, r]) => <option key={v} value={v}>{r}</option>)}</select></label>
+            </div>
+            <CampoImagem rotulo="Logo do sistema (opcional; fica num círculo branco)" municipioId={mid} midia={logo} aoMudar={setLogo} />
+          </>
+        )}
+      </fieldset>
       {publico === 'servidor' && (
         <fieldset>
           <legend>Quais papéis veem este sistema</legend>

@@ -2,27 +2,39 @@
 // Bloco "Sistemas" da página inicial (D-121, migração 0030): os sistemas públicos que "orbitam" o portal (inscrição,
 // matrícula, uniforme...), cada um num círculo branco com o logo (ou o ícone de reserva), o nome e uma linha.
 // Todos abrem em nova aba. A faixa é escura (cor principal) para separar do resto da página.
+// D-122: sistema "em breve" aparece sem link, com a etiqueta; sistema de servidores leva a etiqueta "Servidores".
 import Icone from '../Icone.astro';
 import { urlImagem } from '../../lib/imagens';
 interface Props { sistemas: any[]; titulo: string; municipioId: string }
 const { sistemas, titulo, municipioId } = Astro.props;
 const daOrganizacao = (c?: string) => typeof c === 'string' && c.startsWith(`${municipioId}/`);
 const valido = (u?: string) => typeof u === 'string' && /^https?:\/\//i.test(u);
-const lista = sistemas.filter((s) => s?.nome && valido(s.url));
+const lista = sistemas.filter((s) => s?.nome && (s.em_breve || valido(s.url)));
 ---
 <div class="v-secao-titulo"><h2 id="titulo-sistemas">{titulo}</h2></div>
 <ul class="v-sistemas" role="list">
-  {lista.map((s) => (
-    <li>
-      <a class="v-sistema" href={s.url} target="_blank" rel="noopener">
-        <span class="v-sistema-circulo" aria-hidden="true">
-          {s.logo?.storage_path && daOrganizacao(s.logo.storage_path)
-            ? <img src={urlImagem(s.logo.storage_path, 320)} alt="" width="120" height="120" loading="lazy" />
-            : <Icone nome={s.icone} />}
-        </span>
-        <span class="v-sistema-nome">{s.nome}<span class="sr-only"> (abre em nova aba)</span></span>
-        {s.descricao && <span class="v-sistema-desc">{s.descricao}</span>}
-      </a>
-    </li>
-  ))}
+  {lista.map((s) => {
+    const link = !s.em_breve && valido(s.url);
+    const Tag = link ? 'a' : 'div';
+    return (
+      <li>
+        <Tag class={link ? 'v-sistema' : 'v-sistema v-sistema-em-breve'} href={link ? s.url : undefined}
+             target={link ? '_blank' : undefined} rel={link ? 'noopener' : undefined}>
+          <span class="v-sistema-circulo" aria-hidden="true">
+            {s.logo?.storage_path && daOrganizacao(s.logo.storage_path)
+              ? <img src={urlImagem(s.logo.storage_path, 320)} alt="" width="120" height="120" loading="lazy" />
+              : <Icone nome={s.icone} />}
+          </span>
+          <span class="v-sistema-nome">{s.nome}{link && <span class="sr-only"> (abre em nova aba)</span>}</span>
+          {s.descricao && <span class="v-sistema-desc">{s.descricao}</span>}
+          {(s.publico === 'servidor' || s.em_breve) && (
+            <span class="v-sistema-etiquetas">
+              {s.publico === 'servidor' && <span class="v-sistema-etiqueta">Servidores</span>}
+              {s.em_breve && <span class="v-sistema-etiqueta v-sistema-etiqueta-breve">Em breve</span>}
+            </span>
+          )}
+        </Tag>
+      </li>
+    );
+  })}
 </ul>
