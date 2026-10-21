@@ -927,3 +927,16 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
   .v-cab-claro .marca .v-cab-claro-brasao { margin-left: max(-3.1rem, calc((var(--v-largura-max-topo, 1290px) - 100vw) / 2 + 6px)); margin-right: -.35rem; }
   .vitrine .v-cab-claro .marca { gap: .75rem; }
 }
+
+/* D-114: brasão um pouco menor (154 → 146 px) para não passar da borda de cima do cabeçalho; continua saindo um
+   pouco por baixo. Tablet: 110 px, também sem passar por cima. Altura do cabeçalho e menu numa linha mantidos. */
+@media (min-width: 701px) {
+  .v-cab-claro .marca .v-cab-claro-brasao { margin-top: 0; margin-bottom: -26px; }
+}
+@media (min-width: 1181px) {
+  .v-cab-claro .marca .v-cab-claro-brasao { width: 146px; height: 146px; margin-top: -6px; margin-bottom: -26px; }
+}
+/* D-114: cor própria das letras do cabeçalho claro (tema.cor_letras_cabecalho): nome, menu, submenu e lupa.
+   O botão de ação e a barra de acessibilidade não mudam. Fora do alto contraste (lá valem as cores dele). */
+:root:not(.contraste).vitrine[style*="--v-cab-letras"] :is(.v-cab-claro .marca-tipo, .v-cab-claro .marca-nome,
+  .v-cab-claro .menu-lista > li > a, .v-cab-claro .menu-lista > li > .menu-grupo, .v-cab-claro .submenu a, .v-cab-claro .v-cab-lupa) { color: var(--v-cab-letras); }

@@ -25,6 +25,8 @@ export interface Tema {
   cor_fundo_pagina?: string;
   /** Fundo da barra de acessibilidade do topo (D-111), com texto branco; vazio = cor do cabeçalho ou a principal. */
   cor_barra_acessibilidade?: string;
+  /** Cabeçalho claro: cor das letras (nome, menu, lupa) sobre o fundo branco (D-114); vazio = cor principal. */
+  cor_letras_cabecalho?: string;
   /** Cabeçalho do vitrine (D-54): fundo e cor do texto; padrão: cor primária com texto branco. */
   cor_cabecalho?: string;
   cor_cabecalho_texto?: string;

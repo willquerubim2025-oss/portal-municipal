@@ -39,6 +39,7 @@ function paresVitrine(t: Record<string, any>, primaria: string) {
     { chave: 'cor_secundaria_escura', rotulo: 'Destaque escuro (rótulos, links e botões com texto branco)', contra: '#ffffff', contraNome: 'branco' },
     { chave: 'cor_acento', rotulo: 'Cor de acento (botão do destaque, faixa de aviso)', contra: primaria, contraNome: 'a cor principal' },
     { chave: 'cor_regua', rotulo: 'Fundo dos títulos das seções', contra: TEXTO_ESCURO, contraNome: 'o texto escuro' },
+    { chave: 'cor_letras_cabecalho', rotulo: 'Letras do cabeçalho branco: nome, menu e lupa (vazia = cor principal)', contra: '#ffffff', contraNome: 'o fundo branco do cabeçalho' },
     { chave: 'cor_barra_acessibilidade', rotulo: 'Barra de acessibilidade do topo (texto branco; vazia = cor do cabeçalho)', contra: '#ffffff', contraNome: 'o texto branco' },
     { chave: 'cor_fundo_pagina', rotulo: 'Fundo da página inicial (vazio = branco)', contra: primaria, contraNome: 'a cor principal (títulos das seções)' },
     { chave: 'cor_calendario', rotulo: 'Dias com evento no calendário (vazia = cor dos títulos)', contra: primaria, contraNome: 'a cor principal (número do dia)' },
