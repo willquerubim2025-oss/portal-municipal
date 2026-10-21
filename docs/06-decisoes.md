@@ -859,6 +859,7 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 **D-111 · 20/10/2026 · Barra de acessibilidade do topo em cinza escuro (pedido do William)**
 - "O cabeçalho de acessibilidade, ao invés daquele verde escuro, utilize um cinza um pouco mais escuro... é só essa alteração." Campo novo do tema, **`tema.cor_barra_acessibilidade`** (texto branco; vazio = cor do cabeçalho ou a principal, como antes), no painel em Identidade visual e dados, com checagem de contraste contra o branco. Muda só a barra fina do topo (atalhos, A−/A/A+, alto contraste, "Site da Prefeitura"); o resto do cabeçalho não muda. No alto contraste, continua preta.
 - SMEDU: **`#45494e`** (cinza escuro, levemente azulado); contraste do texto branco 9,1:1.
+- **Descartado em 21/10/2026** ("volta ao verde... um cinza não ficou legal; altera só isso"): `cor_barra_acessibilidade` removido do tema da SMEDU; a barra voltou ao petróleo `#004348` (conferido no site). O campo continua disponível no painel, vazio.
 
 **D-112 · 21/10/2026 · Fundo da página inicial igual ao do site da Prefeitura: `#f5f7f7` (pedido do William)**
 - O pedido por trás do teste do cinza (D-110) era ter **a mesma cor de fundo do site da Prefeitura de Paulínia**. Inspecionado em www.paulinia.sp.gov.br em 21/10/2026: a área de conteúdo da página principal (`#e_conteudo`) tem fundo **`rgb(245, 247, 247)` = `#f5f7f7`**, cor chapada (sem degradê nem imagem; confirmado também pela leitura de um pixel). O cabeçalho deles é branco e o rodapé `#05474c`.
