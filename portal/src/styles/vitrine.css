@@ -921,3 +921,9 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 @media (min-width: 1181px) {
   .v-cab-claro .marca .v-cab-claro-brasao { width: 154px; height: 154px; margin-block: -18px; }
 }
+/* D-113 (ajuste): o brasão de 154 px empurrava o menu para a 2ª linha. A partir de 1181 px ele avança sobre a margem
+   esquerda (até 3,1 rem, sem passar da borda da tela) e encosta um pouco no nome, ocupando a mesma largura de antes. */
+@media (min-width: 1181px) {
+  .v-cab-claro .marca .v-cab-claro-brasao { margin-left: max(-3.1rem, calc((var(--v-largura-max-topo, 1290px) - 100vw) / 2 + 6px)); margin-right: -.35rem; }
+  .vitrine .v-cab-claro .marca { gap: .75rem; }
+}
