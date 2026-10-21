@@ -969,3 +969,10 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
   padding-left: .8rem; border-left: 4px solid var(--v-acento, var(--cor-secundaria)); }
 .v-video video { box-shadow: none; }
 :root.contraste.vitrine .v-video { background: #000; border-color: #fff; }
+/* D-117: os vídeos ficam numa caixa maior, com fundo cinza-claro (o mesmo tom da faixa do título da página) e título
+   próprio do serviço (servicos.videos_titulo), no estilo dos outros títulos de bloco. As caixas dos vídeos continuam brancas. */
+.vitrine .v-videos { background: var(--v-faixa-neutra); border: 1px solid color-mix(in srgb, var(--cor-primaria) 11%, #fff);
+  border-radius: var(--v-raio); padding: 1.5rem 1.75rem 1.9rem; margin: 0 0 2.25rem; }
+.vitrine .v-videos .v-bloco-titulo { border-bottom-color: color-mix(in srgb, var(--cor-primaria) 14%, #fff); }
+@media (max-width: 700px) { .vitrine .v-videos { padding: 1.1rem 1rem 1.3rem; border-radius: 12px; } }
+:root.contraste.vitrine .v-videos { background: #000; border-color: #fff; }

@@ -31,6 +31,7 @@
 | 0013_exportacao | Bucket privado `exportacoes` (admin do município lê a própria pasta; ninguém grava pela API); uma exportação em andamento por município; `disparar_rotinas()` passa a chamar a exportação | RF19, D-32 |
 | 0014_verificacao_concluir_trava | `verificacao_concluir()` trava a verificação (FOR UPDATE): duas execuções simultâneas não duplicam os problemas | D-31 |
 | 0015_pntp_2026 | `pntp_criterios` ganha matriz, código, classificação, aspectos e sugestão de evidência; carga dos 181 critérios oficiais do ciclo 2026; `pntp_atendimento.evidencia_url` | RF11, D-35 |
+| 0029_titulo_dos_videos | `servicos.videos_titulo` (título da seção de vídeos; vazio = "Vídeos explicativos") | D-117 |
 | 0028_videos_dos_servicos | `servicos.videos` (jsonb `[{titulo, caminho, capa?}]`, até 6; CHECK: arquivos na pasta da organização e título obrigatório) | D-116 |
 | 0011_cache_portal | Schema `interno` (não exposto); fila `interno.cache_pendente`; gatilhos em 22 tabelas; `interno.limpar_cache_portal()` agendada no `pg_cron` a cada minuto (envia a limpeza via `pg_net`) | D-30 |
 | 0007_modulos_genericos | `orgaos`, `perguntas_frequentes`, `documento_relacoes` + `documentos.situacao`, `destaques`, `publicacao_midias`, `eventos`, `publicacoes.expira_em`, `orgao_id` em serviços/documentos/publicações, `buscar()` ampliada, `provisionar_municipio()` e `criar_municipio()` | D-10, D-12 (doc 08) |

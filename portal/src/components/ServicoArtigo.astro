@@ -23,7 +23,7 @@ const blocos: [string, string | null][] = [
       {s.descricao && <p>{s.descricao}</p>}
     </header>
     <Capa imagem={s.imagem} />
-    <Videos videos={s.videos} municipioId={municipioId} />
+    <Videos videos={s.videos} titulo={s.videos_titulo} municipioId={municipioId} />
     <ComLateral>
     <section class="v-bloco v-bloco-ficha" aria-labelledby="t-resumo">
       <h2 id="t-resumo" class="v-bloco-titulo">Informações do serviço</h2>

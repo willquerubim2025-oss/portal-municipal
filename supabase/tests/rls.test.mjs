@@ -810,7 +810,9 @@ r = await como('admin', `update servicos set videos = '[{"titulo": "Capa de outr
 espera('serviço NÃO usa capa de vídeo de outra organização', !!r.erro)
 r = await como('admin', `update servicos set videos = '[{"caminho": "${J}/videos/x.mp4"}]' where municipio_id = '${J}' returning 1`)
 espera('vídeo sem título é recusado', !!r.erro)
-r = await como('anon', `select videos from servicos limit 1`)
+r = await como('admin', `update servicos set videos_titulo = 'Inscrição para creche' where municipio_id = '${J}' returning 1`)
+espera('serviço guarda o título da seção de vídeos', r.rows?.length > 0)
+r = await como('anon', `select videos, videos_titulo from servicos limit 1`)
 espera('o portal (visitante) pode ler a coluna de vídeos', !r.erro)
 
 console.log('\nExclusão de organização com permissões')

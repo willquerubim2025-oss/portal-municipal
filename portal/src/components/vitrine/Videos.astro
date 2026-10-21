@@ -4,14 +4,14 @@
 // antes do clique (preload="none"); a capa é a imagem mostrada enquanto o vídeo não toca.
 import { urlMidia } from '../../lib/supabase';
 interface Video { titulo: string; caminho: string; capa?: string }
-interface Props { videos?: Video[] | null; municipioId: string }
-const { videos, municipioId } = Astro.props;
+interface Props { videos?: Video[] | null; titulo?: string | null; municipioId: string }
+const { videos, titulo, municipioId } = Astro.props;
 const daOrganizacao = (c?: string) => typeof c === 'string' && c.startsWith(`${municipioId}/`) && !c.includes('..');
 const lista = (Array.isArray(videos) ? videos : []).filter((v) => v?.titulo && daOrganizacao(v.caminho));
 ---
 {lista.length > 0 && (
   <section class="v-videos" aria-labelledby="t-videos">
-    <h2 id="t-videos" class="v-bloco-titulo">{lista.length > 1 ? 'Vídeos explicativos' : 'Vídeo explicativo'}</h2>
+    <h2 id="t-videos" class="v-bloco-titulo">{titulo?.trim() || (lista.length > 1 ? 'Vídeos explicativos' : 'Vídeo explicativo')}</h2>
     <p class="v-videos-nota">Os vídeos têm legenda. Prefere ler? As mesmas informações estão logo abaixo.</p>
     <div class="v-videos-grade">
       {lista.map((v, i) => (
