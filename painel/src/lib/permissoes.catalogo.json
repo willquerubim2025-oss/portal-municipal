@@ -14,5 +14,7 @@
   { "codigo": "conteudo.publicar", "modulo": "Conteúdo", "nome": "Publicar conteúdo",
     "descricao": "Publicar, agendar, retirar do site e excluir conteúdo; gerenciar categorias. Na unidade ou região: só as notícias das próprias unidades.", "escopos": ["rede", "regiao", "unidade"], "ordem": 31 },
   { "codigo": "organizacao.administrar", "modulo": "Organização", "nome": "Administrar a organização",
-    "descricao": "Menus, transparência, identidade visual e dados, estrutura, redirecionamentos, auditoria, exportação e usuários.", "escopos": ["rede"], "ordem": 40 }
+    "descricao": "Menus, transparência, identidade visual e dados, estrutura, redirecionamentos, auditoria, exportação e usuários.", "escopos": ["rede"], "ordem": 40 },
+  { "codigo": "ci.administrar", "modulo": "CI Eletrônica", "nome": "Administrar a CI Eletrônica",
+    "descricao": "Cadastrar caixas, pessoas e papéis da CI, calendário, grupos de destino, resetar PIN e responder pedidos de ajuda. Não dá acesso ao conteúdo das CIs.", "escopos": ["rede"], "ordem": 900 }
 ]
