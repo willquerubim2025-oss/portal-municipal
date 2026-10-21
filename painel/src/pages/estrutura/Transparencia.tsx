@@ -5,8 +5,19 @@ import { useAuth } from '../../contexts/AuthContext';
 import { mensagemErro, supabase } from '../../lib/supabase';
 import { slugificar } from '../../lib/texto';
 import { Obrigatorio } from '../../components/Edicao';
+import { CampoImagem } from '../../components/CampoImagem';
+import type { Midia } from '../../lib/midias';
 
-interface Sistema { id: string; nome: string; fornecedor: string | null; categoria: string; url: string; descricao: string | null; ativo: boolean; publico: 'cidadao' | 'servidor' }
+interface Sistema { id: string; nome: string; fornecedor: string | null; categoria: string; url: string; descricao: string | null; ativo: boolean; publico: 'cidadao' | 'servidor';
+  na_home: boolean; ordem: number; icone: string | null; logo: Midia | null }
+
+/** Ícones de reserva do bloco "Sistemas" da página inicial (mesmos nomes do portal, components/Icone.astro). */
+const ICONES_SISTEMA: Record<string, string> = {
+  link: 'Link (padrão)', school: 'Escola', 'graduation-cap': 'Formatura', 'book-open': 'Livro', 'file-text': 'Documento', users: 'Pessoas',
+  calendar: 'Calendário', bus: 'Ônibus', utensils: 'Alimentação', landmark: 'Prédio público', 'chart-column': 'Gráfico',
+  'messages-square': 'Conversa', megaphone: 'Megafone', 'map-pin': 'Localização',
+};
+const SELECT_SISTEMA = '*, logo:midias!sistemas_externos_logo_fkey(id, storage_path, nome_original, mime_type, texto_alternativo)';
 interface ItemT {
   id: string; secao_id: string; titulo: string; descricao: string | null; url: string | null; pagina_id: string | null; categoria_id: string | null;
   sistema_id: string | null; ordem: number; ativo: boolean;
@@ -219,7 +230,7 @@ function Sistemas() {
   const [edit, setEdit] = useState<Sistema | 'novo' | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const carregar = useCallback(() => {
-    supabase.from('sistemas_externos').select('*').eq('municipio_id', mid).order('nome').then(({ data }) => setLista(data ?? []));
+    supabase.from('sistemas_externos').select(SELECT_SISTEMA).eq('municipio_id', mid).order('nome').then(({ data }) => setLista((data ?? []) as Sistema[]));
   }, [mid]);
   useEffect(() => { carregar(); }, [carregar]);
   async function excluir(s: Sistema) {
@@ -234,7 +245,7 @@ function Sistemas() {
       {erro && <p className="erro" role="alert">{erro}</p>}
       {!lista ? <p role="status">Carregando…</p> : (
         <table className="tabela">
-          <thead><tr><th scope="col">Sistema</th><th scope="col">Para</th><th scope="col">Tipo</th><th scope="col">Endereço</th><th scope="col">Situação</th><th scope="col"><span className="sr-only">Ações</span></th></tr></thead>
+          <thead><tr><th scope="col">Sistema</th><th scope="col">Para</th><th scope="col">Tipo</th><th scope="col">Endereço</th><th scope="col">Situação</th><th scope="col">Página inicial</th><th scope="col"><span className="sr-only">Ações</span></th></tr></thead>
           <tbody>{lista.map((s) => (
             <tr key={s.id}>
               <td>{s.nome}{s.fornecedor && <span className="meta"> · {s.fornecedor}</span>}</td>
@@ -242,6 +253,7 @@ function Sistemas() {
               <td>{CATEGORIAS_SISTEMA[s.categoria]}</td>
               <td><a href={s.url} target="_blank" rel="noopener">{s.url.replace(/^https?:\/\//, '').slice(0, 45)}</a></td>
               <td>{s.ativo ? 'Ativo' : 'Inativo'}</td>
+              <td>{s.na_home && s.publico === 'cidadao' ? `Sim (ordem ${s.ordem})` : 'Não'}</td>
               <td className="acoes-linha">
                 <button type="button" className="botao-link" onClick={() => setEdit(s)}>Editar<span className="sr-only"> {s.nome}</span></button>
                 <button type="button" className="botao-link" onClick={() => excluir(s)}>Excluir<span className="sr-only"> {s.nome}</span></button>
@@ -264,6 +276,10 @@ function FormSistema({ sistema, mid, aoFechar }: { sistema: Sistema | null; mid:
   const [ativo, setAtivo] = useState(sistema?.ativo ?? true);
   const [descricao, setDescricao] = useState(sistema?.descricao ?? '');
   const [publico, setPublico] = useState<'cidadao' | 'servidor'>(sistema?.publico ?? 'cidadao');
+  const [naHome, setNaHome] = useState(sistema?.na_home ?? false);
+  const [ordem, setOrdem] = useState(String(sistema?.ordem ?? 0));
+  const [icone, setIcone] = useState(sistema?.icone ?? 'link');
+  const [logo, setLogo] = useState<Midia | null>(sistema?.logo ?? null);
   const [papeis, setPapeis] = useState<{ id: string; nome: string }[]>([]);
   const [marcados, setMarcados] = useState<Set<string>>(new Set());
   const [erro, setErro] = useState<string | null>(null);
@@ -276,7 +292,9 @@ function FormSistema({ sistema, mid, aoFechar }: { sistema: Sistema | null; mid:
     ev.preventDefault();
     if (!nome.trim()) return setErro('Informe o nome.');
     if (!/^https?:\/\//.test(url.trim())) return setErro('O endereço deve começar com http:// ou https://.');
-    const linha = { municipio_id: mid, nome: nome.trim(), fornecedor: fornecedor.trim() || null, categoria, url: url.trim(), ativo, publico, descricao: descricao.trim() || null };
+    if (logo && !logo.texto_alternativo?.trim()) return setErro('O logo precisa de texto alternativo.');
+    const linha = { municipio_id: mid, nome: nome.trim(), fornecedor: fornecedor.trim() || null, categoria, url: url.trim(), ativo, publico, descricao: descricao.trim() || null,
+      na_home: publico === 'cidadao' && naHome, ordem: Number.parseInt(ordem, 10) || 0, icone: icone || null, logo_id: logo?.id ?? null };
     const r = sistema
       ? await supabase.from('sistemas_externos').update(linha).eq('id', sistema.id).select('id').single()
       : await supabase.from('sistemas_externos').insert(linha).select('id').single();
@@ -306,6 +324,21 @@ function FormSistema({ sistema, mid, aoFechar }: { sistema: Sistema | null; mid:
         <label className="opcao"><input type="radio" name="publico" checked={publico === 'cidadao'} onChange={() => setPublico('cidadao')} /> Público: link no portal (Transparência e serviços)</label>
         <label className="opcao"><input type="radio" name="publico" checked={publico === 'servidor'} onChange={() => setPublico('servidor')} /> Servidores: atalho no painel, em "Meus sistemas"</label>
       </fieldset>
+      {publico === 'cidadao' && (
+        <fieldset>
+          <legend>Página inicial do portal</legend>
+          <label className="opcao"><input type="checkbox" checked={naHome} onChange={(e) => setNaHome(e.target.checked)} /> Mostrar no bloco "Sistemas" da página inicial</label>
+          {naHome && (
+            <>
+              <div className="linha-campos">
+                <label>Ordem<input type="number" value={ordem} onChange={(e) => setOrdem(e.target.value)} min={0} /></label>
+                <label>Ícone (usado quando não há logo)<select value={icone} onChange={(e) => setIcone(e.target.value)}>{Object.entries(ICONES_SISTEMA).map(([v, r]) => <option key={v} value={v}>{r}</option>)}</select></label>
+              </div>
+              <CampoImagem rotulo="Logo do sistema (opcional; fica num círculo branco)" municipioId={mid} midia={logo} aoMudar={setLogo} />
+            </>
+          )}
+        </fieldset>
+      )}
       {publico === 'servidor' && (
         <fieldset>
           <legend>Quais papéis veem este sistema</legend>

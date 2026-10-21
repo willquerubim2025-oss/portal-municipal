@@ -192,6 +192,14 @@ export async function servicosHome(municipioId: string) {
   return linhas.map(comLink);
 }
 
+/** Sistemas públicos e ativos marcados para a página inicial (0030, D-121), na ordem cadastrada. */
+export async function sistemasHome(municipioId: string) {
+  return erro(await supabase().from('sistemas_externos')
+    .select('id, nome, url, descricao, icone, ordem, logo:midias!sistemas_externos_logo_fkey(storage_path, texto_alternativo)')
+    .eq('municipio_id', municipioId).eq('na_home', true).eq('ativo', true).eq('publico', 'cidadao')
+    .order('ordem').order('nome')) as any[];
+}
+
 /** Equipe gestora visível (0019): o RLS já esconde os ocultos e a seção desligada. */
 export async function equipe(municipioId: string) {
   return erro(await supabase().from('equipe')

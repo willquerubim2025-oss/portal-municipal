@@ -54,7 +54,7 @@ export interface Tema {
 export const FONTES_DISPONIVEIS = ['Montserrat', 'Source Sans 3', 'Prompt', 'Raleway'] as const;
 
 /** Blocos da página inicial no layout vitrine, na ordem em que aparecem. */
-export type BlocoHome = 'destaque' | 'noticias' | 'foco' | 'servicos' | 'calendario' | 'agenda' | 'equipe' | 'atalhos';
+export type BlocoHome = 'destaque' | 'noticias' | 'foco' | 'servicos' | 'calendario' | 'agenda' | 'equipe' | 'atalhos' | 'sistemas';
 
 /** Card do bloco "Em foco" (config.home.foco, D-44): divisão ou programa com muita procura do cidadão. */
 export interface ItemFoco {
