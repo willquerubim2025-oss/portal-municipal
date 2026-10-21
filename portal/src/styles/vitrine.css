@@ -940,3 +940,12 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
    O botão de ação e a barra de acessibilidade não mudam. Fora do alto contraste (lá valem as cores dele). */
 :root:not(.contraste).vitrine[style*="--v-cab-letras"] :is(.v-cab-claro .marca-tipo, .v-cab-claro .marca-nome,
   .v-cab-claro .menu-lista > li > a, .v-cab-claro .menu-lista > li > .menu-grupo, .v-cab-claro .submenu a, .v-cab-claro .v-cab-lupa) { color: var(--v-cab-letras); }
+
+/* D-115: brasão inteiro dentro do cabeçalho (não passa por cima nem por baixo). Computador: 126 px (cabeçalho de
+   134 px, ~4 px de folga em cima e embaixo). Tablet: 90 px. Celular: sem mudança (D-73). */
+@media (min-width: 701px) {
+  .v-cab-claro .marca .v-cab-claro-brasao { width: 90px; height: 90px; margin-top: 0; margin-bottom: 0; }
+}
+@media (min-width: 1181px) {
+  .v-cab-claro .marca .v-cab-claro-brasao { width: 126px; height: 126px; margin-top: -8px; margin-bottom: -8px; }
+}
