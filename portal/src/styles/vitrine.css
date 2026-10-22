@@ -1103,3 +1103,5 @@ a.v-sistema:hover .v-sistema-nome, .v-sistema:focus-visible .v-sistema-nome { te
 @media (max-width: 700px) { .vitrine .cartao { padding: 5px; } }
 :root.contraste.vitrine body:has(.v-pagina-noticias) { background: #000; }
 :root.contraste.vitrine .cartao { border-color: #fff; }
+/* D-132: na lista de notícias, a faixa das migalhas e do título usa o mesmo tom do fundo (sem a faixa neutra). */
+.vitrine[style*="--v-fundo-pagina"] body:has(.v-pagina-noticias) :is(.migalhas, .cabecalho-pagina) { background: var(--v-fundo-pagina); box-shadow: 0 0 0 100vmax var(--v-fundo-pagina); }
