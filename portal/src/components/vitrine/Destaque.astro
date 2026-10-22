@@ -6,6 +6,9 @@
 // Compacto (cabeçalho claro, D-57): mais baixo, alinhado ao cabeçalho, com setas laterais,
 // pausa redonda no canto e indicadores numerados. No compacto os slides deslizam (D-66): avançar entra pela
 // direita e sai pela esquerda; voltar (seta da esquerda ou ponto anterior), o contrário. Cada slide fica 4,5 s (D-68).
+// D-129: banner com "arte pronta" (o texto já está na imagem) mostra a arte inteira, sem escurecer e sem texto por
+// cima; o espaço que sobra é preenchido pela própria arte, desfocada. O título fica só para leitores de tela e o link,
+// se houver, cobre o banner todo.
 import { urlImagem, srcsetImagem } from '../../lib/imagens';
 interface Props { banners: any[]; titulo: string; slogan?: string; compacto?: boolean }
 const { banners, titulo, slogan, compacto = false } = Astro.props;
@@ -20,13 +23,19 @@ const varios = banners.length > 1;
       </div>
     </div>
   ) : banners.map((b, i) => (
-    <div class={`v-slide${i === 0 ? ' v-slide-ativo' : ''}`} role={varios ? 'group' : undefined}
+    <div class={`v-slide${i === 0 ? ' v-slide-ativo' : ''}${b.arte_pronta ? ' v-slide-arte' : ''}`} role={varios ? 'group' : undefined}
          aria-roledescription={varios ? 'slide' : undefined} aria-label={varios ? `${i + 1} de ${banners.length}` : undefined}
          aria-hidden={i === 0 ? undefined : 'true'}>
+      {b.arte_pronta && <img class="v-slide-fundo" src={urlImagem(b.imagem.storage_path, 640)} alt="" aria-hidden="true" loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />}
       <img class="v-slide-imagem" src={urlImagem(b.imagem.storage_path, 1600)}
            srcset={srcsetImagem(b.imagem.storage_path, [640, 800, 1200, 1600])} sizes="100vw"
            alt={b.imagem.texto_alternativo ?? ''} width="1600" height="700"
            loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />
+      {b.arte_pronta ? (
+        b.url
+          ? <a class="v-slide-link" href={b.url} target={b.nova_aba ? '_blank' : undefined} rel={b.nova_aba ? 'noopener' : undefined} tabindex={i === 0 ? undefined : -1}><span class="sr-only">{b.titulo}{b.nova_aba && ' (abre em nova aba)'}</span></a>
+          : <h2 class="sr-only">{b.titulo}</h2>
+      ) : (
       <div class="v-miolo v-slide-texto">
         <h2>{b.titulo}</h2>
         {b.texto && <p>{b.texto}</p>}
@@ -38,6 +47,7 @@ const varios = banners.length > 1;
           </a>
         )}
       </div>
+      )}
     </div>
   ))}
   {varios && (

@@ -1071,3 +1071,13 @@ a.v-sistema:hover .v-sistema-nome, .v-sistema:focus-visible .v-sistema-nome { te
   .vitrine .v-noticias-linha > .v-noticia, .vitrine .v-noticias-grandes > .v-noticia:not(:first-child) { column-gap: .25rem; }
 }
 :root.contraste.vitrine .v-noticia { border-color: #fff; }
+
+/* D-129: destaque com "arte pronta" (o texto já está na imagem). A arte aparece inteira (contain), sem o escurecimento
+   e sem texto por cima; atrás dela, a mesma arte ampliada e desfocada preenche o espaço que sobra, em qualquer tela. */
+.v-slide-arte::after { display: none; }
+.v-slide-arte .v-slide-imagem { object-fit: contain; }
+.v-slide-fundo { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; z-index: -2; filter: blur(22px) saturate(1.1) brightness(.9); transform: scale(1.2); }
+.v-slide-link { position: absolute; inset: 0; z-index: 1; }
+.v-slide-link:focus-visible { outline: 3px solid #fff; outline-offset: -6px; }
+:root.contraste.vitrine .v-slide-arte .v-slide-imagem { display: block; }
+:root.contraste.vitrine .v-slide-fundo { display: none; }

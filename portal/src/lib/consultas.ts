@@ -102,7 +102,7 @@ export async function previaPublicacao(municipioId: string, token: string) {
 // ---------------------------------------------------------------- destaques e eventos
 export async function destaques(municipioId: string) {
   return erro(await supabase().from('destaques')
-    .select('id, tipo, nivel, titulo, texto, url, nova_aba, botao_rotulo, frequencia, versao, fim_em, imagem:midias(storage_path, texto_alternativo)')
+    .select('id, tipo, nivel, titulo, texto, url, nova_aba, botao_rotulo, arte_pronta, frequencia, versao, fim_em, imagem:midias(storage_path, texto_alternativo)')
     .eq('municipio_id', municipioId)
     .or(`fim_em.is.null,fim_em.gt.${agora()}`)
     .order('ordem')) as any[];

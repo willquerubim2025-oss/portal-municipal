@@ -22,7 +22,7 @@ export function ListaDestaques() {
   );
 }
 
-interface Form { tipo: 'banner' | 'alerta'; nivel: keyof typeof NIVEIS; titulo: string; texto: string; imagem: Midia | null; url: string; novaAba: boolean; fim: string; ordem: string }
+interface Form { tipo: 'banner' | 'alerta'; nivel: keyof typeof NIVEIS; titulo: string; texto: string; imagem: Midia | null; url: string; novaAba: boolean; arte: boolean; fim: string; ordem: string }
 const CAMPOS_MIDIA = 'id, storage_path, nome_original, mime_type, texto_alternativo';
 
 export function EditarDestaque() {
@@ -30,14 +30,14 @@ export function EditarDestaque() {
     tabela: 'destaques',
     rotaBase: '/destaques',
     select: `*, imagem:midias(${CAMPOS_MIDIA})`,
-    vazio: { tipo: 'banner', nivel: 'informativo', titulo: '', texto: '', imagem: null, url: '', novaAba: false, fim: '', ordem: '0' },
+    vazio: { tipo: 'banner', nivel: 'informativo', titulo: '', texto: '', imagem: null, url: '', novaAba: false, arte: false, fim: '', ordem: '0' },
     deLinha: (d) => ({
       tipo: d.tipo, nivel: d.nivel, titulo: d.titulo, texto: d.texto ?? '', imagem: d.imagem ?? null, url: d.url ?? '',
-      novaAba: d.nova_aba, fim: paraInputDataHora(d.fim_em), ordem: String(d.ordem ?? 0),
+      novaAba: d.nova_aba, arte: d.arte_pronta ?? false, fim: paraInputDataHora(d.fim_em), ordem: String(d.ordem ?? 0),
     }),
     paraLinha: (f) => ({
       tipo: f.tipo, nivel: f.nivel, titulo: f.titulo.trim(), texto: f.texto.trim() || null, imagem_id: f.imagem?.id ?? null,
-      url: f.url.trim() || null, nova_aba: f.novaAba, fim_em: deInputDataHora(f.fim), ordem: Number(f.ordem) || 0,
+      url: f.url.trim() || null, nova_aba: f.novaAba, arte_pronta: f.tipo === 'banner' && f.arte, fim_em: deInputDataHora(f.fim), ordem: Number(f.ordem) || 0,
     }),
     validar: (f) => [
       !f.titulo.trim() && 'Informe o título.',
@@ -77,7 +77,10 @@ export function EditarDestaque() {
             <label className="opcao"><input type="checkbox" checked={f.novaAba} onChange={(ev) => mudar('novaAba', ev.target.checked)} /> Abrir o link em nova aba</label>
           </div>
           <div className="coluna-lateral">
-            {f.tipo === 'banner' && <CampoImagem rotulo="Imagem do banner (larga, ex.: 1200 × 514)" municipioId={e.mid} midia={f.imagem} aoMudar={(m) => mudar('imagem', m)} desabilitado={e.bloqueado} />}
+            {f.tipo === 'banner' && <CampoImagem rotulo="Imagem do banner (larga, ex.: 2560 × 768)" municipioId={e.mid} midia={f.imagem} aoMudar={(m) => mudar('imagem', m)} desabilitado={e.bloqueado} />}
+            {f.tipo === 'banner' && (
+              <label className="opcao"><input type="checkbox" checked={f.arte} onChange={(ev) => mudar('arte', ev.target.checked)} /> Arte pronta: a imagem já tem o texto (o portal mostra a arte inteira, sem título nem botão por cima). Escreva o texto da arte no texto alternativo da imagem.</label>
+            )}
             <label>Sai do ar em (opcional)<input type="datetime-local" value={f.fim} onChange={(ev) => mudar('fim', ev.target.value)} /></label>
             <label>Ordem<input type="number" value={f.ordem} onChange={(ev) => mudar('ordem', ev.target.value)} /></label>
           </div>

@@ -850,6 +850,12 @@ await como('admin', `update sistemas_externos set ativo = false where id = '${si
 r = await como('anon', `select count(*)::int n from sistemas_externos where id = '${sisHome}'`)
 espera('visitante NÃO vê sistema inativo, mesmo na página inicial', r.rows?.[0]?.n === 0)
 
+console.log('\nDestaque com arte pronta (0032)')
+r = await como('anon', `select arte_pronta from destaques limit 1`)
+espera('o portal (visitante) pode ler o campo arte_pronta', !r.erro)
+r = await como('admin', `insert into destaques (municipio_id, tipo, titulo, arte_pronta) values ('${J}', 'banner', 'Arte de teste', true) returning arte_pronta`)
+espera('admin marca o banner como arte pronta', r.rows?.[0]?.arte_pronta === true)
+
 console.log('\nExclusão de organização com permissões')
 r = await como('plat', `delete from municipios where slug = 'org-nova-papeis' returning 1`)
 espera('SECKE exclui organização com papéis (cascata não trava)', r.rows?.length === 1)
