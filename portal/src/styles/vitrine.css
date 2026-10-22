@@ -1093,3 +1093,13 @@ a.v-sistema:hover .v-sistema-nome, .v-sistema:focus-visible .v-sistema-nome { te
    o título estava a 14 px do fim do destaque. */
 .vitrine.v-claro .v-destaque ~ .v-secao:not(.v-secao ~ .v-secao) { padding-top: calc(clamp(.55rem, 1vw, .875rem) + 38px); }
 @media (max-width: 700px) { .vitrine.v-claro .v-destaque ~ .v-secao:not(.v-secao ~ .v-secao) { padding-top: calc(clamp(.55rem, 1vw, .875rem) + 24px); } }
+
+/* D-132: a lista de notícias (/noticias) segue a página inicial: mesmo fundo (tema.cor_fundo_pagina, D-110) e cards
+   com a moldura branca fina em volta da foto (D-127). O .cartao é usado só pelos cards de notícia. */
+.vitrine[style*="--v-fundo-pagina"] body:has(.v-pagina-noticias) { background: var(--v-fundo-pagina); }
+.vitrine .cartao { padding: 8px; border: 1px solid color-mix(in srgb, var(--cor-primaria) 12%, #e6eaea); background: #fff; }
+.vitrine .cartao > img { border-radius: calc(var(--v-raio) - 6px); }
+.vitrine .cartao-corpo { padding: .85rem .6rem .6rem; }
+@media (max-width: 700px) { .vitrine .cartao { padding: 5px; } }
+:root.contraste.vitrine body:has(.v-pagina-noticias) { background: #000; }
+:root.contraste.vitrine .cartao { border-color: #fff; }

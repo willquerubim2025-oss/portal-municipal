@@ -956,3 +956,6 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 
 **D-131 · 22/10/2026 · Mais espaço entre o destaque e a primeira seção (pedido do William)**
 - "A seção Em foco está muito próxima da área de destaque. Desce ela pelo menos 1 centímetro." O título ficava a 14 px do fim do destaque; a primeira seção depois do destaque (qualquer que seja; na SMEDU, "Em foco") ganhou 38 px a mais em cima (24 px no celular).
+
+**D-132 · 22/10/2026 · Lista de notícias com o fundo e a moldura da página inicial (pedido do William)**
+- "Igual ao que acontece na homepage, o tom do fundo da página deve ser o mesmo, e a gente deve levar aquela moldura branca em volta do card das notícias." Na página `/noticias`, o fundo passa a ser `tema.cor_fundo_pagina` (o mesmo da página inicial, D-110) e os cards ganham a moldura branca de 8 px em volta da foto (5 px no celular) e o contorno fino da D-127.
