@@ -1076,6 +1076,12 @@ a.v-sistema:hover .v-sistema-nome, .v-sistema:focus-visible .v-sistema-nome { te
    e sem texto por cima; atrás dela, a mesma arte ampliada e desfocada preenche o espaço que sobra, em qualquer tela. */
 .v-slide-arte::after { display: none; }
 .v-slide-arte .v-slide-imagem { object-fit: contain; }
+/* D-130: a pedido do William, no computador e no tablet a arte ocupa toda a área (corta em cima e embaixo, centrada);
+   o fundo desfocado só aparece no celular, onde o corte esconderia o texto da arte. */
+@media (min-width: 701px) {
+  .v-slide-arte .v-slide-imagem { object-fit: cover; object-position: center 45%; }
+  .v-slide-arte .v-slide-fundo { display: none; }
+}
 .v-slide-fundo { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; z-index: -2; filter: blur(22px) saturate(1.1) brightness(.9); transform: scale(1.2); }
 .v-slide-link { position: absolute; inset: 0; z-index: 1; }
 .v-slide-link:focus-visible { outline: 3px solid #fff; outline-offset: -6px; }
