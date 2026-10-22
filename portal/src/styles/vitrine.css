@@ -1050,3 +1050,15 @@ a.v-sistema:hover .v-sistema-nome, .v-sistema:focus-visible .v-sistema-nome { te
 :root.contraste.vitrine .v-sistema-nome, :root.contraste.vitrine .v-sistema-desc, :root.contraste.vitrine .v-sistema-etiqueta { color: #ff0; }
 :root.contraste.vitrine .v-sistema-etiqueta { background: #000; border-color: #ff0; }
 :root.contraste.vitrine .v-sistema-em-breve .v-sistema-circulo { opacity: 1; }
+
+/* D-127: cards de notícia com moldura branca fina em volta da foto (modelo enviado pelo William): a foto fica
+   "dentro" do card, afastada 8 px da borda e com cantos levemente arredondados; o card ganha um contorno fino.
+   No celular (lista compacta da D-85), a moldura é de 5 px. */
+.vitrine .v-noticia { padding: 8px; border: 1px solid color-mix(in srgb, var(--cor-primaria) 12%, #e6eaea); }
+.vitrine .v-noticia > img, .vitrine .v-noticia > .v-noticia-sem-foto { border-radius: calc(var(--v-raio) - 6px); }
+.vitrine .v-noticia > .v-noticia-texto { padding-inline: .6rem; padding-bottom: .6rem; }
+@media (max-width: 700px) {
+  .vitrine .v-noticia { padding: 5px; }
+  .vitrine .v-noticias-linha > .v-noticia, .vitrine .v-noticias-grandes > .v-noticia:not(:first-child) { column-gap: .25rem; }
+}
+:root.contraste.vitrine .v-noticia { border-color: #fff; }
