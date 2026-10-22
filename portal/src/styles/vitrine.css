@@ -907,7 +907,7 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
    branco (.v-secao), então a cor vai no corpo da página inicial e nessas faixas. Mantêm a cor própria: a faixa de
    Serviços, cards, blocos do "Em foco", calendário, avisos, cabeçalho e rodapé. Só na página inicial (:has). */
 .vitrine[style*="--v-fundo-pagina"] body:has(.v-destaque, .v-bloco-noticias) { background: var(--v-fundo-pagina); }
-.vitrine.v-claro[style*="--v-fundo-pagina"] .v-secao:not(.v-bloco-servicos):not(.v-bloco-sistemas) { background: var(--v-fundo-pagina); }
+.vitrine.v-claro[style*="--v-fundo-pagina"] .v-secao:not(.v-bloco-servicos) { background: var(--v-fundo-pagina); }
 :root.contraste.vitrine body, :root.contraste.vitrine.v-claro .v-secao { background: #000; }
 
 /* D-111: cor própria da barra de acessibilidade do topo (tema.cor_barra_acessibilidade), com texto branco. */
@@ -1015,34 +1015,37 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
 .v-videos-com-apoio .v-video-par { flex-direction: row; }
 @media (max-width: 700px) { .v-videos-com-apoio .v-video-par { flex-direction: column; } }
 
-/* D-121: bloco "Sistemas" da página inicial. Faixa escura na cor principal (o petróleo do rodapé e da barra de
-   acessibilidade), com um brilho turquesa discreto; círculos brancos com o logo de cada sistema, nome e uma linha. */
-.vitrine .v-secao.v-bloco-sistemas, .vitrine.v-claro .v-secao.v-bloco-sistemas {
+/* D-121: bloco "Sistemas" da página inicial. Caixa escura na cor principal (o petróleo do rodapé e da barra de
+   acessibilidade), com um brilho turquesa discreto; círculos brancos com o logo de cada sistema, nome e uma linha.
+   D-126: a caixa tem a largura do miolo, como as outras seções (o fundo da seção é o da página), e os círculos são
+   menores, para caberem mais sistemas numa fileira. */
+.vitrine .v-bloco-sistemas > .v-miolo {
+  padding: clamp(1.25rem, 3vw, 2rem) clamp(1rem, 3vw, 2.5rem); border-radius: var(--v-raio);
   background:
     radial-gradient(60% 120% at 85% 0%, color-mix(in srgb, var(--cor-secundaria) 22%, transparent), transparent 70%),
     linear-gradient(160deg, var(--cor-primaria), color-mix(in srgb, var(--cor-primaria) 80%, #000));
   color: #fff; }
 .vitrine .v-bloco-sistemas .v-secao-titulo, .vitrine.v-claro .v-bloco-sistemas .v-secao-titulo { border-color: rgb(255 255 255 / .25); }
 .vitrine .v-bloco-sistemas .v-secao-titulo h2, .vitrine.v-claro .v-bloco-sistemas .v-secao-titulo h2 { color: #fff; }
-.v-sistemas { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem 1.5rem; }
-.v-sistemas > li { flex: 0 1 190px; display: flex; }
-.v-sistema { display: grid; justify-items: center; align-content: start; gap: .55rem; width: 100%; padding: .5rem .25rem; text-align: center; color: #fff; text-decoration: none; border-radius: var(--v-raio); }
-.v-sistema-circulo { display: grid; place-items: center; width: 128px; height: 128px; border-radius: 50%; background: #fff; overflow: hidden;
-  box-shadow: 0 8px 22px rgb(0 0 0 / .25), 0 0 0 4px rgb(255 255 255 / .12); color: var(--cor-primaria); transition: transform .2s ease, box-shadow .2s ease; }
-.v-sistema-circulo img { width: 78%; height: 78%; object-fit: contain; }
-.v-sistema-circulo svg { width: 52px; height: 52px; }
-.v-sistema-nome { margin-top: .35rem; font-family: var(--v-fonte-titulos); font-weight: 800; font-size: 1.05rem; line-height: 1.25; }
-.v-sistema-desc { font-size: .9rem; line-height: 1.4; color: rgb(255 255 255 / .85); }
-a.v-sistema:hover .v-sistema-circulo, .v-sistema:focus-visible .v-sistema-circulo { transform: translateY(-4px); box-shadow: 0 12px 26px rgb(0 0 0 / .3), 0 0 0 4px var(--cor-secundaria); }
+.v-sistemas { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem 1rem; }
+.v-sistemas > li { flex: 0 1 140px; display: flex; }
+.v-sistema { display: grid; justify-items: center; align-content: start; gap: .45rem; width: 100%; padding: .4rem .2rem; text-align: center; color: #fff; text-decoration: none; border-radius: var(--v-raio); }
+.v-sistema-circulo { display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; background: #fff; overflow: hidden;
+  box-shadow: 0 6px 16px rgb(0 0 0 / .25), 0 0 0 3px rgb(255 255 255 / .12); color: var(--cor-primaria); transition: transform .2s ease, box-shadow .2s ease; }
+.v-sistema-circulo img { width: 76%; height: 76%; object-fit: contain; }
+.v-sistema-circulo svg { width: 36px; height: 36px; }
+.v-sistema-nome { margin-top: .2rem; font-family: var(--v-fonte-titulos); font-weight: 800; font-size: .95rem; line-height: 1.25; }
+.v-sistema-desc { font-size: .8rem; line-height: 1.35; color: rgb(255 255 255 / .85); }
+a.v-sistema:hover .v-sistema-circulo, .v-sistema:focus-visible .v-sistema-circulo { transform: translateY(-3px); box-shadow: 0 10px 20px rgb(0 0 0 / .3), 0 0 0 3px var(--cor-secundaria); }
 a.v-sistema:hover .v-sistema-nome, .v-sistema:focus-visible .v-sistema-nome { text-decoration: underline; text-underline-offset: 3px; }
 .v-sistema:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
-.v-sistema-etiquetas { display: flex; flex-wrap: wrap; justify-content: center; gap: .35rem; }
-.v-sistema-etiqueta { padding: .15rem .6rem; border: 1px solid rgb(255 255 255 / .6); border-radius: 999px; font-size: .75rem; font-weight: 700; letter-spacing: .02em; color: #fff; }
+.v-sistema-etiquetas { display: flex; flex-wrap: wrap; justify-content: center; gap: .3rem; }
+.v-sistema-etiqueta { padding: .1rem .5rem; border: 1px solid rgb(255 255 255 / .6); border-radius: 999px; font-size: .7rem; font-weight: 700; letter-spacing: .02em; color: #fff; }
 .v-sistema-etiqueta-breve { border-color: transparent; background: #fff; color: var(--cor-primaria); }
 .v-sistema-em-breve .v-sistema-circulo { opacity: .82; }
-@media (max-width: 700px) { .v-sistemas > li { flex-basis: 150px; } .v-sistema-circulo { width: 104px; height: 104px; } }
+@media (max-width: 700px) { .v-sistemas > li { flex-basis: 120px; } .v-sistema-circulo { width: 72px; height: 72px; } .v-sistema-circulo svg { width: 32px; height: 32px; } }
 @media (prefers-reduced-motion: reduce) { .v-sistema-circulo { transition: none; } .v-sistema:hover .v-sistema-circulo { transform: none; } }
-:root.contraste.vitrine .v-secao.v-bloco-sistemas { background: #000; }
+:root.contraste.vitrine .v-bloco-sistemas > .v-miolo { background: #000; border: 1px solid #ff0; }
 :root.contraste.vitrine .v-sistema-circulo { box-shadow: 0 0 0 2px #ff0; }
 :root.contraste.vitrine .v-sistema-nome, :root.contraste.vitrine .v-sistema-desc, :root.contraste.vitrine .v-sistema-etiqueta { color: #ff0; }
 :root.contraste.vitrine .v-sistema-etiqueta { background: #000; border-color: #ff0; }
