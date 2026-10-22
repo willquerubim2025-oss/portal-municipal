@@ -205,7 +205,7 @@ const painelUrl = (() => { try { return getSecret('PAINEL_URL') || null; } catch
   </script>
 </head>
 <body>
-  {homologacao && <div class="faixa-homologacao" role="note">Ambiente de homologação — conteúdo de teste, não indexado.</div>}
+  {homologacao && m.config.faixa_homologacao !== false && <div class="faixa-homologacao" role="note">Ambiente de homologação — conteúdo de teste, não indexado.</div>}
 
   <!-- Barra de acessibilidade (eMAG 3.1): atalhos numéricos e alto contraste.
        No layout vitrine a barra vira cabeçalho único: os atalhos ficam ocultos até receberem foco

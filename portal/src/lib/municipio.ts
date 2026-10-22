@@ -70,6 +70,8 @@ export interface ItemFoco {
 
 /** Dados institucionais e chaves de comportamento (municipios.config). */
 export interface Config {
+  /** D-133: false esconde a faixa "Ambiente de homologação" (o portal continua fora dos buscadores). */
+  faixa_homologacao?: boolean;
   nome_curto?: string;                 // "Jeriquara" (padrão: nome sem "Prefeitura Municipal de")
   slogan?: string;
   endereco?: string;

@@ -959,3 +959,7 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 
 **D-132 · 22/10/2026 · Lista de notícias com o fundo e a moldura da página inicial (pedido do William)**
 - "Igual ao que acontece na homepage, o tom do fundo da página deve ser o mesmo, e a gente deve levar aquela moldura branca em volta do card das notícias." Na página `/noticias`, o fundo passa a ser `tema.cor_fundo_pagina` (o mesmo da página inicial, D-110) e os cards ganham a moldura branca de 8 px em volta da foto (5 px no celular) e o contorno fino da D-127. A faixa das migalhas e do título, que nas páginas internas tem um tom neutro próprio, também passa a usar o tom do fundo nessa página.
+
+**D-133 · 22/10/2026 · Sem a faixa vermelha de homologação no endereço provisório (pedido do William)**
+- O endereço provisório (`portal-municipal.willquerubim2025.workers.dev`) segue cadastrado como `homologacao` em `municipio_dominios`, para continuar **fora dos buscadores** (`noindex` e `X-Robots-Tag`). Só a faixa "Ambiente de homologação — conteúdo de teste, não indexado" some, por atrapalhar as demonstrações.
+- **Genérico:** `config.faixa_homologacao = false` esconde a faixa daquela organização; sem o campo, a faixa continua aparecendo em homologação. Ligado na SMEDU. No dia do domínio oficial (ver `docs/11-checklist-ir-ao-ar.md`), o domínio novo entra como `producao`.
