@@ -1088,3 +1088,8 @@ a.v-sistema:hover .v-sistema-nome, .v-sistema:focus-visible .v-sistema-nome { te
 .v-slide-link:focus-visible { outline: 3px solid #fff; outline-offset: -6px; }
 :root.contraste.vitrine .v-slide-arte .v-slide-imagem { display: block; }
 :root.contraste.vitrine .v-slide-fundo { display: none; }
+
+/* D-131: a primeira seção depois do destaque (na SMEDU, "Em foco") desce cerca de 1 cm (38 px), a pedido do William:
+   o título estava a 14 px do fim do destaque. */
+.vitrine.v-claro .v-destaque ~ .v-secao:not(.v-secao ~ .v-secao) { padding-top: calc(clamp(.55rem, 1vw, .875rem) + 38px); }
+@media (max-width: 700px) { .vitrine.v-claro .v-destaque ~ .v-secao:not(.v-secao ~ .v-secao) { padding-top: calc(clamp(.55rem, 1vw, .875rem) + 24px); } }
