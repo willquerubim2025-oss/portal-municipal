@@ -950,6 +950,15 @@ a.v-servico:hover .v-servico-ir svg { transform: translateX(4px); }
   .v-cab-claro .marca .v-cab-claro-brasao { width: 126px; height: 126px; margin-top: -8px; margin-bottom: -8px; }
 }
 
+/* D-128: brasão (agora só o brasão, D-127) cerca de 20% menor, a pedido do William: 126 → 100 px no computador,
+   90 → 72 px no tablet, centralizado na altura do cabeçalho. */
+@media (min-width: 701px) {
+  .v-cab-claro .marca .v-cab-claro-brasao { width: 72px; height: 72px; }
+}
+@media (min-width: 1181px) {
+  .v-cab-claro .marca .v-cab-claro-brasao { width: 100px; height: 100px; margin-top: 0; margin-bottom: 0; }
+}
+
 /* D-116: vídeos explicativos do serviço, entre a foto de capa e as informações. Vídeos verticais (celular) lado a lado,
    centralizados; no celular, um embaixo do outro. */
 .v-videos { margin-bottom: 2rem; }
