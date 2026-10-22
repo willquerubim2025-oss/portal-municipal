@@ -1,0 +1,24 @@
+# TEMPORÁRIO (D-130): envia a arte "Novo Portal da Educação" (versão 2580×740 aprox.) da SMEDU ao Storage da produção.
+# Existe só no branch carga-destaque2-smedu, que é apagado depois do envio.
+name: Carga temporária do destaque (v2)
+on:
+  push:
+    branches: [carga-destaque2-smedu]
+permissions:
+  contents: read
+jobs:
+  enviar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.SUPABASE_S3_ID_PRODUCAO }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.SUPABASE_S3_SEGREDO_PRODUCAO }}
+      AWS_DEFAULT_REGION: sa-east-1
+      S3: https://qgywucdnaeheqndcxtho.storage.supabase.co/storage/v1/s3
+      DESTINO: 3af0d4ae-d118-468f-8f8a-8cdaae780488/2026/10/novo-portal-educacao-v2.jpg
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enviar
+        run: |
+          aws s3 cp carga/novo-portal-educacao-v2.jpg "s3://midias/$DESTINO" --endpoint-url "$S3" --content-type image/jpeg --cache-control "public, max-age=31536000" --only-show-errors
+          echo "enviado: $DESTINO"
