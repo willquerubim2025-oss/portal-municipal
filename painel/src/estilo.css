@@ -262,3 +262,22 @@ tr.inativo td, tr.inativo th { color: var(--suave); }
 .meus-sistemas a:hover, .meus-sistemas a:focus-visible { border-color: var(--azul); }
 .meus-sistemas strong { color: var(--azul); }
 .meus-sistemas span { font-size: .9rem; color: var(--suave); }
+
+/* Vídeos explicativos do serviço (D-116 a D-120) */
+.campo-videos { display: grid; gap: .5rem; }
+.campo-videos > p { margin: 0; }
+.lista-videos { list-style: none; padding: 0; margin: .5rem 0 0; display: grid; gap: 1rem; }
+.video-item { display: grid; grid-template-columns: minmax(160px, 240px) 1fr; gap: 1rem; padding: .75rem; border: 1px solid var(--borda); border-radius: var(--raio); background: var(--branco); }
+.video-previa { display: grid; gap: .35rem; align-content: start; }
+.video-previa video { width: 100%; max-height: 320px; background: #000; border-radius: 6px; }
+.video-capa { cursor: pointer; justify-self: start; }
+.video-capa:focus-within { outline: 3px solid #ffbf47; outline-offset: 2px; }
+.video-campos { display: grid; gap: .6rem; align-content: start; min-width: 0; }
+.video-apoio { display: grid; gap: .5rem; }
+.video-link { display: grid; grid-template-columns: 1fr 1fr; gap: .25rem .5rem; align-items: end; padding-bottom: .5rem; border-bottom: 1px dashed var(--borda); }
+.video-link .botao-link { justify-self: start; }
+.video-novo { display: grid; gap: .5rem; padding-top: .5rem; border-top: 1px solid var(--borda); }
+.video-novo h3 { margin: .25rem 0 0; font-size: 1rem; }
+@media (max-width: 700px) {
+  .video-item, .video-link { grid-template-columns: 1fr; }
+}

@@ -7,6 +7,7 @@ import { usePortal } from '../../lib/portal';
 import { EditorTexto } from '../../components/EditorTexto';
 import { CampoImagem } from '../../components/CampoImagem';
 import type { Midia } from '../../lib/midias';
+import { CampoVideos, errosVideos, videosParaGravar, type VideoServico } from '../../components/CampoVideos';
 import { BarraAcoes, CabecalhoEdicao, CampoSlug, CarregandoOuAusente, MensagensEdicao, Obrigatorio, SeletorOrgao } from '../../components/Edicao';
 
 export function ListaServicos() {
@@ -25,6 +26,7 @@ export function ListaServicos() {
 interface Form {
   categoriaId: string; titulo: string; slug: string; descricao: string; publicoAlvo: string; requisitos: string; etapas: string;
   prazo: string; custo: string; canal: string; localHorario: string; urlExterna: string; orgaoId: string; capa: Midia | null;
+  videos: VideoServico[]; videosTitulo: string;
 }
 
 export function EditarServico() {
@@ -35,11 +37,12 @@ export function EditarServico() {
     tabela: 'servicos',
     rotaBase: '/servicos',
     select: '*, capa:midias!servicos_imagem_fkey(id, storage_path, nome_original, mime_type, texto_alternativo)',
-    vazio: { categoriaId: '', titulo: '', slug: '', descricao: '', publicoAlvo: '', requisitos: '', etapas: '', prazo: '', custo: '', canal: '', localHorario: '', urlExterna: '', orgaoId: '', capa: null },
+    vazio: { categoriaId: '', titulo: '', slug: '', descricao: '', publicoAlvo: '', requisitos: '', etapas: '', prazo: '', custo: '', canal: '', localHorario: '', urlExterna: '', orgaoId: '', capa: null, videos: [], videosTitulo: '' },
     deLinha: (d) => ({
       categoriaId: d.categoria_id ?? '', titulo: d.titulo, slug: d.slug, descricao: d.descricao ?? '', publicoAlvo: d.publico_alvo ?? '',
       requisitos: d.requisitos_html ?? '', etapas: d.etapas_html ?? '', prazo: d.prazo ?? '', custo: d.custo ?? '', canal: d.canal_atendimento ?? '',
       localHorario: d.local_horario ?? '', urlExterna: d.url_externa ?? '', orgaoId: d.orgao_id ?? '', capa: d.capa ?? null,
+      videos: Array.isArray(d.videos) ? d.videos : [], videosTitulo: d.videos_titulo ?? '',
     }),
     paraLinha: (f) => ({
       categoria_id: f.categoriaId || null, titulo: f.titulo.trim(), slug: f.slug, descricao: f.descricao.trim() || null,
@@ -47,12 +50,14 @@ export function EditarServico() {
       prazo: f.prazo.trim() || null, custo: f.custo.trim() || null, canal_atendimento: f.canal.trim() || null,
       local_horario: f.localHorario.trim() || null, url_externa: f.urlExterna.trim() || null, orgao_id: f.orgaoId || null,
       imagem_id: f.capa?.id ?? null,
+      videos: videosParaGravar(f.videos), videos_titulo: f.videosTitulo.trim() || null,
     }),
     validar: (f) => [
       !f.titulo.trim() && 'Informe o nome do serviço.',
       !SLUG_VALIDO.test(f.slug) && 'O endereço só pode ter letras minúsculas, números e hífens.',
       f.urlExterna.trim() && !/^(https?:\/\/|\/)/.test(f.urlExterna.trim()) && 'O link do serviço deve começar com https:// (site externo) ou / (página do portal).',
       f.capa && !f.capa.texto_alternativo?.trim() && 'A foto de capa precisa de texto alternativo.',
+      ...errosVideos(f.videos, f.videosTitulo),
     ].filter(Boolean) as string[],
     mensagens: { salvar: 'Alterações salvas.', publicar: 'Serviço publicado.', agendar: 'Publicação agendada para', despublicar: 'Serviço retirado do site.' },
   });
@@ -83,6 +88,7 @@ export function EditarServico() {
               <span className="rotulo-campo">Como solicitar (etapas)</span>
               <EditorTexto rotulo="Como solicitar" valor={f.etapas} aoMudar={(v) => mudar('etapas', v)} municipioId={e.mid} desabilitado={e.bloqueado} />
             </div>
+            <CampoVideos municipioId={e.mid} videos={f.videos} titulo={f.videosTitulo} aoMudar={(v) => mudar('videos', v)} aoMudarTitulo={(t) => mudar('videosTitulo', t)} desabilitado={e.bloqueado} />
           </div>
           <div className="coluna-lateral">
             <CampoImagem rotulo="Foto de capa (opcional)" municipioId={e.mid} midia={f.capa} aoMudar={(m) => mudar('capa', m)} desabilitado={e.bloqueado} />
