@@ -963,3 +963,8 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 **D-133 · 22/10/2026 · Sem a faixa vermelha de homologação no endereço provisório (pedido do William)**
 - O endereço provisório (`portal-municipal.willquerubim2025.workers.dev`) segue cadastrado como `homologacao` em `municipio_dominios`, para continuar **fora dos buscadores** (`noindex` e `X-Robots-Tag`). Só a faixa "Ambiente de homologação — conteúdo de teste, não indexado" some, por atrapalhar as demonstrações.
 - **Genérico:** `config.faixa_homologacao = false` esconde a faixa daquela organização; sem o campo, a faixa continua aparecendo em homologação. Ligado na SMEDU. No dia do domínio oficial (ver `docs/11-checklist-ir-ao-ar.md`), o domínio novo entra como `producao`.
+
+**D-134 · 24/10/2026 · Edge Function `alterar-pessoa`: corrigir nome e e-mail (login) de uma pessoa**
+- Não havia tela para isso em lugar nenhum (pendência de 24/10). A função recebe `municipio_id`, `user_id`, `nome` e/ou `email`; confere com o token de quem chama se é administrador da organização (`is_admin`) ou da CI (`ci.e_admin`); troca o e-mail no Supabase Auth (já confirmado) e o `perfis`; grava a mudança na `auditoria` (antes/depois).
+- **Trava multiorganização:** recusa (409) se a pessoa também está ligada a outra organização ou é da equipe da plataforma, porque mudar o login dela afetaria a outra. Esses casos ficam com a SECKE.
+- Hoje a tela que usa a função é a Administração da CI (Pessoas e papéis → lápis). O painel pode ganhar o mesmo botão em Usuários quando for preciso.
