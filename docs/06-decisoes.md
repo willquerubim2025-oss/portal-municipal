@@ -968,3 +968,8 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Não havia tela para isso em lugar nenhum (pendência de 24/10). A função recebe `municipio_id`, `user_id`, `nome` e/ou `email`; confere com o token de quem chama se é administrador da organização (`is_admin`) ou da CI (`ci.e_admin`); troca o e-mail no Supabase Auth (já confirmado) e o `perfis`; grava a mudança na `auditoria` (antes/depois).
 - **Trava multiorganização:** recusa (409) se a pessoa também está ligada a outra organização ou é da equipe da plataforma, porque mudar o login dela afetaria a outra. Esses casos ficam com a SECKE.
 - Hoje a tela que usa a função é a Administração da CI (Pessoas e papéis → lápis). O painel pode ganhar o mesmo botão em Usuários quando for preciso.
+
+**D-135 · 24/10/2026 · Padrão dos manuais (pedido do William)**
+- Todo manual ou guia da SECKE (portal, painel e sistemas satélites) segue a mesma regra dos sistemas: **a experiência do usuário é o centro**. Formato de referência: o Guia do Usuário da CI (`ci-eletronica/docs/guia/`, D-75 de lá): uma unidade por papel, índice no início de cada unidade, "Problemas e o que fazer" no fim, fotos reais com números, fluxogramas, cartões de atenção/dica e glossário.
+- O guia é **gerado por código** a partir do aplicativo rodando com dados fictícios, para ser refeito quando as telas mudarem.
+- Próximo sistema satélite: **Pesquisas da Educação** (cartão "Em breve" no portal, D-126).
