@@ -980,3 +980,6 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Tom cuidadoso com o site atual: fala do "site geral da Prefeitura" e do deslocamento até a Secretaria, sem crítica direta.
 - **Gerada por código** a partir do portal publicado (mesma regra da D-135), para ser refeita quando o portal mudar.
 
+
+**D-137 · 25/10/2026 · Molde dos materiais (pedido do William)**
+- A apresentação impressa do Portal (D-136) e o Guia do Usuário da CI (D-75 da CI) foram aprovados e viram o **molde** para os materiais de todos os sistemas (próximo: Pesquisas da Educação). Receita completa em [13-padrao-materiais.md](13-padrao-materiais.md): começar copiando a pasta `fonte/` do modelo.

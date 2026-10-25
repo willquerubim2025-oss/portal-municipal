@@ -12,6 +12,7 @@
 | [08-base-generica](08-base-generica.md) | Revisão do schema como base para qualquer prefeitura (D-10): correções feitas e módulos propostos |
 | [09-seo-indexacao](09-seo-indexacao.md) | SEO e indexação no Google: o que a arquitetura já resolve e o checklist do portal (D-15) |
 | [12-backup-e-restauracao](12-backup-e-restauracao.md) | Backup extra no R2 (D-34): como configurar, como funciona o teste de restauração e como restaurar |
+| [13-padrao-materiais](13-padrao-materiais.md) | **Molde das apresentações impressas e dos guias do usuário** de qualquer sistema (D-137) |
 | [11-checklist-ir-ao-ar](11-checklist-ir-ao-ar.md) | **Antes de colocar uma prefeitura no ar:** contas, infraestrutura, dados, migração, qualidade e o dia da troca (inclui itens adiados de propósito) |
 | [reuniao/](reuniao/00-LEIA-PRIMEIRO.md) | **Reunião com a prefeitura:** guia, pauta e tudo o que precisa ser levantado, por assunto (onde cada informação entra e o que muda no sistema) |
 

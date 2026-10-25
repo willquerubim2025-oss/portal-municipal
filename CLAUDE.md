@@ -37,3 +37,6 @@ Toda decisão técnica, descoberta ou consideração importante discutida em con
 - informação sobre o cliente ou o site atual → doc correspondente.
 
 Ao terminar, avisar o usuário em uma linha o que foi registrado e onde.
+
+## Materiais de apresentação e guias (D-137)
+Apresentação impressa e Guia do Usuário de qualquer sistema seguem o molde aprovado: receita em `portal-municipal/docs/13-padrao-materiais.md` (modelos: `Portais-Publicos/docs/portfolio/apresentacao/` e `ci-eletronica/docs/guia/`). Começar copiando a pasta `fonte/` do modelo. Na apresentação, primeiro conquistar; a técnica vem no fim.
