@@ -973,3 +973,10 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Todo manual ou guia da SECKE (portal, painel e sistemas satélites) segue a mesma regra dos sistemas: **a experiência do usuário é o centro**. Formato de referência: o Guia do Usuário da CI (`ci-eletronica/docs/guia/`, D-75 de lá): uma unidade por papel, índice no início de cada unidade, "Problemas e o que fazer" no fim, fotos reais com números, fluxogramas, cartões de atenção/dica e glossário.
 - O guia é **gerado por código** a partir do aplicativo rodando com dados fictícios, para ser refeito quando as telas mudarem.
 - Próximo sistema satélite: **Pesquisas da Educação** (cartão "Em breve" no portal, D-126).
+
+**D-136 · 25/10/2026 · Apresentação impressa do Portal da Educação (pedido do William)**
+- Material para entregar na mão à Secretaria (impresso é imediato): `Portais-Publicos/docs/portfolio/apresentacao/Portal-Educacao-Apresentacao.pdf`, A4, substitui o portfólio anterior.
+- **Primeiro conquistar, depois explicar a técnica:** abre com o portal de verdade (destaque de abertura, página inicial em partes, alternando página de imagem e página de explicação), depois serviços para a família, acessibilidade, celular, integração (sistemas e CI Eletrônica) e painel; perguntas sobre segurança, problemas e o que fazer e tecnologia (Supabase, RLS, backups) vêm por último.
+- Tom cuidadoso com o site atual: fala do "site geral da Prefeitura" e do deslocamento até a Secretaria, sem crítica direta.
+- **Gerada por código** a partir do portal publicado (mesma regra da D-135), para ser refeita quando o portal mudar.
+
