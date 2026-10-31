@@ -25,6 +25,7 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
   - [ ] **William:** marcar `geoescola` em Supabase → Settings → Data API → Exposed schemas (o comando no banco já foi feito).
   - [x] **Publicado na Cloudflare (31/10/2026):** https://simape.willquerubim2025.workers.dev (Worker `simape`, botão "Publicar produção" do repositório `geoescola`). Cartão **"SIMAPE"** na página inicial do Portal Educação, área do servidor, já sem o "em breve". Quem tem conta no portal mas não tem acesso ao SIMAPE recebe o aviso "Sua conta ainda não tem acesso ao SIMAPE".
   - [ ] **William:** entrar com a sua conta e conferir. O site antigo da Hostinger ainda usa o banco antigo: tirar do ar ou redirecionar para o endereço novo.
+  - [ ] **Liberado para excluir (31/10/2026):** banco antigo sem nenhuma mudança desde 29/08 (tudo foi copiado), sem arquivos guardados; William e Mateus já entraram no SIMAPE novo. Falta o William excluir o projeto GEOESCOLAS no Supabase.
   - [ ] Depois de conferido: excluir o projeto antigo GEOESCOLAS (hoje **ligado**, para o site atual continuar funcionando até a troca) e a função solta `trocar-senha` do Portal Municipal (publicada sem prefixo por engano; não tem uso).
   - [ ] Recriar Mateus e Luciana pela tela Usuários do SIMAPE.
   - [ ] A planilha ESTUDO.xlsx (dados pessoais) saiu do repositório `geoescola`, mas continua no histórico do 1º commit: limpar o histórico (precisa da autorização do William para reescrever) ou recriar o repositório.
