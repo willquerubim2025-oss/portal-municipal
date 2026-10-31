@@ -983,3 +983,11 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 
 **D-137 · 25/10/2026 · Molde dos materiais (pedido do William)**
 - A apresentação impressa do Portal (D-136) e o Guia do Usuário da CI (D-75 da CI) foram aprovados e viram o **molde** para os materiais de todos os sistemas (próximo: Pesquisas da Educação). Receita completa em [13-padrao-materiais.md](13-padrao-materiais.md): começar copiando a pasta `fonte/` do modelo.
+
+**D-138 · 31/10/2026 · SIMAPE (GeoEscola) vira sistema satélite do Portal Municipal (pedido do William)**
+- O banco do SIMAPE saiu do projeto GEOESCOLAS (us-west-2, pausado) e foi para o schema **`geoescola`** do Portal Municipal, no mesmo molde da CI e das Pesquisas. Código: repositório `willquerubim2025-oss/geoescola` (migrações `geoescola_0001` a `0006`, funções em `supabase/functions/`, `docs/instalacao.md`).
+- **Destacável (exigência do William):** o schema só usa `auth.users`; nada de `public.*`. Schema e prefixo das funções do servidor são configuráveis no app (`VITE_SUPABASE_SCHEMA`, `VITE_FUNCOES_PREFIXO`), então o mesmo código serve a outro órgão num projeto próprio.
+- Funções do servidor publicadas com o prefixo **`geoescola-`**, para não colidir com as de outros sistemas no projeto compartilhado.
+- Login compartilhado com o portal; só entra no SIMAPE quem está em `geoescola.usuarios`. Criar usuário com e-mail que já tem conta só dá acesso, sem trocar a senha.
+- Segurança corrigida na migração: funções do banco antes abertas a qualquer um agora conferem quem está logado; a IA do "Projetor de Solução" passa a exigir login (antes qualquer pessoa podia gastar a chave paga).
+- Motivo: um projeto só (São Paulo, plano Pro), sem pagar um segundo projeto, e o SIMAPE ligado ao Portal Educação.
