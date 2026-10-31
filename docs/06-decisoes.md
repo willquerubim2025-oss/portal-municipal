@@ -990,4 +990,5 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Funções do servidor publicadas com o prefixo **`geoescola-`**, para não colidir com as de outros sistemas no projeto compartilhado.
 - Login compartilhado com o portal; só entra no SIMAPE quem está em `geoescola.usuarios`. Criar usuário com e-mail que já tem conta só dá acesso, sem trocar a senha.
 - Segurança corrigida na migração: funções do banco antes abertas a qualquer um agora conferem quem está logado; a IA do "Projetor de Solução" passa a exigir login (antes qualquer pessoa podia gastar a chave paga).
+- Publicação: Cloudflare (Worker `simape`, botão "Publicar produção" no repositório `geoescola`), como os outros sistemas; acesso pelo cartão "SIMAPE" na área do servidor do Portal Educação.
 - Motivo: um projeto só (São Paulo, plano Pro), sem pagar um segundo projeto, e o SIMAPE ligado ao Portal Educação.

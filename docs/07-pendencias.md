@@ -23,7 +23,8 @@ Desenvolvimento ~80% pronto; o que falta depende sobretudo da prefeitura (reuni�
 - [x] **Pesquisas da Educação (D-126):** no ar desde 27/10/2026 e ligado ao cartão da página inicial (público servidor; D-64 do repositório `pesquisas`).
 - [x] **SIMAPE (GeoEscola) trazido para o Portal Municipal (30–31/10/2026, D-138).** Schema `geoescola` com todos os dados (13.361 alunos, 13 simulações, 164 mil alocações), 6 funções do servidor (`geoescola-*`), app adaptado e testado (a simulação reprocessada deu os mesmos números da original). Arquivo para publicar: `geoescola/dist.zip`.
   - [ ] **William:** marcar `geoescola` em Supabase → Settings → Data API → Exposed schemas (o comando no banco já foi feito).
-  - [ ] **William:** publicar o `dist.zip` na Hostinger (ou decidir passar para a Cloudflare com publicação automática) e conferir entrando com a sua conta.
+  - [x] Cartão **"SIMAPE"** na página inicial do Portal Educação (área do servidor, `public.sistemas_externos`), por enquanto como "em breve", apontando para `https://simape.willquerubim2025.workers.dev/login` (31/10/2026, pedido do William).
+  - [ ] **William:** pôr no repositório `geoescola` os dois segredos da Cloudflare (`CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID`, os mesmos das Pesquisas). Depois: Actions → "Publicar produção" → tirar o "em breve" do cartão → conferir entrando com a sua conta. (O `dist.zip` para a Hostinger continua como alternativa.)
   - [ ] Depois de conferido: excluir o projeto antigo GEOESCOLAS (hoje **ligado**, para o site atual continuar funcionando até a troca) e a função solta `trocar-senha` do Portal Municipal (publicada sem prefixo por engano; não tem uso).
   - [ ] Recriar Mateus e Luciana pela tela Usuários do SIMAPE.
   - [ ] A planilha ESTUDO.xlsx (dados pessoais) saiu do repositório `geoescola`, mas continua no histórico do 1º commit: limpar o histórico (precisa da autorização do William para reescrever) ou recriar o repositório.
