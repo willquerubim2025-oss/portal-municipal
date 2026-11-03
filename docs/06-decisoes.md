@@ -997,5 +997,6 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - Menu Alunos do painel do SIMAPE ganha a consulta para quem ainda não está cadastrado: data de nascimento + CEP (e número) → série, segmento, bairro, setor e as escolas mais próximas que atendem a série, com distância, aviso de transporte e vagas.
 - Série pela **idade completa em 31/03 do ano letivo** (regra do MEC, confirmada pelo William para Paulínia): 0 = B1, 1 = B2, 2 = M1, 3 = M2, 4 = Etapa 1, 5 = Etapa 2, 6 = 1º ano … 14 = 9º ano; 15 ou mais = fora da rede municipal.
 - **Só consulta, não grava** (escolha do William). Vagas: com cenário aberto, quantas sobram no cenário; sem cenário, as vagas da base atual.
+- A lista mostra as 8 unidades mais próximas que atendem a série, **também as sem vaga cadastrada** (pelo tipo da unidade), incluindo as creches conveniadas do **PROEB**; na idade de creche, a PROEB mais próxima sempre aparece (pedido do William, 03/11/2026).
 - Setor = o da escola mais próxima que atende a série (setor é das escolas). Se o mapa não achar o CEP, usa o ponto médio dos alunos já cadastrados no mesmo CEP.
 - Detalhes em `geoescola/docs/instalacao.md`; banco na migração `geoescola_0007`.
