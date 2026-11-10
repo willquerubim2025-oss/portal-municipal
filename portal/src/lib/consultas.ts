@@ -325,3 +325,20 @@ export async function urlsSitemap(municipioId: string) {
     ...u(ser.data, '/servicos/'), ...u(eve.data, '/eventos/'), ...u(org.data, '/estrutura-organizacional/'),
   ];
 }
+
+/** Notícias com as categorias, para o bloco "noticias_lista" (D-136). */
+export async function noticiasComCategoria(municipioId: string, limite = 6) {
+  return erro(await supabase().from('publicacoes')
+    .select(`${CAMPOS_NOTICIA}, categorias:publicacao_categorias(categoria:categorias(nome, slug))`)
+    .eq('municipio_id', municipioId)
+    .or(`expira_em.is.null,expira_em.gt.${agora()}`)
+    .order('publicado_em', { ascending: false })
+    .limit(limite)) as any[];
+}
+
+/** Resumo das avaliações do atendimento dos últimos 12 meses (D-136): total, média e quantidade por nota (1 a 5). */
+export async function resumoAvaliacoes(municipioId: string): Promise<{ total: number; media: number | null; dist: number[] } | null> {
+  const r = await supabase().rpc('resumo_avaliacoes', { p_municipio: municipioId });
+  if (r.error) return null;
+  return r.data as any;
+}

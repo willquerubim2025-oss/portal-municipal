@@ -1,0 +1,25 @@
+---
+// Bloco "direitos" (D-136): cartões com um número grande (prazo), o direito e a lei.
+import type { ItemDireito, TextosBloco } from '../../lib/municipio';
+import TituloBloco from './TituloBloco.astro';
+interface Props { itens?: ItemDireito[]; textos?: TextosBloco }
+const { textos } = Astro.props;
+const itens = (Astro.props.itens ?? []).filter((d) => d?.numero && d?.titulo);
+---
+{itens.length > 0 && (
+  <section class="vb-secao vb-direitos" aria-labelledby="vb-t-direitos">
+    <div class="vb-miolo">
+      <TituloBloco id="vb-t-direitos" textos={textos} padrao={{ sobretitulo: 'Seus direitos', titulo: 'O que todo *consumidor deve saber*' }} />
+      <div class="vb-direitos-grade">
+        {itens.map((d, i) => (
+          <article class={`vb-direito vb-direito-${i % 3}`}>
+            <div class="vb-prazo">{d.numero}{d.unidade && <small>{d.unidade}</small>}</div>
+            <h3>{d.titulo}</h3>
+            <p>{d.texto}</p>
+            {d.lei && <span class="vb-lei">{d.lei}</span>}
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+)}

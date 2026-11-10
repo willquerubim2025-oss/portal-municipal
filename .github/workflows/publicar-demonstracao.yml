@@ -1,0 +1,51 @@
+# Publica o portal de DEMONSTRAÇÃO do Procon Sumaré na Cloudflare (D-136), com um botão:
+# Actions → "Publicar demonstração" → Run workflow. Worker à parte (procon-sumare), mesmo banco da
+# produção; o endereço está em municipio_dominios como homologação (fora dos buscadores).
+# Não mexe no Worker portal-municipal (SMEDU) nem no painel.
+#
+# Segredos do repositório: CLOUDFLARE_API_TOKEN e CLOUDFLARE_ACCOUNT_ID (os mesmos de "Publicar produção").
+name: Publicar demonstração
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publicar-demonstracao
+  cancel-in-progress: false
+
+jobs:
+  portal:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: portal
+    steps:
+      - uses: actions/checkout@v4
+      # Tira espaços e quebras de linha que vêm junto ao colar os segredos (a Cloudflare recusa).
+      - name: Credenciais da Cloudflare
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CONTA: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          token=$(printf '%s' "$TOKEN" | tr -d '[:space:]'); conta=$(printf '%s' "$CONTA" | tr -d '[:space:]')
+          echo "::add-mask::$token"; echo "::add-mask::$conta"
+          echo "CLOUDFLARE_API_TOKEN=$token" >> "$GITHUB_ENV"
+          echo "CLOUDFLARE_ACCOUNT_ID=$conta" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: portal/package-lock.json
+      - run: npm ci
+      - run: npx astro build
+        env:
+          CLOUDFLARE_ENV: procon-sumare
+      - name: Conferir que o build é o da demonstração
+        run: |
+          grep -q '"name":"procon-sumare"' dist/server/wrangler.json
+          grep -q 'qgywucdnaeheqndcxtho' dist/server/wrangler.json
+      - run: npx wrangler deploy

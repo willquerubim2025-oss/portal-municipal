@@ -1,0 +1,82 @@
+---
+// Bloco "golpes" (D-136): vídeos curtos do YouTube. Um vídeo em destaque e a lista ao lado; clicar na lista troca o destaque.
+// O YouTube só é carregado depois do clique em "Assistir" (privacidade e desempenho), pelo domínio youtube-nocookie.
+// Vídeo ainda sem endereço aparece como "em breve". Sem JavaScript, "Assistir" abre o vídeo no YouTube.
+import type { TextosBloco, VideoGolpe } from '../../lib/municipio';
+import TituloBloco from './TituloBloco.astro';
+interface Props { videos?: VideoGolpe[]; textos?: TextosBloco }
+const { textos } = Astro.props;
+// Aceita o código do vídeo ou um endereço do YouTube (watch, youtu.be, shorts, embed).
+const idDe = (v?: string) => {
+  if (!v) return null;
+  const m = v.match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([A-Za-z0-9_-]{11})/) ?? v.match(/^([A-Za-z0-9_-]{11})$/);
+  return m ? m[1] : null;
+};
+const videos = (Astro.props.videos ?? []).filter((v) => v?.titulo).map((v, i) => ({ ...v, id: idDe(v.youtube), n: String(i + 1).padStart(2, '0') }));
+const [primeiro] = videos;
+---
+{primeiro && (
+  <section class="vb-secao vb-golpes" aria-labelledby="vb-t-golpes" data-vb-golpes>
+    <div class="vb-miolo">
+      <TituloBloco id="vb-t-golpes" textos={textos} claro padrao={{ sobretitulo: 'Golpes em vídeo', titulo: 'Assista antes. *Não caia depois.*' }} />
+      <div class="vb-golpes-grade">
+        <div class="vb-player" data-vb-player aria-live="polite">
+          <span class="vb-player-num" data-campo="n" aria-hidden="true">{primeiro.n}</span>
+          <span class="vb-player-dur" data-campo="duracao">{primeiro.duracao ?? ''}</span>
+          <h3 data-campo="titulo">{primeiro.titulo}</h3>
+          <p data-campo="resumo">{primeiro.resumo ?? ''}</p>
+          <div>
+            <a class="vb-botao vb-botao-amarelo" data-vb-assistir data-id={primeiro.id ?? ''} href={primeiro.id ? `https://www.youtube.com/watch?v=${primeiro.id}` : '#vb-t-golpes'}
+               hidden={!primeiro.id}>Assistir ao vídeo</a>
+            <span class="vb-em-breve" data-vb-breve hidden={!!primeiro.id}>Vídeo em breve</span>
+          </div>
+        </div>
+        <ul class="vb-playlist">
+          {videos.map((v, i) => (
+            <li>
+              <button type="button" class={i === 0 ? 'vb-item-video vb-ativo' : 'vb-item-video'} aria-pressed={i === 0 ? 'true' : 'false'}
+                      data-n={v.n} data-titulo={v.titulo} data-resumo={v.resumo ?? ''} data-duracao={v.duracao ?? ''} data-id={v.id ?? ''}>
+                <span class="vb-item-n" aria-hidden="true">{v.n}</span>
+                <span><b>{v.titulo}</b><span>{v.id ? v.duracao ?? 'Vídeo' : 'Em breve'}</span></span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+)}
+<script>
+  for (const bloco of document.querySelectorAll<HTMLElement>('[data-vb-golpes]')) {
+    const player = bloco.querySelector<HTMLElement>('[data-vb-player]')!;
+    const assistir = player.querySelector<HTMLAnchorElement>('[data-vb-assistir]')!;
+    const breve = player.querySelector<HTMLElement>('[data-vb-breve]')!;
+    const campo = (n: string) => player.querySelector<HTMLElement>(`[data-campo="${n}"]`);
+    const fecharVideo = () => player.querySelector('iframe')?.remove();
+    for (const item of bloco.querySelectorAll<HTMLButtonElement>('.vb-item-video')) {
+      item.addEventListener('click', () => {
+        fecharVideo();
+        for (const x of bloco.querySelectorAll('.vb-item-video')) { x.classList.remove('vb-ativo'); x.setAttribute('aria-pressed', 'false'); }
+        item.classList.add('vb-ativo'); item.setAttribute('aria-pressed', 'true');
+        for (const n of ['n', 'titulo', 'resumo', 'duracao']) { const c = campo(n); if (c) c.textContent = item.dataset[n] ?? ''; }
+        const id = item.dataset.id ?? '';
+        assistir.dataset.id = id; assistir.href = id ? `https://www.youtube.com/watch?v=${id}` : '#';
+        assistir.hidden = !id; breve.hidden = !!id;
+      });
+    }
+    assistir.addEventListener('click', (e) => {
+      const id = assistir.dataset.id;
+      if (!id) return;
+      e.preventDefault();
+      fecharVideo();
+      const f = document.createElement('iframe');
+      f.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0`;
+      f.title = campo('titulo')?.textContent ?? 'Vídeo';
+      f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      f.allowFullscreen = true;
+      f.className = 'vb-player-video';
+      player.append(f);
+      f.focus();
+    });
+  }
+</script>

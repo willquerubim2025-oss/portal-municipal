@@ -1,0 +1,21 @@
+---
+// Bloco "acoes" (D-136): cartões numerados (01, 02...) que sobem sobre o destaque.
+import type { ItemAcao } from '../../lib/municipio';
+interface Props { itens?: ItemAcao[] }
+const lista = (Astro.props.itens ?? []).filter((a) => a?.titulo && /^(\/(?!\/)|#|https:\/\/)/.test(a.url ?? ''));
+const externo = (u: string) => u.startsWith('https://');
+---
+{lista.length > 0 && (
+  <section class="vb-acoes" aria-label="Como podemos ajudar">
+    <div class="vb-miolo vb-acoes-grade" style={`--vb-colunas:${Math.min(lista.length, 4)}`}>
+      {lista.map((a, i) => (
+        <a class="vb-acao" href={a.url} target={externo(a.url) ? '_blank' : undefined} rel={externo(a.url) ? 'noopener' : undefined}>
+          <span class="vb-acao-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <h3>{a.titulo}</h3>
+          {a.texto && <p>{a.texto}</p>}
+          <span class="vb-acao-link">{a.rotulo ?? 'Acessar'}{externo(a.url) && <span class="sr-only"> (abre em nova aba)</span>}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+)}

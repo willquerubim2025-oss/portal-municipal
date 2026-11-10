@@ -1,0 +1,54 @@
+---
+// Bloco "noticias_lista" (D-136): a notícia mais recente em destaque (com foto) e as demais em lista, com data e categoria.
+import { urlImagem, srcsetImagem } from '../../lib/imagens';
+import type { TextosBloco } from '../../lib/municipio';
+import TituloBloco from './TituloBloco.astro';
+interface Props { noticias: any[]; textos?: TextosBloco }
+const { noticias, textos } = Astro.props;
+// Em destaque: a mais recente que tem foto (sem foto, a mais recente); as outras seguem na ordem.
+const principal = noticias.find((n) => n.imagem) ?? noticias[0];
+const demais = noticias.filter((n) => n !== principal);
+const mes = (d: string) => new Date(d).toLocaleDateString('pt-BR', { month: 'short', timeZone: 'America/Sao_Paulo' }).replace('.', '');
+const ano = (d: string) => new Date(d).toLocaleDateString('pt-BR', { year: 'numeric', timeZone: 'America/Sao_Paulo' });
+const data = (d: string) => new Date(d).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Sao_Paulo' });
+const categoria = (n: any) => n.categorias?.find((c: any) => c?.categoria?.slug !== 'geral')?.categoria?.nome as string | undefined;
+---
+{principal && (
+  <section class="vb-secao vb-noticias" aria-labelledby="vb-t-noticias">
+    <div class="vb-miolo">
+      <TituloBloco id="vb-t-noticias" textos={textos} padrao={{ sobretitulo: 'Notícias', titulo: 'Acontece *aqui*', botao: { rotulo: 'Todas as notícias', url: '/noticias' } }} />
+      <div class="vb-noticias-grade">
+        <a class="vb-noticia-principal" href={`/noticias/${principal.slug}`}>
+          {principal.imagem && (
+            <div class="vb-noticia-imagem">
+              <img src={urlImagem(principal.imagem.storage_path, 800)} srcset={srcsetImagem(principal.imagem.storage_path, [480, 800, 1200])}
+                   sizes="(max-width: 1100px) 100vw, 640px" alt={principal.imagem.texto_alternativo ?? ''} loading="lazy" decoding="async" width="800" height="450" />
+            </div>
+          )}
+          <div class="vb-noticia-corpo">
+            <div class="vb-meta">{categoria(principal) && <span class="vb-cat">{categoria(principal)}</span>}<time datetime={principal.publicado_em}>{data(principal.publicado_em)}</time></div>
+            <h3>{principal.titulo}</h3>
+            {principal.resumo && <p>{principal.resumo}</p>}
+          </div>
+        </a>
+        {demais.length > 0 && (
+          <ul class="vb-noticias-lista">
+            {demais.map((n, i) => (
+              <li>
+                <a class="vb-noticia" href={`/noticias/${n.slug}`}>
+                  <span class={`vb-data vb-data-${i % 3}`} aria-hidden="true"><b>{mes(n.publicado_em)}</b><span>{ano(n.publicado_em)}</span></span>
+                  <span>
+                    {categoria(n) && <span class={`vb-cat vb-cat-${i % 3}`}>{categoria(n)}</span>}
+                    <span class="vb-noticia-titulo">{n.titulo}</span>
+                    {n.resumo && <span class="vb-noticia-resumo">{n.resumo}</span>}
+                    <span class="sr-only">Publicada em {data(n.publicado_em)}</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  </section>
+)}
