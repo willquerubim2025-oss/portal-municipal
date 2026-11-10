@@ -173,7 +173,7 @@ const faixaCores = coresFaixa.length
   ? `linear-gradient(90deg, ${coresFaixa.map((c, i) => `${c} ${(100 * i) / coresFaixa.length}% ${(100 * (i + 1)) / coresFaixa.length}%`).join(', ')})`
   : undefined;
 const classeHtml = vitrine
-  ? ['vitrine', tema.filtro_destaque === 'neutro' && 'v-filtro-neutro', claro && 'v-claro', claro && fonte(tema.fonte_cabecalho) && 'v-fonte-cab', tema.sem_icones && 'v-sem-icones', cor(tema.cor_rodape) && 'v-rodape-cor'].filter(Boolean).join(' ')
+  ? ['vitrine', tema.filtro_destaque === 'neutro' && 'v-filtro-neutro', claro && 'v-claro', claro && fonte(tema.fonte_cabecalho) && 'v-fonte-cab', tema.sem_icones && 'v-sem-icones', claro && tema.cabecalho_compacto && 'v-cab-compacto', cor(tema.cor_rodape) && 'v-rodape-cor'].filter(Boolean).join(' ')
   : undefined;
 const caminhoAtual = Astro.url.pathname;
 // "Acesso do servidor" (D-94): leva ao painel deste ambiente (PAINEL_URL do Worker). Sem a variável, não aparece.

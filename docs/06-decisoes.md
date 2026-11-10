@@ -983,3 +983,8 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - **Avaliação (migração 0033):** tabela `avaliacoes` (sem dado pessoal; só o admin da organização lê), funções `registrar_avaliacao` (só aceita organização ativa com o bloco `avaliacao` ligado) e `resumo_avaliacoes` (12 meses), no padrão `seguranca`/`public` da 0016. Rota `POST /avaliar`. `config.home.avaliacao.ilustrativo` mostra um resumo de exemplo (demonstração).
 - **Dados da demonstração:** notícias **reais**, com a fonte no texto (Portal da Cidade Sumaré, Prefeitura de Sumaré, Todo Dia, Rádio Nossa FM); endereço, telefone e horário reais (horário informado pelo William: 8h30 às 16h30). Números, ranking por segmento e resumo das avaliações são **ilustrativos** e aparecem marcados assim na página; a versão final virá dos atendimentos do SigDoc. O ranking mostra segmentos, não nomes de empresas (nomes só com dados oficiais). Os vídeos de golpes aparecem como "Vídeo em breve" até o William enviar os links.
 - **SMEDU:** conferida no navegador depois da mudança: sem nenhum bloco novo e com o mesmo cabeçalho.
+
+**D-137 · 10/11/2026 · Cabeçalho claro compacto no Procon Sumaré (pedido do William)**
+- "O cabeçalho está muito alto... reduzir entre 20% e 25% a altura dele... tenta não mexer nas fontes... para trazer o destaque mais para cima."
+- **Genérico:** `tema.cabecalho_compacto = true` (classe `v-cab-compacto`) diminui só as alturas mínimas e os espaços do cabeçalho claro; fontes, logotipo e menu ficam iguais. Medido: computador 134 → 101 px (−25%), tablet (1024 px) 122 → 97 px (−20%), celular (390 px) 132 → 100 px (−24%). O destaque sobe a mesma diferença (no computador começa 33 px mais acima).
+- Ligado só no Procon Sumaré. A SMEDU não liga a opção e não muda.

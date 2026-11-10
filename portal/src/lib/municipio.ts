@@ -13,6 +13,8 @@ export interface Tema {
   logo_rodape_path?: string;
   /** D-136: sem ícones decorativos no cabeçalho e no rodapé (só texto). */
   sem_icones?: boolean;
+  /** D-137: cabeçalho claro cerca de 25% mais baixo (mesmas fontes e logotipo), para o destaque subir na tela. */
+  cabecalho_compacto?: boolean;
   /** D-136: cor do rodapé do cabeçalho claro; vazia = a do padrão. */
   cor_rodape?: string;
   // ---- Tema ampliado (D-17, D-39). Sem `layout: 'vitrine'`, nada abaixo muda o portal.

@@ -292,3 +292,23 @@
 .vb-golpes [hidden], .vb-mapa [hidden] { display: none !important; }
 .vb-noticia-principal { align-self: start; }
 .vb-noticia-principal:has(.vb-noticia-imagem) { align-self: stretch; }
+
+/* D-137: cabeçalho claro compacto (tema.cabecalho_compacto): cerca de 25% mais baixo, com as mesmas fontes e o
+   mesmo logotipo; só diminuem as alturas mínimas e os espaços em volta. O destaque sobe junto. */
+.v-cab-compacto .v-cab-claro .v-cab-linha { min-height: 88px; }
+.vitrine.v-cab-compacto .v-cab-claro .marca { padding-block: .45rem; }
+@media (min-width: 1181px) {
+  .v-cab-compacto .v-cab-claro .v-cab-linha { min-height: 100px; }
+  .vitrine.v-cab-compacto .v-cab-claro:not(.v-cab-uma-linha) .menu-lista > li > a,
+  .vitrine.v-cab-compacto .v-cab-claro:not(.v-cab-uma-linha) .menu-lista > li > .menu-grupo { padding-block: .55rem; }
+}
+@media (max-width: 1180px) {
+  .v-cab-compacto .v-cab-claro .v-cab-linha { min-height: 0; row-gap: 0; }
+  .vitrine.v-cab-compacto .v-cab-claro .marca { padding-block: .2rem; }
+  .v-cab-compacto .v-cab-claro .v-cab-acoes { top: 1rem; }
+  .vitrine.v-cab-compacto .v-cab-claro .menu-movel > summary { padding-block: .35rem; }
+}
+@media (max-width: 700px) {
+  .vitrine.v-cab-compacto .v-cab-claro .marca { padding-block: .45rem; }
+  .vitrine.v-cab-compacto .v-cab-claro .menu-movel > summary { padding-block: .45rem; }
+}
