@@ -35,10 +35,20 @@ const categoria = (n: any) => n.categorias?.find((c: any) => c?.categoria?.slug 
           <ul class="vb-noticias-lista">
             {demais.map((n, i) => (
               <li>
-                <a class="vb-noticia" href={`/noticias/${n.slug}`}>
-                  <span class={`vb-data vb-data-${i % 3}`} aria-hidden="true"><b>{mes(n.publicado_em)}</b><span>{ano(n.publicado_em)}</span></span>
+                <a class={n.imagem ? 'vb-noticia vb-noticia-com-foto' : 'vb-noticia'} href={`/noticias/${n.slug}`}>
+                  {n.imagem ? (
+                    <span class="vb-miniatura" aria-hidden="true">
+                      <img src={urlImagem(n.imagem.storage_path, 320)} srcset={srcsetImagem(n.imagem.storage_path, [320, 480, 800])} sizes="(max-width: 700px) 100vw, 160px"
+                           alt="" loading="lazy" decoding="async" width="160" height="110" />
+                    </span>
+                  ) : (
+                    <span class={`vb-data vb-data-${i % 3}`} aria-hidden="true"><b>{mes(n.publicado_em)}</b><span>{ano(n.publicado_em)}</span></span>
+                  )}
                   <span>
-                    {categoria(n) && <span class={`vb-cat vb-cat-${i % 3}`}>{categoria(n)}</span>}
+                    <span class="vb-meta-lista">
+                      {categoria(n) && <span class={`vb-cat vb-cat-${i % 3}`}>{categoria(n)}</span>}
+                      {n.imagem && <span class="vb-data-texto" aria-hidden="true">{mes(n.publicado_em)} {ano(n.publicado_em)}</span>}
+                    </span>
                     <span class="vb-noticia-titulo">{n.titulo}</span>
                     {n.resumo && <span class="vb-noticia-resumo">{n.resumo}</span>}
                     <span class="sr-only">Publicada em {data(n.publicado_em)}</span>

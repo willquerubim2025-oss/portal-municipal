@@ -312,3 +312,15 @@
   .vitrine.v-cab-compacto .v-cab-claro .marca { padding-block: .45rem; }
   .vitrine.v-cab-compacto .v-cab-claro .menu-movel > summary { padding-block: .45rem; }
 }
+
+/* D-138: notícia da lista com foto: miniatura no lugar do bloco de data; a data vai ao lado da categoria. */
+.vb-noticia-com-foto { grid-template-columns: 150px 1fr; align-items: center; }
+.vb-miniatura { display: block; width: 150px; aspect-ratio: 16 / 11; border-radius: 12px; overflow: hidden; background: var(--vb-creme); }
+.vb-miniatura img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s ease; }
+.vb-noticia:hover .vb-miniatura img, .vb-noticia:focus-visible .vb-miniatura img { transform: scale(1.06); }
+.vb-meta-lista { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+.vb-data-texto { font-family: var(--vb-titulos); font-weight: 700; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--vb-suave); }
+@media (max-width: 700px) {
+  .vb-noticia-com-foto { grid-template-columns: 1fr; gap: .8rem; }
+  .vb-miniatura { width: 100%; aspect-ratio: 16 / 9; }
+}
