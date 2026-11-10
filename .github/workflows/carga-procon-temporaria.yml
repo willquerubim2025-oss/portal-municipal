@@ -1,0 +1,27 @@
+# TEMPORÁRIO (D-138): envia as fotos das notícias do portal de demonstração do Procon Sumaré ao Storage da produção.
+# Existe só no branch carga-procon-sumare-2, que é apagado depois do envio.
+name: Carga temporária Procon Sumaré (fotos das notícias)
+on:
+  push:
+    branches: [carga-procon-sumare-2]
+permissions:
+  contents: read
+jobs:
+  enviar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.SUPABASE_S3_ID_PRODUCAO }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.SUPABASE_S3_SEGREDO_PRODUCAO }}
+      AWS_DEFAULT_REGION: sa-east-1
+      S3: https://qgywucdnaeheqndcxtho.storage.supabase.co/storage/v1/s3
+      PASTA: 13202ec8-a2af-4e93-90c2-6a8a01c5f864/carga
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enviar
+        run: |
+          set -euo pipefail
+          for f in carga/*.jpg; do
+            aws s3 cp "$f" "s3://midias/$PASTA/$(basename "$f")" --endpoint-url "$S3" --content-type image/jpeg --cache-control "public, max-age=31536000" --only-show-errors
+            echo "enviado: $PASTA/$(basename "$f") $(stat -c %s "$f")"
+          done
