@@ -4,7 +4,6 @@ import { getSecret } from 'astro:env/server';
 // identidade visual do município (municipios.tema / config). Nada de prefeitura
 // específica aqui (D-10).
 import '../styles/global.css';
-import ModalConsumidor from '../components/consumidor/ModalConsumidor.astro';
 // Tema ampliado (D-17, D-39): fontes auto-hospedadas (só o subconjunto latino) e estilos do
 // layout vitrine. Os @font-face só baixam a fonte se uma página usá-la.
 import '@fontsource/montserrat/latin-600.css';
@@ -630,8 +629,6 @@ const painelUrl = (() => { try { return getSecret('PAINEL_URL') || null; } catch
       b.parentElement?.addEventListener('focusout', (e) => { if (!b.parentElement!.contains(e.relatedTarget as Node)) fechar(); });
     });
   </script>
-  {/* D-139: janela de login do consumidor por cima do portal (só com config.area_consumidor). */}
-  {cfg.area_consumidor?.cidade && <ModalConsumidor cidade={cfg.area_consumidor.cidade} orgao={m.nome} />}
   {moduloAtivo(m, 'vlibras') && (
     <>
       {/* VLibras (Governo Federal): tradução do conteúdo para Libras, pedida pela especificação (seção 9) e pelo eMAG.

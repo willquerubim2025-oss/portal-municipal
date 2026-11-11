@@ -129,9 +129,6 @@ export interface Config {
     botoes?: { rotulo: string; url: string; estilo?: 'cheio' | 'contorno' }[] };
   /** D-136: faixa fina no topo de todas as páginas (ex.: "Proposta de demonstração"). */
   faixa_topo?: string;
-  /** D-139: área do consumidor ligada ao SigDoc (login por cima do portal e página /area-do-consumidor).
-   *  `cidade` = órgão no SigDoc (campo city, ex.: "SUMARÉ-SP"): cadastro novo e fila do atendimento online. */
-  area_consumidor?: { cidade: string };
   home?: { blocos?: BlocoHome[]; titulos?: Partial<Record<BlocoHome, string>>; foco?: ItemFoco[]; fundo_cinza?: BlocoHome[];
     /** Quantos cards na fileira de cima das Notícias (D-59): 1 a 5, padrão 5. */
     noticias_fileira?: number;
