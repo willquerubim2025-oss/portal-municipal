@@ -1,6 +1,6 @@
 ---
 // Bloco "golpes" (D-136; carrossel em D-141): vídeos curtos (Shorts) do YouTube em "telas de celular" que giram
-// num carrossel (4 à vista). Clicar numa tela abre, no lugar do carrossel, um palco com o vídeo em pé, o título e o
+// num carrossel (5 à vista, a do centro maior), girando em círculo. Clicar numa tela abre, no lugar do carrossel, um palco com o vídeo em pé, o título e o
 // resumo; "Voltar aos vídeos" fecha o vídeo e o carrossel volta a girar.
 // O player do YouTube só é carregado depois do clique (domínio youtube-nocookie); antes, só a imagem de capa
 // (i.ytimg.com). Sem JavaScript, cada tela é um link para o vídeo no YouTube. Com "reduzir movimento", não gira sozinho.
@@ -75,15 +75,21 @@ const videos = (Astro.props.videos ?? []).filter((v) => v?.titulo).map((v, i) =>
     let parado = false;
     let tocando = -1;
 
-    // Cada tela vai para uma "vaga": 0 a 3 = as 4 à vista (da esquerda para a direita); as outras ficam escondidas
-    // à direita, prontas para entrar. Com 4 vídeos ou menos, não gira.
-    const VISTAS = 4;
+    // Cada tela vai para uma "vaga": 0 = centro, ±1 = vizinhas, ±2 = pontas; com mais de 5 vídeos, as outras
+    // ficam escondidas atrás. Gira em círculo: a da ponta esquerda passa para a ponta direita (e vice-versa).
     const desenhar = () => {
       telas.forEach((t, i) => {
-        const vaga = n <= VISTAS ? i + (VISTAS - n) / 2 : (i - atual + n) % n;
-        const vista = n <= VISTAS || vaga < VISTAS;
-        t.style.setProperty('--vaga', String(vista ? vaga : VISTAS));
-        t.dataset.vaga = vista ? String(vaga) : 'fora';
+        let vaga = (i - atual + n) % n;
+        if (vaga > Math.floor(n / 2)) vaga -= n;
+        const vista = Math.abs(vaga) <= 2;
+        const nova = vista ? String(vaga) : 'fora';
+        const antiga = t.dataset.vaga;
+        // Deu a volta (de um lado para o outro): troca de lado apagada e aparece no lugar novo.
+        if (antiga && antiga !== 'fora' && vista && Math.abs(Number(antiga) - vaga) > 2) {
+          t.classList.add('vb-salto');
+          requestAnimationFrame(() => requestAnimationFrame(() => t.classList.remove('vb-salto')));
+        }
+        t.dataset.vaga = nova;
         t.tabIndex = vista ? 0 : -1;
         t.setAttribute('aria-hidden', vista ? 'false' : 'true');
       });
@@ -92,7 +98,7 @@ const videos = (Astro.props.videos ?? []).filter((v) => v?.titulo).map((v, i) =>
     const ir = (i: number) => { atual = (i + n) % n; desenhar(); agendar(); };
     const agendar = () => {
       clearTimeout(timer);
-      if (!parado && !calmo.matches && palco.hidden && n > VISTAS) timer = window.setTimeout(() => ir(atual + 1), 3500);
+      if (!parado && !calmo.matches && palco.hidden && n > 1) timer = window.setTimeout(() => ir(atual + 1), 3500);
     };
 
     const abrir = (i: number) => {
@@ -125,6 +131,8 @@ const videos = (Astro.props.videos ?? []).filter((v) => v?.titulo).map((v, i) =>
       if (!t.dataset.id) { e.preventDefault(); return; }
       if (e.ctrlKey || e.metaKey) return;
       e.preventDefault();
+      // Tela do lado: primeiro gira até ela; a do centro abre o vídeo.
+      if (t.dataset.vaga !== '0') { ir(i); return; }
       abrir(i);
     }));
     bloco.querySelector('[data-vb-ant]')!.addEventListener('click', () => ir(atual - 1));

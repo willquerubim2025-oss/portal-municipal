@@ -291,22 +291,28 @@
 
 .vb-golpes [hidden], .vb-mapa [hidden] { display: none !important; }
 
-/* golpes em carrossel (D-141): "telas de celular" em pé, 4 à vista, girando; o vídeo abre num palco no lugar do carrossel */
+/* golpes em carrossel (D-141): "telas de celular" em pé, 5 à vista (centro em destaque), girando em círculo; o vídeo abre num palco no lugar do carrossel */
 .vb-golpes.vb-secao { padding: 4rem 0; }
 .vb-golpes .vb-cabeca { margin-bottom: 1.75rem; }
 .vitrine .vb-golpes .vb-titulo { font-size: clamp(1.6rem, 2.6vw, 2.2rem); }
-.vb-carrossel { --tela-l: clamp(150px, 14.5vw, 190px); --passo: calc(var(--tela-l) * 1.14); margin-top: .25rem; }
+.vb-carrossel { --tela-l: clamp(170px, 15vw, 210px); margin-top: .25rem; }
 .vb-carrossel-pista { display: flex; gap: 1rem; overflow-x: auto; padding: .5rem 0 1rem; }
 .vb-carrossel-ativo .vb-carrossel-pista { display: block; position: relative; overflow: visible; height: calc(var(--tela-l) * 16 / 9 + .5rem); padding: 0; }
 .vb-tela { flex: none; position: relative; display: block; width: var(--tela-l); aspect-ratio: 9 / 16; border-radius: 26px; overflow: hidden;
   background: linear-gradient(160deg, var(--vb-verde) 0%, var(--vb-azul-escuro) 100%); border: 3px solid rgba(255, 255, 255, .14);
   box-shadow: 0 24px 50px rgba(0, 0, 0, .45); color: #fff; text-decoration: none; isolation: isolate; }
-.vb-carrossel-ativo .vb-tela { position: absolute; left: 50%; top: 0; margin-left: calc(var(--tela-l) / -2);
-  transform: translateX(calc((var(--vaga, 0) - 1.5) * var(--passo))); opacity: 1;
-  transition: transform .7s cubic-bezier(.2, .7, .2, 1), opacity .5s, border-color .25s; z-index: 1; }
-.vb-carrossel-ativo .vb-tela:hover, .vb-carrossel-ativo .vb-tela:focus-visible { border-color: var(--vb-amarelo); }
-/* A tela que sai pela esquerda some sem atravessar o carrossel; volta deslizando pela direita. */
-.vb-carrossel-ativo .vb-tela[data-vaga="fora"] { opacity: 0; pointer-events: none; z-index: 0; transition: opacity .35s; }
+/* Vagas: 0 = centro (maior, borda amarela), ±1 = vizinhas, ±2 = pontas. A tela que dá a volta (da ponta esquerda
+   para a direita, ou o contrário) troca de lado sem atravessar o carrossel (classe vb-salto). */
+.vb-carrossel-ativo .vb-tela { position: absolute; left: 50%; top: 0; margin-left: calc(var(--tela-l) / -2); transform-origin: 50% 50%;
+  transition: transform .7s cubic-bezier(.2, .7, .2, 1), opacity .6s, filter .6s, border-color .3s; }
+.vb-carrossel-ativo .vb-tela[data-vaga="0"] { transform: none; opacity: 1; z-index: 5; border-color: var(--vb-amarelo); }
+.vb-carrossel-ativo .vb-tela[data-vaga="-1"] { transform: translateX(calc(var(--tela-l) * -.98)) scale(.82); opacity: .7; filter: saturate(.75); z-index: 4; }
+.vb-carrossel-ativo .vb-tela[data-vaga="1"] { transform: translateX(calc(var(--tela-l) * .98)) scale(.82); opacity: .7; filter: saturate(.75); z-index: 4; }
+.vb-carrossel-ativo .vb-tela[data-vaga="-2"] { transform: translateX(calc(var(--tela-l) * -1.8)) scale(.66); opacity: .4; filter: saturate(.5); z-index: 3; }
+.vb-carrossel-ativo .vb-tela[data-vaga="2"] { transform: translateX(calc(var(--tela-l) * 1.8)) scale(.66); opacity: .4; filter: saturate(.5); z-index: 3; }
+.vb-carrossel-ativo .vb-tela[data-vaga="fora"] { transform: scale(.5); opacity: 0; pointer-events: none; z-index: 0; }
+.vb-carrossel-ativo .vb-tela.vb-salto { transition: none; opacity: 0; }
+.vb-carrossel-ativo .vb-tela:not([data-vaga="0"]):hover { opacity: .95; }
 .vb-tela img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
 .vb-tela-sombra { position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(0,0,0,.25) 0%, transparent 28%, transparent 50%, rgba(0,0,0,.85) 100%); }
 .vb-tela-n { position: absolute; top: .7rem; left: .9rem; font-family: var(--vb-titulos); font-weight: 900; font-style: italic; font-size: 1.7rem; line-height: 1; color: var(--vb-amarelo); text-shadow: 0 2px 8px rgba(0,0,0,.5); }
@@ -334,7 +340,7 @@
 .vb-botao-contorno-claro { border-color: rgba(255,255,255,.6); color: #fff; background: transparent; }
 .vb-botao-contorno-claro:hover, .vb-botao-contorno-claro:focus-visible { background: #fff; color: var(--vb-azul-escuro); }
 @media (max-width: 720px) {
-  .vb-carrossel { --tela-l: min(42vw, 190px); --passo: calc(var(--tela-l) * 1.08); }
+  .vb-carrossel { --tela-l: min(46vw, 200px); }
   .vb-palco { grid-template-columns: 1fr; justify-items: center; text-align: center; }
   .vb-palco-video { width: min(78vw, 340px); min-width: 0; }
   .vb-palco-botoes { justify-content: center; }
