@@ -1,0 +1,331 @@
+---
+// Área do consumidor (D-139): janela de login, cadastro, "esqueci minha senha" e "Complete seu cadastro"
+// por cima do portal (o consumidor não sai do site do órgão). Só entra no HTML quando a organização tem
+// config.area_consumidor. Os dados ficam no banco do SigDoc (lib/sigdoc-cliente.ts).
+// Abre com: links que levam ao login do consumidor do SigDoc (…?entrar=consumidor), links para
+// /area-do-consumidor e elementos com [data-area-consumidor].
+interface Props { cidade: string; orgao: string }
+const { cidade, orgao } = Astro.props;
+---
+<dialog id="sdc-modal" class="sdc-modal" aria-labelledby="sdc-titulo" data-cidade={cidade}>
+  <div class="sdc-caixa">
+    <button type="button" class="sdc-fechar" data-sdc-fechar aria-label="Fechar">×</button>
+    <p class="sdc-orgao">{orgao}</p>
+
+    <!-- Entrar -->
+    <section data-sdc-tela="entrar">
+      <h2 id="sdc-titulo" class="sdc-titulo">Área do consumidor</h2>
+      <p class="sdc-sub">Entre para pedir atendimento online e acompanhar as suas reclamações.</p>
+      <button type="button" class="sdc-google" data-sdc-google hidden>
+        <svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.5z"/></svg>
+        Entrar com Google
+      </button>
+      <p class="sdc-ou" data-sdc-ou hidden><span>ou</span></p>
+      <form data-sdc-form="entrar" novalidate>
+        <label class="sdc-campo">E-mail<input name="email" type="email" autocomplete="email" required /></label>
+        <label class="sdc-campo">Senha<input name="senha" type="password" autocomplete="current-password" required /></label>
+        <p class="sdc-erro" role="alert" data-sdc-erro></p>
+        <button type="submit" class="sdc-botao">Entrar</button>
+      </form>
+      <div class="sdc-links">
+        <button type="button" data-sdc-ir="cadastro">Não tenho cadastro</button>
+        <button type="button" data-sdc-ir="esqueci">Esqueci minha senha</button>
+      </div>
+    </section>
+
+    <!-- Cadastro por e-mail e senha -->
+    <section data-sdc-tela="cadastro" hidden>
+      <h2 class="sdc-titulo">Criar cadastro</h2>
+      <p class="sdc-sub">Preencha os seus dados. Depois confirme pelo link que vamos enviar ao seu e-mail.</p>
+      <form data-sdc-form="cadastro" novalidate>
+        <label class="sdc-campo">Nome completo<input name="nome" autocomplete="name" maxlength="120" required /></label>
+        <div class="sdc-duas">
+          <label class="sdc-campo">CPF<input name="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" data-mascara="cpf" required /></label>
+          <label class="sdc-campo">RG<input name="rg" maxlength="20" required /></label>
+        </div>
+        <label class="sdc-campo">Telefone (WhatsApp)<input name="telefone" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="(19) 99999-9999" data-mascara="telefone" required /></label>
+        <div class="sdc-tres">
+          <label class="sdc-campo">CEP<input name="cep" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000" data-mascara="cep" required /></label>
+          <label class="sdc-campo">Nº<input name="numero" maxlength="10" required /></label>
+          <label class="sdc-campo">Complemento<input name="complemento" maxlength="60" /></label>
+        </div>
+        <label class="sdc-campo">E-mail<input name="email" type="email" autocomplete="email" required /></label>
+        <div class="sdc-duas">
+          <label class="sdc-campo">Senha<input name="senha" type="password" autocomplete="new-password" minlength="6" required /></label>
+          <label class="sdc-campo">Repita a senha<input name="senha2" type="password" autocomplete="new-password" minlength="6" required /></label>
+        </div>
+        <p class="sdc-erro" role="alert" data-sdc-erro></p>
+        <button type="submit" class="sdc-botao">Criar cadastro</button>
+      </form>
+      <div class="sdc-links"><button type="button" data-sdc-ir="entrar">Já tenho cadastro</button></div>
+    </section>
+
+    <!-- Esqueci minha senha -->
+    <section data-sdc-tela="esqueci" hidden>
+      <h2 class="sdc-titulo">Esqueci minha senha</h2>
+      <p class="sdc-sub">Informe o e-mail do cadastro. Vamos enviar um link para você criar uma senha nova.</p>
+      <form data-sdc-form="esqueci" novalidate>
+        <label class="sdc-campo">E-mail<input name="email" type="email" autocomplete="email" required /></label>
+        <p class="sdc-erro" role="alert" data-sdc-erro></p>
+        <button type="submit" class="sdc-botao">Enviar link</button>
+      </form>
+      <div class="sdc-links"><button type="button" data-sdc-ir="entrar">Voltar</button></div>
+    </section>
+
+    <!-- Confirme o e-mail -->
+    <section data-sdc-tela="confirmar" hidden>
+      <h2 class="sdc-titulo">Confira o seu e-mail</h2>
+      <p class="sdc-sub">Enviamos um link para <strong data-sdc-email></strong>. Abra o e-mail e clique no link para liberar o acesso. Olhe também a caixa de spam.</p>
+      <p class="sdc-erro" role="alert" data-sdc-erro></p>
+      <button type="button" class="sdc-botao sdc-botao-contorno" data-sdc-reenviar>Reenviar o e-mail</button>
+      <div class="sdc-links"><button type="button" data-sdc-ir="entrar">Já confirmei, quero entrar</button></div>
+    </section>
+
+    <!-- Complete seu cadastro (primeiro acesso pelo Google) -->
+    <section data-sdc-tela="completar" hidden>
+      <h2 class="sdc-titulo">Complete seu cadastro</h2>
+      <p class="sdc-sub">Falta pouco. O Procon precisa destes dados para registrar o seu atendimento.</p>
+      <form data-sdc-form="completar" novalidate>
+        <label class="sdc-campo">Nome completo<input name="nome" autocomplete="name" maxlength="120" required /></label>
+        <div class="sdc-duas">
+          <label class="sdc-campo">CPF<input name="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" data-mascara="cpf" required /></label>
+          <label class="sdc-campo">RG<input name="rg" maxlength="20" required /></label>
+        </div>
+        <label class="sdc-campo">Telefone (WhatsApp)<input name="telefone" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="(19) 99999-9999" data-mascara="telefone" required /></label>
+        <div class="sdc-tres">
+          <label class="sdc-campo">CEP<input name="cep" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000" data-mascara="cep" required /></label>
+          <label class="sdc-campo">Nº<input name="numero" maxlength="10" required /></label>
+          <label class="sdc-campo">Complemento<input name="complemento" maxlength="60" /></label>
+        </div>
+        <p class="sdc-erro" role="alert" data-sdc-erro></p>
+        <button type="submit" class="sdc-botao">Concluir cadastro</button>
+      </form>
+      <div class="sdc-links"><button type="button" data-sdc-sair>Sair desta conta</button></div>
+    </section>
+
+    <!-- Aviso (conta de técnico, conta desabilitada...) -->
+    <section data-sdc-tela="aviso" hidden>
+      <h2 class="sdc-titulo" data-sdc-aviso-titulo>Aviso</h2>
+      <p class="sdc-sub" data-sdc-aviso-texto></p>
+      <button type="button" class="sdc-botao" data-sdc-ir="entrar">Voltar</button>
+    </section>
+
+    <div class="sdc-carregando" data-sdc-carregando hidden><span></span>Aguarde...</div>
+  </div>
+</dialog>
+
+<style is:global>
+  .sdc-modal { border: 0; padding: 0; border-radius: 22px; width: min(560px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); background: #fff; color: #13231a; box-shadow: 0 30px 80px rgba(0,0,0,.35); }
+  .sdc-modal::backdrop { background: rgba(5, 20, 12, .62); backdrop-filter: blur(3px); }
+  .sdc-caixa { position: relative; padding: 28px clamp(18px, 5vw, 36px) 26px; }
+  .sdc-fechar { position: absolute; top: 12px; right: 14px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: #eef2ef; font-size: 26px; line-height: 1; cursor: pointer; color: #13231a; }
+  .sdc-fechar:hover { background: #dfe7e1; }
+  .sdc-orgao { margin: 0 0 4px; font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--cor-primaria, #027538); padding-right: 48px; }
+  .sdc-titulo { margin: 0 0 6px; font-family: var(--v-fonte-titulos, inherit); font-size: 1.6rem; line-height: 1.15; }
+  .sdc-sub { margin: 0 0 18px; color: #4b5b52; font-size: .98rem; }
+  .sdc-campo { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; font-size: .86rem; font-weight: 700; color: #2b3a31; }
+  .sdc-campo input, .sdc-campo select, .sdc-campo textarea { font: inherit; font-weight: 400; font-size: 1rem; padding: 11px 13px; border: 1.5px solid #cfd8d1; border-radius: 12px; background: #fbfcfb; color: #13231a; min-width: 0; }
+  .sdc-campo input:focus, .sdc-campo select:focus, .sdc-campo textarea:focus { outline: 3px solid color-mix(in srgb, var(--cor-primaria, #027538) 30%, transparent); border-color: var(--cor-primaria, #027538); }
+  .sdc-duas { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .sdc-tres { display: grid; grid-template-columns: 1.2fr .6fr 1.2fr; gap: 12px; }
+  @media (max-width: 480px) { .sdc-duas, .sdc-tres { grid-template-columns: 1fr; gap: 0; } }
+  .sdc-botao { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 18px; border: 2px solid var(--cor-primaria, #027538); border-radius: 999px; background: var(--cor-primaria, #027538); color: #fff; font: inherit; font-weight: 800; font-size: 1rem; cursor: pointer; text-decoration: none; }
+  .sdc-botao:hover { filter: brightness(1.08); }
+  .sdc-botao:disabled { opacity: .6; cursor: wait; }
+  .sdc-botao-contorno { background: transparent; color: var(--cor-primaria, #027538); }
+  .sdc-google { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px 18px; border: 1.5px solid #cfd8d1; border-radius: 999px; background: #fff; font: inherit; font-weight: 700; font-size: 1rem; cursor: pointer; color: #13231a; }
+  .sdc-google:hover { background: #f4f7f5; }
+  .sdc-ou { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: #6b7a71; font-size: .85rem; }
+  .sdc-ou::before, .sdc-ou::after { content: ''; flex: 1; height: 1px; background: #dfe5df; }
+  .sdc-erro { min-height: 0; margin: 0 0 10px; color: #b42318; font-weight: 700; font-size: .92rem; }
+  .sdc-erro:empty { display: none; }
+  .sdc-erro.sdc-ok { color: #0f7a3d; }
+  .sdc-links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: 16px; }
+  .sdc-links button { border: 0; background: none; padding: 6px 0; font: inherit; font-weight: 700; color: var(--cor-secundaria, #05437b); text-decoration: underline; cursor: pointer; }
+  .sdc-carregando { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255,255,255,.82); border-radius: 22px; font-weight: 800; }
+  .sdc-carregando[hidden] { display: none; }
+  .sdc-carregando span, .sdc-girando { width: 22px; height: 22px; border: 3px solid #cfd8d1; border-top-color: var(--cor-primaria, #027538); border-radius: 50%; animation: sdc-gira .8s linear infinite; display: inline-block; }
+  @keyframes sdc-gira { to { transform: rotate(360deg); } }
+  [data-sdc-tela][hidden] { display: none; }
+</style>
+
+<script>
+  import {
+    situacaoAtual, entrar, entrarComGoogle, loginGoogleAtivo, cadastrar, reenviarConfirmacao, esqueciSenha,
+    completarCadastro, sair, mascaraCpf, mascaraTelefone, mascaraCep, cpfValido, PAGINA_AREA,
+  } from '../../lib/sigdoc-cliente';
+
+  const modal = document.getElementById('sdc-modal') as HTMLDialogElement | null;
+  if (modal) {
+    const cidade = modal.dataset.cidade || '';
+    const naArea = location.pathname === PAGINA_AREA;
+    const telas = modal.querySelectorAll<HTMLElement>('[data-sdc-tela]');
+    const carregando = modal.querySelector<HTMLElement>('[data-sdc-carregando]')!;
+    let emailConfirmar = '';
+
+    const mostrar = (nome: string) => {
+      telas.forEach((t) => { t.hidden = t.dataset.sdcTela !== nome; });
+      modal.querySelectorAll<HTMLElement>('[data-sdc-erro]').forEach((e) => { e.textContent = ''; e.classList.remove('sdc-ok'); });
+      if (!modal.open) modal.showModal();
+      setTimeout(() => modal.querySelector<HTMLElement>(`[data-sdc-tela="${nome}"] input, [data-sdc-tela="${nome}"] button`)?.focus(), 30);
+    };
+    const erro = (nome: string, texto: string, ok = false) => {
+      const e = modal.querySelector<HTMLElement>(`[data-sdc-tela="${nome}"] [data-sdc-erro]`);
+      if (e) { e.textContent = texto; e.classList.toggle('sdc-ok', ok); }
+    };
+    const ocupado = (sim: boolean) => { carregando.hidden = !sim; };
+    const aviso = (titulo: string, texto: string) => {
+      modal.querySelector('[data-sdc-aviso-titulo]')!.textContent = titulo;
+      modal.querySelector('[data-sdc-aviso-texto]')!.textContent = texto;
+      mostrar('aviso');
+    };
+
+    /** Depois do login (ou ao clicar em "Atendimento online"): decide para onde a pessoa vai. */
+    const seguir = async (abrirSeSemLogin: boolean) => {
+      ocupado(true);
+      try {
+        const s = await situacaoAtual();
+        if (s.tipo === 'ok') {
+          if (naArea) { modal.close(); window.dispatchEvent(new CustomEvent('sdc:logado')); }
+          else location.href = PAGINA_AREA;
+          return;
+        }
+        if (s.tipo === 'completar') {
+          const f = modal.querySelector<HTMLFormElement>('[data-sdc-form="completar"]')!;
+          const nome = f.elements.namedItem('nome') as HTMLInputElement;
+          if (!nome.value) nome.value = s.consumidor.fullName || '';
+          mostrar('completar');
+          return;
+        }
+        if (s.tipo === 'tecnico') { await sair(); aviso('Conta de técnico', 'Esta conta é de técnico. Para trabalhar no SigDoc, use o botão "Área do técnico".'); return; }
+        if (s.tipo === 'bloqueado') { await sair(); aviso('Conta desabilitada', 'Sua conta está desabilitada. Entre em contato com o Procon pelos telefones do rodapé.'); return; }
+        if (s.tipo === 'sem-perfil') { await sair(); aviso('Cadastro não encontrado', 'Não encontramos o seu cadastro de consumidor. Crie um cadastro novo ou fale com o Procon.'); return; }
+        if (abrirSeSemLogin) mostrar('entrar');
+      } catch {
+        if (abrirSeSemLogin) mostrar('entrar');
+      } finally { ocupado(false); }
+    };
+
+    // Botão do Google só aparece se estiver ligado no SigDoc (configuracoes_sistema.login_google).
+    loginGoogleAtivo().then((sim) => {
+      modal.querySelector<HTMLElement>('[data-sdc-google]')!.hidden = !sim;
+      modal.querySelector<HTMLElement>('[data-sdc-ou]')!.hidden = !sim;
+    });
+
+    // Quem abre a janela.
+    const ehLinkConsumidor = (a: HTMLAnchorElement) => {
+      const h = a.getAttribute('href') || '';
+      return /[?&]entrar=consumidor\b/.test(h) || h === PAGINA_AREA || a.hasAttribute('data-area-consumidor');
+    };
+    document.addEventListener('click', (e) => {
+      const alvo = (e.target as HTMLElement).closest<HTMLElement>('a, [data-area-consumidor]');
+      if (!alvo || modal.contains(alvo) || alvo.hasAttribute('data-sem-modal')) return;
+      if (alvo instanceof HTMLAnchorElement ? !ehLinkConsumidor(alvo) : !alvo.hasAttribute('data-area-consumidor')) return;
+      if ((e as MouseEvent).ctrlKey || (e as MouseEvent).metaKey) return;
+      e.preventDefault();
+      seguir(true);
+    });
+    window.addEventListener('sdc:abrir', () => seguir(true));
+
+    modal.querySelectorAll<HTMLButtonElement>('[data-sdc-ir]').forEach((b) => b.addEventListener('click', () => mostrar(b.dataset.sdcIr!)));
+    modal.querySelector('[data-sdc-fechar]')!.addEventListener('click', () => modal.close());
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.close(); });
+    modal.querySelector('[data-sdc-sair]')!.addEventListener('click', async () => { await sair(); modal.close(); if (naArea) location.href = '/'; });
+
+    // Máscaras.
+    modal.querySelectorAll<HTMLInputElement>('[data-mascara]').forEach((i) => i.addEventListener('input', () => {
+      const m = i.dataset.mascara;
+      i.value = m === 'cpf' ? mascaraCpf(i.value) : m === 'telefone' ? mascaraTelefone(i.value) : mascaraCep(i.value);
+    }));
+
+    const valor = (f: HTMLFormElement, nome: string) => ((f.elements.namedItem(nome) as HTMLInputElement | null)?.value || '').trim();
+    const conferirEndereco = (tela: string, f: HTMLFormElement): boolean => {
+      if (valor(f, 'nome').length < 5) { erro(tela, 'Informe o nome completo.'); return false; }
+      if (!cpfValido(valor(f, 'cpf'))) { erro(tela, 'CPF inválido. Confira os números digitados.'); return false; }
+      if (!valor(f, 'rg')) { erro(tela, 'Informe o RG.'); return false; }
+      const tel = valor(f, 'telefone').replace(/\D/g, '');
+      if (tel.length < 10) { erro(tela, 'Informe o telefone com DDD.'); return false; }
+      if (valor(f, 'cep').replace(/\D/g, '').length !== 8) { erro(tela, 'CEP inválido.'); return false; }
+      if (!valor(f, 'numero')) { erro(tela, 'Informe o número da casa.'); return false; }
+      return true;
+    };
+
+    modal.querySelector<HTMLFormElement>('[data-sdc-form="entrar"]')!.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.currentTarget as HTMLFormElement;
+      if (!valor(f, 'email') || !valor(f, 'senha')) { erro('entrar', 'Informe o e-mail e a senha.'); return; }
+      ocupado(true);
+      const r = await entrar(valor(f, 'email'), (f.elements.namedItem('senha') as HTMLInputElement).value);
+      ocupado(false);
+      if (r.erro) {
+        if (r.confirmar) { emailConfirmar = valor(f, 'email'); modal.querySelector('[data-sdc-email]')!.textContent = emailConfirmar; mostrar('confirmar'); }
+        else erro('entrar', r.erro);
+        return;
+      }
+      await seguir(true);
+    });
+
+    modal.querySelector('[data-sdc-google]')!.addEventListener('click', async () => {
+      ocupado(true);
+      const r = await entrarComGoogle();
+      if (r.erro) { ocupado(false); erro('entrar', r.erro); }
+    });
+
+    modal.querySelector<HTMLFormElement>('[data-sdc-form="cadastro"]')!.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.currentTarget as HTMLFormElement;
+      if (!conferirEndereco('cadastro', f)) return;
+      if (!/^\S+@\S+\.\S+$/.test(valor(f, 'email'))) { erro('cadastro', 'Informe um e-mail válido.'); return; }
+      const senha = (f.elements.namedItem('senha') as HTMLInputElement).value;
+      if (senha.length < 6) { erro('cadastro', 'A senha precisa ter pelo menos 6 caracteres.'); return; }
+      if (senha !== (f.elements.namedItem('senha2') as HTMLInputElement).value) { erro('cadastro', 'As duas senhas estão diferentes.'); return; }
+      ocupado(true);
+      const r = await cadastrar({
+        nome: valor(f, 'nome'), cpf: valor(f, 'cpf'), rg: valor(f, 'rg'), telefone: valor(f, 'telefone'), cidade,
+        cep: valor(f, 'cep'), numero: valor(f, 'numero'), complemento: valor(f, 'complemento'), email: valor(f, 'email'), senha,
+      });
+      ocupado(false);
+      if (r.erro) { erro('cadastro', r.erro); return; }
+      emailConfirmar = valor(f, 'email');
+      modal.querySelector('[data-sdc-email]')!.textContent = emailConfirmar;
+      f.reset();
+      mostrar('confirmar');
+    });
+
+    modal.querySelector('[data-sdc-reenviar]')!.addEventListener('click', async () => {
+      if (!emailConfirmar) { mostrar('entrar'); return; }
+      ocupado(true);
+      const r = await reenviarConfirmacao(emailConfirmar);
+      ocupado(false);
+      erro('confirmar', r.erro || 'E-mail reenviado. Confira a sua caixa de entrada.', !r.erro);
+    });
+
+    modal.querySelector<HTMLFormElement>('[data-sdc-form="esqueci"]')!.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.currentTarget as HTMLFormElement;
+      if (!/^\S+@\S+\.\S+$/.test(valor(f, 'email'))) { erro('esqueci', 'Informe um e-mail válido.'); return; }
+      ocupado(true);
+      const r = await esqueciSenha(valor(f, 'email'));
+      ocupado(false);
+      erro('esqueci', r.erro || 'Pronto. Se este e-mail tiver cadastro, você vai receber o link em alguns minutos.', !r.erro);
+    });
+
+    modal.querySelector<HTMLFormElement>('[data-sdc-form="completar"]')!.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.currentTarget as HTMLFormElement;
+      if (!conferirEndereco('completar', f)) return;
+      ocupado(true);
+      const r = await completarCadastro({
+        nome: valor(f, 'nome'), cpf: valor(f, 'cpf'), rg: valor(f, 'rg'), telefone: valor(f, 'telefone'), cidade,
+        cep: valor(f, 'cep'), numero: valor(f, 'numero'), complemento: valor(f, 'complemento'),
+      });
+      ocupado(false);
+      if (r.erro) { erro('completar', r.erro); return; }
+      await seguir(true);
+    });
+
+    // Voltou do Google (ou do link de confirmação do e-mail) direto na página da área: ela mesma chama "sdc:abrir"
+    // quando falta algo. Nas outras páginas, se a pessoa entrou pelo Google e ainda falta o cadastro, abre a janela.
+    if (!naArea && /access_token|code=/.test(location.hash + location.search)) seguir(false);
+  }
+</script>

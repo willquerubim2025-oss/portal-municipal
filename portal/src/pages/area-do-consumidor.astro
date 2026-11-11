@@ -1,0 +1,398 @@
+---
+// Área do consumidor (D-139): página do portal, no mesmo visual, aberta só depois do login (a janela de login
+// abre por cima, ModalConsumidor). Tudo o que aparece aqui vem do banco do SigDoc, no navegador do consumidor
+// (lib/sigdoc-cliente.ts), protegido pelo RLS de lá. O servidor do portal só entrega a "casca" da página.
+import Base from '../layouts/Base.astro';
+
+const { municipio: m } = Astro.locals.contexto;
+if (!m.config.area_consumidor?.cidade) return Astro.rewrite('/404');
+Astro.response.headers.set('Cache-Control', 'no-store');
+---
+<Base titulo="Área do consumidor" descricao="Atendimento online, acompanhamento das reclamações e documentos do consumidor." migalhas={[{ nome: 'Área do consumidor' }]} noindex>
+  <div class="container ac">
+    <!-- Antes do login -->
+    <section class="ac-fora" data-ac="fora">
+      <div class="ac-girando-caixa" data-ac="verificando"><span class="sdc-girando"></span> Verificando o seu acesso...</div>
+      <div data-ac="pedir-login" hidden>
+        <h1>Área do consumidor</h1>
+        <p>Entre com a sua conta para pedir atendimento online, conversar com o técnico do Procon e acompanhar as suas reclamações.</p>
+        <button type="button" class="sdc-botao ac-botao-curto" data-area-consumidor>Entrar ou criar cadastro</button>
+      </div>
+    </section>
+
+    <!-- Depois do login -->
+    <div data-ac="dentro" hidden>
+      <header class="ac-topo">
+        <div>
+          <p class="ac-sobre">Área do consumidor</p>
+          <h1>Olá, <span data-ac-nome></span></h1>
+          <p class="ac-cidade" data-ac-cidade></p>
+        </div>
+        <div class="ac-acoes-topo">
+          <button type="button" class="ac-link" data-ac-ir="dados">Meus dados</button>
+          <button type="button" class="ac-link ac-sair" data-ac-sair>Sair</button>
+        </div>
+      </header>
+
+      <nav class="ac-abas" aria-label="Seções da área do consumidor">
+        <button type="button" class="ac-aba" data-ac-ir="atendimento" aria-current="page">Atendimento online</button>
+        <button type="button" class="ac-aba" data-ac-ir="historico">Meus atendimentos</button>
+        <button type="button" class="ac-aba" data-ac-ir="documentos">Meus documentos</button>
+        <button type="button" class="ac-aba" data-ac-ir="dados">Meus dados</button>
+      </nav>
+
+      <!-- Atendimento online -->
+      <section class="ac-painel" data-ac-painel="atendimento">
+        <div data-ac="sem-atendimento" hidden class="ac-cartao ac-chamada">
+          <h2>Fale com um técnico do Procon</h2>
+          <p>Conte o seu problema pelo chat. Você entra na fila e é atendido na ordem de chegada, no horário de atendimento do Procon.</p>
+          <p class="ac-erro" role="alert" data-ac-erro-solicitar></p>
+          <button type="button" class="sdc-botao ac-botao-curto" data-ac-solicitar>Solicitar atendimento</button>
+        </div>
+
+        <div data-ac="com-atendimento" hidden class="ac-cartao ac-chat">
+          <div class="ac-chat-topo">
+            <div>
+              <p class="ac-status" data-ac-status></p>
+              <p class="ac-status-sub" data-ac-status-sub></p>
+            </div>
+            <button type="button" class="ac-link" data-ac-encerrar>Encerrar atendimento</button>
+          </div>
+          <ol class="ac-mensagens" data-ac-mensagens aria-live="polite"></ol>
+          <form class="ac-enviar" data-ac-form-msg>
+            <label class="sr-only" for="ac-texto">Mensagem</label>
+            <textarea id="ac-texto" name="texto" rows="2" maxlength="4000" placeholder="Escreva a sua mensagem..."></textarea>
+            <button type="submit" class="sdc-botao">Enviar</button>
+          </form>
+          <p class="ac-erro" role="alert" data-ac-erro-msg></p>
+          <p class="ac-dica">Para enviar fotos, documentos ou áudio, por enquanto use o atendimento pelo <a href="https://sigdocconsumidor.com/?entrar=consumidor" target="_blank" rel="noopener" data-sem-modal>site do SigDoc</a>.</p>
+        </div>
+      </section>
+
+      <!-- Meus atendimentos -->
+      <section class="ac-painel" data-ac-painel="historico" hidden>
+        <h2>Meus atendimentos</h2>
+        <div data-ac-historico class="ac-lista"><p class="ac-vazio">Carregando...</p></div>
+      </section>
+
+      <!-- Meus documentos -->
+      <section class="ac-painel" data-ac-painel="documentos" hidden>
+        <h2>Meus documentos</h2>
+        <p class="ac-sub">Documentos do Procon registrados no seu CPF (protocolos, cartas e respostas).</p>
+        <div data-ac-documentos class="ac-lista"><p class="ac-vazio">Carregando...</p></div>
+      </section>
+
+      <!-- Meus dados -->
+      <section class="ac-painel" data-ac-painel="dados" hidden>
+        <h2>Meus dados</h2>
+        <form class="ac-cartao ac-form-dados" data-ac-form-dados novalidate>
+          <label class="sdc-campo">Nome completo<input name="fullName" maxlength="120" required /></label>
+          <div class="sdc-duas">
+            <label class="sdc-campo">CPF<input name="cpf" readonly aria-readonly="true" /></label>
+            <label class="sdc-campo">RG<input name="rg" maxlength="20" /></label>
+          </div>
+          <div class="sdc-duas">
+            <label class="sdc-campo">E-mail<input name="email" readonly aria-readonly="true" /></label>
+            <label class="sdc-campo">Telefone (WhatsApp)<input name="phone" inputmode="tel" maxlength="15" data-ac-mascara="telefone" /></label>
+          </div>
+          <div class="sdc-tres">
+            <label class="sdc-campo">CEP<input name="cep" inputmode="numeric" maxlength="9" data-ac-mascara="cep" /></label>
+            <label class="sdc-campo">Nº<input name="addressNumber" maxlength="10" /></label>
+            <label class="sdc-campo">Complemento<input name="complement" maxlength="60" /></label>
+          </div>
+          <p class="ac-sub">Para corrigir o CPF ou o e-mail, fale com o Procon.</p>
+          <p class="ac-erro" role="alert" data-ac-erro-dados></p>
+          <button type="submit" class="sdc-botao ac-botao-curto">Salvar</button>
+        </form>
+      </section>
+    </div>
+  </div>
+</Base>
+
+<style is:global>
+  .ac { padding-block: clamp(20px, 4vw, 40px) 60px; }
+  .ac [hidden] { display: none !important; }
+  .ac h1 { font-family: var(--v-fonte-titulos, inherit); margin: 0 0 8px; font-size: clamp(1.7rem, 4vw, 2.3rem); line-height: 1.1; }
+  .ac h2 { font-family: var(--v-fonte-titulos, inherit); margin: 0 0 10px; font-size: 1.35rem; }
+  .ac-fora { max-width: 640px; margin: 20px auto; text-align: center; }
+  .ac-fora p { color: #4b5b52; font-size: 1.05rem; }
+  .ac-girando-caixa { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 40px 0; font-weight: 700; color: #4b5b52; }
+  .ac-girando-caixa[hidden] { display: none; }
+  .ac-botao-curto { width: auto; padding-inline: 28px; }
+  .ac-topo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px; padding-bottom: 18px; border-bottom: 1px solid #dfe5df; }
+  .ac-sobre { margin: 0 0 6px; font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--cor-primaria, #027538); }
+  .ac-cidade { margin: 0; color: #4b5b52; }
+  .ac-acoes-topo { display: flex; gap: 16px; }
+  .ac-link { border: 0; background: none; padding: 6px 0; font: inherit; font-weight: 700; color: var(--cor-secundaria, #05437b); text-decoration: underline; cursor: pointer; }
+  .ac-sair { color: #b42318; }
+  .ac-abas { display: flex; gap: 8px; overflow-x: auto; padding: 18px 0; scrollbar-width: thin; }
+  .ac-aba { flex: none; border: 1.5px solid #cfd8d1; background: #fff; border-radius: 999px; padding: 10px 18px; font: inherit; font-weight: 700; cursor: pointer; color: #2b3a31; }
+  .ac-aba[aria-current="page"] { background: var(--cor-primaria, #027538); border-color: var(--cor-primaria, #027538); color: #fff; }
+  .ac-painel[hidden] { display: none; }
+  .ac-cartao { background: #fff; border: 1px solid #dfe5df; border-radius: 20px; padding: clamp(18px, 4vw, 28px); box-shadow: 0 8px 30px rgba(10, 40, 20, .06); }
+  .ac-chamada { max-width: 720px; }
+  .ac-chamada p { color: #4b5b52; }
+  .ac-sub { color: #4b5b52; margin: 0 0 14px; }
+  .ac-erro { color: #b42318; font-weight: 700; margin: 8px 0; }
+  .ac-erro:empty { display: none; }
+  .ac-erro.ac-ok { color: #0f7a3d; }
+  .ac-chat { display: flex; flex-direction: column; gap: 12px; max-width: 860px; }
+  .ac-chat-topo { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: flex-start; }
+  .ac-status { margin: 0; font-weight: 800; font-size: 1.1rem; }
+  .ac-status-sub { margin: 2px 0 0; color: #4b5b52; }
+  .ac-mensagens { list-style: none; margin: 0; padding: 14px; height: min(52vh, 480px); overflow-y: auto; background: #f4f7f5; border-radius: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .ac-msg { max-width: 80%; padding: 10px 14px; border-radius: 16px; background: #fff; border: 1px solid #e3e9e4; align-self: flex-start; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .ac-msg-eu { align-self: flex-end; background: color-mix(in srgb, var(--cor-primaria, #027538) 12%, #fff); border-color: color-mix(in srgb, var(--cor-primaria, #027538) 25%, #fff); }
+  .ac-msg-sistema { align-self: center; max-width: 92%; background: #fff7d6; border-color: #f1e2a0; font-size: .92rem; text-align: center; }
+  .ac-msg small { display: block; margin-top: 4px; color: #6b7a71; font-size: .75rem; }
+  .ac-msg strong { display: block; font-size: .8rem; color: #2b3a31; margin-bottom: 2px; }
+  .ac-msg audio { max-width: 100%; margin-top: 4px; }
+  .ac-enviar { display: flex; gap: 10px; align-items: stretch; }
+  .ac-enviar textarea { flex: 1; font: inherit; padding: 11px 13px; border: 1.5px solid #cfd8d1; border-radius: 14px; resize: vertical; min-height: 52px; }
+  .ac-enviar .sdc-botao { width: auto; padding-inline: 22px; }
+  .ac-dica { margin: 0; font-size: .88rem; color: #6b7a71; }
+  .ac-lista { display: grid; gap: 12px; }
+  .ac-item { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding: 16px 18px; border: 1px solid #dfe5df; border-radius: 16px; background: #fff; }
+  .ac-item h3 { margin: 0 0 4px; font-size: 1.02rem; }
+  .ac-item p { margin: 0; color: #4b5b52; font-size: .92rem; }
+  .ac-etiqueta { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: .78rem; font-weight: 800; background: #eef2ef; color: #2b3a31; }
+  .ac-etiqueta-aguardando { background: #fff3c4; color: #7a5a00; }
+  .ac-etiqueta-andamento { background: #dbeafe; color: #1e40af; }
+  .ac-etiqueta-concluido { background: #dcfce7; color: #166534; }
+  .ac-vazio { color: #6b7a71; }
+  .ac-form-dados { max-width: 720px; }
+  .ac-form-dados input[readonly] { background: #eef2ef; color: #4b5b52; }
+  @media (max-width: 560px) { .ac-enviar { flex-direction: column; } .ac-msg { max-width: 92%; } }
+</style>
+
+<script>
+  import {
+    situacaoAtual, sair, atendimentoAberto, solicitarAtendimento, lerAtendimento, enviarMensagem, encerrarAtendimento,
+    ouvirAtendimento, posicaoNaFila, historico, documentos, linkArquivo, salvarDados, mascaraCpf, mascaraTelefone, mascaraCep,
+    type Consumidor, type Atendimento, type Mensagem,
+  } from '../lib/sigdoc-cliente';
+
+  const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
+  const el = (tag: string, cls?: string, texto?: string) => { const e = document.createElement(tag); if (cls) e.className = cls; if (texto != null) e.textContent = texto; return e; };
+  const dataHora = (iso?: string | null) => iso ? new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+  const hora = (iso?: string | null) => iso ? new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '';
+
+  let eu: Consumidor | null = null;
+  let atual: Atendimento | null = null;
+  let pararDeOuvir: (() => void) | null = null;
+  let qtdMensagens = -1;
+  const carregado = new Set<string>();
+
+  // ---------- Abas ----------
+  const abrirAba = (nome: string) => {
+    document.querySelectorAll<HTMLElement>('[data-ac-painel]').forEach((p) => { p.hidden = p.dataset.acPainel !== nome; });
+    document.querySelectorAll<HTMLElement>('.ac-aba').forEach((a) => { if (a.dataset.acIr === nome) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    if (nome === 'historico' && !carregado.has(nome)) { carregado.add(nome); carregarHistorico(); }
+    if (nome === 'documentos' && !carregado.has(nome)) { carregado.add(nome); carregarDocumentos(); }
+    if (nome === 'dados') preencherDados();
+  };
+  document.querySelectorAll<HTMLElement>('[data-ac-ir]').forEach((b) => b.addEventListener('click', () => abrirAba(b.dataset.acIr!)));
+
+  // ---------- Entrada ----------
+  async function iniciar() {
+    const s = await situacaoAtual().catch(() => ({ tipo: 'sem-login' as const }));
+    $('[data-ac="verificando"]').hidden = true;
+    if (s.tipo !== 'ok') {
+      $('[data-ac="pedir-login"]').hidden = false;
+      window.dispatchEvent(new CustomEvent('sdc:abrir'));
+      return;
+    }
+    eu = s.consumidor;
+    $('[data-ac="fora"]').hidden = true;
+    $('[data-ac="dentro"]').hidden = false;
+    $('[data-ac-nome]').textContent = (eu.fullName || '').split(' ')[0] || 'consumidor';
+    $('[data-ac-cidade]').textContent = eu.city ? `Cidade do cadastro: ${eu.city}` : '';
+    await atualizarAtendimento();
+  }
+  window.addEventListener('sdc:logado', () => { $('[data-ac="pedir-login"]').hidden = true; $('[data-ac="verificando"]').hidden = false; iniciar(); });
+  $('[data-ac-sair]').addEventListener('click', async () => { pararDeOuvir?.(); await sair(); location.href = '/'; });
+
+  // ---------- Atendimento online ----------
+  async function atualizarAtendimento() {
+    if (!eu) return;
+    const a = atual ? await lerAtendimento(atual.id) : await atendimentoAberto(eu.id);
+    if (a && a.status === 'completed') {
+      atual = null; pararDeOuvir?.(); pararDeOuvir = null; qtdMensagens = -1;
+      mostrarSemAtendimento('Seu último atendimento foi encerrado. Se precisar, solicite um novo.');
+      carregado.delete('historico');
+      return;
+    }
+    if (!a) { mostrarSemAtendimento(); return; }
+    const novo = !atual || atual.id !== a.id;
+    atual = a;
+    if (novo) { pararDeOuvir?.(); pararDeOuvir = ouvirAtendimento(a.id, () => { atualizarAtendimento(); }); }
+    await desenharAtendimento(a);
+  }
+
+  function mostrarSemAtendimento(aviso = '') {
+    $('[data-ac="com-atendimento"]').hidden = true;
+    $('[data-ac="sem-atendimento"]').hidden = false;
+    const e = $('[data-ac-erro-solicitar]');
+    e.textContent = aviso; e.classList.toggle('ac-ok', !!aviso);
+  }
+
+  async function desenharAtendimento(a: Atendimento) {
+    $('[data-ac="sem-atendimento"]').hidden = true;
+    $('[data-ac="com-atendimento"]').hidden = false;
+    if (a.status === 'waiting') {
+      const pos = await posicaoNaFila(a);
+      $('[data-ac-status]').textContent = pos ? `Você está na fila: posição ${pos}` : 'Você está na fila';
+      $('[data-ac-status-sub]').textContent = 'Aguarde nesta página. Quando o técnico começar, as mensagens dele aparecem aqui.';
+    } else {
+      $('[data-ac-status]').textContent = 'Em atendimento';
+      $('[data-ac-status-sub]').textContent = a.attendedBy ? `Técnico: ${a.attendedBy}` : 'Um técnico está atendendo você.';
+    }
+    const msgs = (a.messages || []) as Mensagem[];
+    if (msgs.length === qtdMensagens) return;
+    const lista = $('[data-ac-mensagens]');
+    const estavaNoFim = lista.scrollHeight - lista.scrollTop - lista.clientHeight < 80;
+    lista.replaceChildren(...msgs.map(desenharMensagem));
+    if (estavaNoFim || qtdMensagens < 0) lista.scrollTop = lista.scrollHeight;
+    qtdMensagens = msgs.length;
+  }
+
+  function desenharMensagem(m: Mensagem) {
+    const sistema = m.senderId === 'system';
+    const meu = m.senderType === 'consumer';
+    const li = el('li', `ac-msg ${sistema ? 'ac-msg-sistema' : meu ? 'ac-msg-eu' : ''}`);
+    if (!sistema) li.append(el('strong', '', meu ? 'Você' : m.senderName || 'Técnico'));
+    if (m.type === 'audio' && m.fileUrl) {
+      const audio = document.createElement('audio'); audio.controls = true; audio.preload = 'none';
+      linkArquivo(m.fileUrl).then((u) => { if (u) audio.src = u; });
+      li.append(audio);
+    } else if (m.type === 'file' && m.fileUrl) {
+      const b = el('button', 'ac-link', `Abrir arquivo: ${m.content || 'arquivo'}`);
+      b.addEventListener('click', async () => { const u = await linkArquivo(m.fileUrl!); if (u) window.open(u, '_blank', 'noopener'); });
+      li.append(b);
+    } else {
+      li.append(document.createTextNode(m.content || ''));
+    }
+    li.append(el('small', '', hora(m.timestamp)));
+    return li;
+  }
+
+  $('[data-ac-solicitar]').addEventListener('click', async (e) => {
+    if (!eu) return;
+    const b = e.currentTarget as HTMLButtonElement;
+    b.disabled = true;
+    const r = await solicitarAtendimento(eu);
+    b.disabled = false;
+    if (r.erro) { const er = $('[data-ac-erro-solicitar]'); er.textContent = r.erro; er.classList.remove('ac-ok'); return; }
+    atual = null; qtdMensagens = -1;
+    await atualizarAtendimento();
+    $('#ac-texto').focus();
+  });
+
+  $<HTMLFormElement>('[data-ac-form-msg]').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!eu || !atual) return;
+    const campo = $<HTMLTextAreaElement>('#ac-texto');
+    const texto = campo.value.trim();
+    if (!texto) return;
+    const er = $('[data-ac-erro-msg]');
+    er.textContent = '';
+    campo.value = '';
+    const r = await enviarMensagem(atual, eu, texto);
+    if (r.erro) { er.textContent = r.erro; campo.value = texto; return; }
+    await atualizarAtendimento();
+    const lista = $('[data-ac-mensagens]'); lista.scrollTop = lista.scrollHeight;
+  });
+  $<HTMLTextAreaElement>('#ac-texto').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $<HTMLFormElement>('[data-ac-form-msg]').requestSubmit(); }
+  });
+
+  $('[data-ac-encerrar]').addEventListener('click', async () => {
+    if (!atual || !confirm('Encerrar este atendimento? Se precisar depois, você pode solicitar um novo.')) return;
+    const r = await encerrarAtendimento(atual);
+    if (r.erro) { $('[data-ac-erro-msg]').textContent = r.erro; return; }
+    await atualizarAtendimento();
+  });
+
+  // ---------- Meus atendimentos ----------
+  const STATUS: Record<string, [string, string]> = {
+    waiting: ['Aguardando', 'ac-etiqueta-aguardando'], 'in-progress': ['Em atendimento', 'ac-etiqueta-andamento'], completed: ['Finalizado', 'ac-etiqueta-concluido'],
+  };
+  async function carregarHistorico() {
+    const caixa = $('[data-ac-historico]');
+    if (!eu?.cpf) { caixa.replaceChildren(el('p', 'ac-vazio', 'Nenhum atendimento encontrado.')); return; }
+    const itens = await historico(eu.cpf);
+    if (!itens.length) { caixa.replaceChildren(el('p', 'ac-vazio', 'Você ainda não tem atendimentos online.')); return; }
+    caixa.replaceChildren(...itens.map((a) => {
+      const div = el('div', 'ac-item');
+      const info = el('div');
+      info.append(el('h3', '', `Atendimento de ${dataHora(a.createdAt)}`));
+      info.append(el('p', '', a.attendedBy ? `Técnico: ${a.attendedBy}` : 'Aguardando técnico'));
+      const [rot, cls] = STATUS[a.status] ?? [a.status, ''];
+      const lado = el('div');
+      lado.append(el('span', `ac-etiqueta ${cls}`, rot));
+      if (a.transcriptionPdf) {
+        const b = el('button', 'ac-link', ' Ver conversa (PDF)');
+        b.addEventListener('click', async () => { const u = await linkArquivo(a.transcriptionPdf!); if (u) window.open(u, '_blank', 'noopener'); });
+        lado.append(b);
+      }
+      div.append(info, lado);
+      return div;
+    }));
+  }
+
+  // ---------- Meus documentos ----------
+  async function carregarDocumentos() {
+    const caixa = $('[data-ac-documentos]');
+    if (!eu?.cpf) { caixa.replaceChildren(el('p', 'ac-vazio', 'Nenhum documento disponível.')); return; }
+    const docs = await documentos(eu.cpf);
+    if (!docs.length) { caixa.replaceChildren(el('p', 'ac-vazio', 'Nenhum documento disponível ainda.')); return; }
+    caixa.replaceChildren(...docs.map((d) => {
+      const div = el('div', 'ac-item');
+      const info = el('div');
+      info.append(el('h3', '', d.documentType || 'Documento'));
+      info.append(el('p', '', [dataHora(d.dateTime), d.contentSnippet ? d.contentSnippet.slice(0, 140) : ''].filter(Boolean).join(' · ')));
+      const b = el('button', 'sdc-botao ac-botao-curto', 'Ver PDF');
+      b.addEventListener('click', async () => { const u = await linkArquivo(d.pdfData!); if (u) window.open(u, '_blank', 'noopener'); });
+      div.append(info, b);
+      return div;
+    }));
+  }
+
+  // ---------- Meus dados ----------
+  const formDados = $<HTMLFormElement>('[data-ac-form-dados]');
+  const campoDados = (n: string) => formDados.elements.namedItem(n) as HTMLInputElement;
+  function preencherDados() {
+    if (!eu) return;
+    campoDados('fullName').value = eu.fullName || '';
+    campoDados('cpf').value = mascaraCpf(eu.cpf || '');
+    campoDados('rg').value = eu.rg || '';
+    campoDados('email').value = eu.email || '';
+    campoDados('phone').value = mascaraTelefone(eu.phone || '');
+    campoDados('cep').value = mascaraCep(eu.cep || '');
+    campoDados('addressNumber').value = eu.addressNumber || '';
+    campoDados('complement').value = eu.complement || '';
+    $('[data-ac-erro-dados]').textContent = '';
+  }
+  formDados.querySelectorAll<HTMLInputElement>('[data-ac-mascara]').forEach((i) => i.addEventListener('input', () => {
+    i.value = i.dataset.acMascara === 'telefone' ? mascaraTelefone(i.value) : mascaraCep(i.value);
+  }));
+  formDados.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!eu) return;
+    const er = $('[data-ac-erro-dados]');
+    const nome = campoDados('fullName').value.trim();
+    if (nome.length < 5) { er.textContent = 'Informe o nome completo.'; er.classList.remove('ac-ok'); return; }
+    const dados = {
+      fullName: nome, rg: campoDados('rg').value.trim() || null, phone: campoDados('phone').value.trim() || null,
+      cep: campoDados('cep').value.trim() || null, addressNumber: campoDados('addressNumber').value.trim() || null,
+      complement: campoDados('complement').value.trim() || null,
+    };
+    const r = await salvarDados(eu.id, dados);
+    if (r.erro) { er.textContent = r.erro; er.classList.remove('ac-ok'); return; }
+    eu = { ...eu, ...dados, cep: dados.cep ? dados.cep.replace(/\D/g, '') : null };
+    $('[data-ac-nome]').textContent = nome.split(' ')[0];
+    er.textContent = 'Dados salvos.'; er.classList.add('ac-ok');
+  });
+
+  iniciar();
+</script>
