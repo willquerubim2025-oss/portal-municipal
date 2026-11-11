@@ -47,41 +47,15 @@ Astro.response.headers.set('Cache-Control', 'no-store');
           <h2>Fale com um técnico do Procon</h2>
           <p>Conte o seu problema pelo chat. Você entra na fila e é atendido na ordem de chegada, no horário de atendimento do Procon.</p>
           <p class="ac-erro" role="alert" data-ac-erro-solicitar></p>
-          <button type="button" class="sdc-botao ac-botao-curto" data-ac-solicitar>Solicitar atendimento</button>
+          <button type="button" class="ac-botao-p" data-ac-solicitar>Solicitar atendimento</button>
         </div>
 
-        <div data-ac="com-atendimento" hidden class="ac-cartao ac-chat">
-          <div class="ac-chat-topo">
-            <div>
-              <p class="ac-status" data-ac-status></p>
-              <p class="ac-status-sub" data-ac-status-sub></p>
-            </div>
-            <button type="button" class="ac-link" data-ac-encerrar>Encerrar atendimento</button>
+        <div data-ac="com-atendimento" hidden class="ac-cartao ac-chamada ac-resumo">
+          <div>
+            <p class="ac-status" data-ac-status></p>
+            <p class="ac-status-sub" data-ac-status-sub></p>
           </div>
-          <ol class="ac-mensagens" data-ac-mensagens aria-live="polite"></ol>
-          <form class="ac-enviar" data-ac-form-msg>
-            <label class="sr-only" for="ac-texto">Mensagem</label>
-            <textarea id="ac-texto" name="texto" rows="2" maxlength="4000" placeholder="Escreva a sua mensagem..."></textarea>
-            <div class="ac-botoes-msg">
-              <label class="ac-redondo" title="Enviar foto ou documento">
-                <input type="file" class="sr-only" data-ac-arquivo accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt,audio/*" />
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.4 11.1-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"/></svg>
-                <span class="sr-only">Enviar foto ou documento</span>
-              </label>
-              <button type="button" class="ac-redondo" data-ac-gravar title="Gravar áudio">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 19v3"/></svg>
-                <span class="sr-only">Gravar áudio</span>
-              </button>
-              <button type="submit" class="sdc-botao">Enviar</button>
-            </div>
-          </form>
-          <div class="ac-gravando" data-ac-gravando hidden>
-            <span class="ac-ponto"></span><strong>Gravando</strong> <span data-ac-tempo>0:00</span>
-            <button type="button" class="ac-link" data-ac-cancelar-audio>Cancelar</button>
-            <button type="button" class="sdc-botao ac-botao-curto" data-ac-enviar-audio>Enviar áudio</button>
-          </div>
-          <p class="ac-erro" role="alert" data-ac-erro-msg></p>
-          <p class="ac-dica">Você pode mandar fotos, PDFs e documentos de até 15 MB, ou gravar um áudio.</p>
+          <button type="button" class="ac-botao-p" data-ac-abrir-chat>Abrir conversa</button>
         </div>
       </section>
 
@@ -118,9 +92,49 @@ Astro.response.headers.set('Cache-Control', 'no-store');
           </div>
           <p class="ac-sub">Para corrigir o CPF ou o e-mail, fale com o Procon.</p>
           <p class="ac-erro" role="alert" data-ac-erro-dados></p>
-          <button type="submit" class="sdc-botao ac-botao-curto">Salvar</button>
+          <button type="submit" class="ac-botao-p">Salvar</button>
         </form>
       </section>
+
+      <!-- Conversa: janela no canto da tela, no mesmo formato da do SigDoc -->
+      <section class="ac-janela" data-ac-janela hidden aria-label="Conversa com o técnico">
+        <header class="ac-j-topo">
+          <div class="ac-j-info">
+            <h2>Atendimento</h2>
+            <p data-ac-j-quem></p>
+            <p class="ac-j-tecnico" data-ac-j-tecnico></p>
+          </div>
+          <button type="button" class="ac-j-icone" data-ac-minimizar title="Minimizar" aria-label="Minimizar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+          <button type="button" class="ac-j-icone ac-j-fechar" data-ac-encerrar title="Encerrar atendimento" aria-label="Encerrar atendimento"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+        </header>
+        <ol class="ac-mensagens" data-ac-mensagens aria-live="polite"></ol>
+        <p class="ac-erro ac-j-erro" role="alert" data-ac-erro-msg></p>
+        <form class="ac-enviar" data-ac-form-msg>
+          <label class="ac-j-botao" title="Anexar PDF ou documento">
+            <input type="file" class="sr-only" data-ac-arquivo accept="application/pdf,.doc,.docx,.xls,.xlsx,.txt,audio/*,image/*" />
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.4 11.1-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"/></svg>
+            <span class="sr-only">Anexar arquivo</span>
+          </label>
+          <label class="ac-j-botao" title="Tirar ou enviar foto">
+            <input type="file" class="sr-only" data-ac-arquivo accept="image/*" capture="environment" />
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9a2 2 0 0 1 2-2h1l2-3h8l2 3h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.2"/></svg>
+            <span class="sr-only">Enviar foto</span>
+          </label>
+          <label class="sr-only" for="ac-texto">Mensagem</label>
+          <input id="ac-texto" name="texto" type="text" maxlength="4000" autocomplete="off" placeholder="Digite sua mensagem..." />
+          <button type="submit" class="ac-j-botao ac-j-enviar" data-ac-enviar-btn hidden title="Enviar" aria-label="Enviar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg></button>
+          <button type="button" class="ac-j-botao" data-ac-gravar title="Gravar áudio" aria-label="Gravar áudio"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 19v3"/></svg></button>
+        </form>
+        <div class="ac-enviar ac-gravando" data-ac-gravando hidden>
+          <button type="button" class="ac-j-botao" data-ac-cancelar-audio title="Cancelar gravação" aria-label="Cancelar gravação"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+          <span class="ac-ponto"></span><span class="ac-gravando-txt">Gravando <span data-ac-tempo>0:00</span></span>
+          <button type="button" class="ac-j-botao ac-j-enviar" data-ac-enviar-audio title="Parar e enviar o áudio" aria-label="Parar e enviar o áudio"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
+        </div>
+      </section>
+      <button type="button" class="ac-janela-min" data-ac-min hidden>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Atendimento</span><small data-ac-min-status></small>
+      </button>
     </div>
   </div>
 </Base>
@@ -142,7 +156,7 @@ Astro.response.headers.set('Cache-Control', 'no-store');
   .ac-link { border: 0; background: none; padding: 6px 0; font: inherit; font-weight: 700; color: var(--cor-secundaria, #05437b); text-decoration: underline; cursor: pointer; }
   .ac-sair { color: #b42318; }
   .ac-abas { display: flex; gap: 8px; overflow-x: auto; padding: 18px 0; scrollbar-width: thin; }
-  .ac-aba { flex: none; border: 1.5px solid #cfd8d1; background: #fff; border-radius: 999px; padding: 10px 18px; font: inherit; font-weight: 700; cursor: pointer; color: #2b3a31; }
+  .ac-aba { flex: none; border: 1.5px solid #cfd8d1; background: #fff; border-radius: 999px; padding: 7px 15px; font-size: .92rem; font: inherit; font-weight: 700; cursor: pointer; color: #2b3a31; }
   .ac-aba[aria-current="page"] { background: var(--cor-primaria, #027538); border-color: var(--cor-primaria, #027538); color: #fff; }
   .ac-painel[hidden] { display: none; }
   .ac-cartao { background: #fff; border: 1px solid #dfe5df; border-radius: 20px; padding: clamp(18px, 4vw, 28px); box-shadow: 0 8px 30px rgba(10, 40, 20, .06); }
@@ -152,29 +166,49 @@ Astro.response.headers.set('Cache-Control', 'no-store');
   .ac-erro { color: #b42318; font-weight: 700; margin: 8px 0; }
   .ac-erro:empty { display: none; }
   .ac-erro.ac-ok { color: #0f7a3d; }
-  .ac-chat { display: flex; flex-direction: column; gap: 12px; max-width: 860px; }
-  .ac-chat-topo { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: flex-start; }
-  .ac-status { margin: 0; font-weight: 800; font-size: 1.1rem; }
-  .ac-status-sub { margin: 2px 0 0; color: #4b5b52; }
-  .ac-mensagens { list-style: none; margin: 0; padding: 14px; height: min(52vh, 480px); overflow-y: auto; background: #f4f7f5; border-radius: 14px; display: flex; flex-direction: column; gap: 10px; }
-  .ac-msg { max-width: 80%; padding: 10px 14px; border-radius: 16px; background: #fff; border: 1px solid #e3e9e4; align-self: flex-start; white-space: pre-wrap; overflow-wrap: anywhere; }
-  .ac-msg-eu { align-self: flex-end; background: color-mix(in srgb, var(--cor-primaria, #027538) 12%, #fff); border-color: color-mix(in srgb, var(--cor-primaria, #027538) 25%, #fff); }
-  .ac-msg-sistema { align-self: center; max-width: 92%; background: #fff7d6; border-color: #f1e2a0; font-size: .92rem; text-align: center; }
-  .ac-msg small { display: block; margin-top: 4px; color: #6b7a71; font-size: .75rem; }
-  .ac-msg strong { display: block; font-size: .8rem; color: #2b3a31; margin-bottom: 2px; }
-  .ac-msg audio { max-width: 100%; margin-top: 4px; }
-  .ac-enviar { display: flex; gap: 10px; align-items: stretch; }
-  .ac-enviar textarea { flex: 1; font: inherit; padding: 11px 13px; border: 1.5px solid #cfd8d1; border-radius: 14px; resize: vertical; min-height: 52px; }
-  .ac-enviar .sdc-botao { width: auto; padding-inline: 22px; }
-  .ac-botoes-msg { display: flex; gap: 8px; align-items: center; }
-  .ac-redondo { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 50%; border: 1.5px solid #cfd8d1; background: #fff; color: var(--cor-secundaria, #05437b); cursor: pointer; }
-  .ac-redondo:hover { background: #f4f7f5; }
-  .ac-redondo:focus-within { outline: 3px solid color-mix(in srgb, var(--cor-primaria, #027538) 35%, transparent); }
-  .ac-gravando { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 14px; background: #fdecea; }
-  .ac-ponto { width: 12px; height: 12px; border-radius: 50%; background: #d92d20; animation: ac-pisca 1s infinite; }
+  .ac-status { margin: 0; font-weight: 800; font-size: 1.05rem; }
+  .ac-status-sub { margin: 2px 0 0; color: #4b5b52; font-size: .95rem; }
+  .ac-resumo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+  .ac-botao-p { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border: 1.5px solid var(--cor-primaria, #027538); border-radius: 999px; background: var(--cor-primaria, #027538); color: #fff; font: inherit; font-weight: 700; font-size: .92rem; cursor: pointer; }
+  .ac-botao-p:hover { filter: brightness(1.08); }
+  .ac-botao-p:disabled { opacity: .6; cursor: wait; }
+  /* Janela da conversa (formato da janela do consumidor no SigDoc) */
+  .ac-janela { position: fixed; right: 16px; bottom: 16px; z-index: 900; width: 26rem; height: min(620px, calc(100dvh - 32px)); display: flex; flex-direction: column; background: #fff; border: 1px solid #dfe5df; border-radius: 16px; box-shadow: 0 18px 50px rgba(0,0,0,.22); overflow: hidden; }
+  .ac-j-topo { display: flex; align-items: flex-start; gap: 4px; padding: 12px 12px 10px 16px; border-bottom: 3px solid var(--cor-primaria, #027538); }
+  .ac-j-info { flex: 1; min-width: 0; }
+  .ac-j-info h2 { margin: 0; font-size: .82rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .ac-j-info p { margin: 1px 0 0; font-size: .74rem; color: #6b7a71; text-transform: uppercase; letter-spacing: .03em; }
+  .ac-j-info .ac-j-tecnico { color: var(--cor-primaria, #027538); font-weight: 700; }
+  .ac-j-info .ac-j-tecnico:empty { display: none; }
+  .ac-j-icone { flex: none; display: inline-flex; padding: 5px; border: 0; background: none; color: #6b7a71; cursor: pointer; border-radius: 8px; }
+  .ac-j-icone:hover { background: #eef2ef; color: #13231a; }
+  .ac-j-fechar { color: #b42318; }
+  .ac-mensagens { flex: 1; list-style: none; margin: 0; padding: 14px; overflow-y: auto; background: #f4f6f5; display: flex; flex-direction: column; gap: 8px; }
+  .ac-msg { max-width: 80%; padding: 8px 11px; border-radius: 14px; background: #fff; border: 1px solid #e3e9e4; align-self: flex-start; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .9rem; line-height: 1.35; }
+  .ac-msg-eu { align-self: flex-end; background: var(--cor-primaria, #027538); border-color: var(--cor-primaria, #027538); color: #fff; }
+  .ac-msg-eu .ac-link { color: #fff; }
+  .ac-msg-sistema { align-self: center; max-width: 92%; background: #fff7d6; border-color: #f1e2a0; font-size: .8rem; text-align: center; }
+  .ac-msg small { display: block; margin-top: 3px; font-size: .62rem; font-weight: 700; opacity: .65; text-transform: uppercase; }
+  .ac-msg strong { display: block; font-size: .72rem; margin-bottom: 1px; }
+  .ac-msg .ac-link { font-size: .82rem; padding: 2px 0; text-align: left; }
+  .ac-msg audio { width: 220px; max-width: 100%; height: 36px; margin-top: 2px; }
+  .ac-msg img { display: block; max-width: 200px; max-height: 200px; border-radius: 8px; margin-top: 2px; cursor: zoom-in; }
+  .ac-j-erro { margin: 0; padding: 6px 12px; font-size: .82rem; background: #fff; }
+  .ac-enviar { display: flex; align-items: center; gap: 6px; padding: 10px 12px; border-top: 1px solid #e3e9e4; background: #fff; }
+  .ac-enviar input[type="text"] { flex: 1; min-width: 0; font: inherit; font-size: .92rem; padding: 8px 11px; border: 1px solid #cfd8d1; border-radius: 10px; }
+  .ac-enviar input[type="text"]:focus { outline: none; border-color: var(--cor-primaria, #027538); }
+  .ac-j-botao { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid #cfd8d1; border-radius: 10px; background: #f6f8f7; color: #4b5b52; cursor: pointer; }
+  .ac-j-botao:hover { background: #eaefec; color: #13231a; }
+  .ac-j-botao:focus-within, .ac-j-botao:focus-visible { outline: 2px solid var(--cor-primaria, #027538); outline-offset: 1px; }
+  .ac-j-enviar { background: var(--cor-primaria, #027538); border-color: var(--cor-primaria, #027538); color: #fff; }
+  .ac-j-enviar:hover { background: var(--cor-primaria, #027538); color: #fff; filter: brightness(1.1); }
+  .ac-gravando { background: #fdf0ef; }
+  .ac-gravando-txt { flex: 1; font-size: .88rem; font-weight: 700; color: #b42318; }
+  .ac-ponto { width: 10px; height: 10px; border-radius: 50%; background: #d92d20; animation: ac-pisca 1s infinite; }
   @keyframes ac-pisca { 50% { opacity: .25; } }
-  .ac-msg img { display: block; max-width: min(260px, 100%); max-height: 260px; border-radius: 10px; margin-top: 4px; cursor: zoom-in; }
-  .ac-dica { margin: 0; font-size: .88rem; color: #6b7a71; }
+  .ac-janela-min { position: fixed; right: 16px; bottom: 16px; z-index: 900; display: flex; align-items: center; gap: 8px; min-width: 240px; padding: 11px 14px; border: 2px solid rgba(255,255,255,.75); border-radius: 12px; background: var(--cor-primaria, #027538); color: #fff; font: inherit; font-size: .82rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; box-shadow: 0 10px 30px rgba(0,0,0,.25); cursor: pointer; }
+  .ac-janela-min small { margin-left: auto; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,.2); font-size: .7rem; letter-spacing: 0; text-transform: none; }
+  @media (max-width: 640px) { .ac-janela { inset: 0; width: auto; height: auto; border-radius: 0; border: 0; } }
   .ac-lista { display: grid; gap: 12px; }
   .ac-item { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding: 16px 18px; border: 1px solid #dfe5df; border-radius: 16px; background: #fff; }
   .ac-item h3 { margin: 0 0 4px; font-size: 1.02rem; }
@@ -186,7 +220,6 @@ Astro.response.headers.set('Cache-Control', 'no-store');
   .ac-vazio { color: #6b7a71; }
   .ac-form-dados { max-width: 720px; }
   .ac-form-dados input[readonly] { background: #eef2ef; color: #4b5b52; }
-  @media (max-width: 560px) { .ac-enviar { flex-direction: column; } .ac-botoes-msg .sdc-botao { flex: 1; } .ac-msg { max-width: 92%; } }
 </style>
 
 <script>
@@ -253,7 +286,21 @@ Astro.response.headers.set('Cache-Control', 'no-store');
     await desenharAtendimento(a);
   }
 
+  // Janela da conversa: aberta, minimizada (barra no canto) ou fechada (sem atendimento).
+  let minimizada = false;
+  const janela = $('[data-ac-janela]');
+  const barraMin = $('[data-ac-min]');
+  const mostrarJanela = (abrir: boolean) => {
+    if (abrir) minimizada = false;
+    janela.hidden = minimizada; barraMin.hidden = !minimizada;
+    if (!minimizada) { const l = $('[data-ac-mensagens]'); l.scrollTop = l.scrollHeight; }
+  };
+  $('[data-ac-minimizar]').addEventListener('click', () => { minimizada = true; mostrarJanela(false); });
+  barraMin.addEventListener('click', () => { mostrarJanela(true); $('#ac-texto').focus(); });
+  $('[data-ac-abrir-chat]').addEventListener('click', () => { mostrarJanela(true); $('#ac-texto').focus(); });
+
   function mostrarSemAtendimento(aviso = '') {
+    janela.hidden = true; barraMin.hidden = true; minimizada = false;
     $('[data-ac="com-atendimento"]').hidden = true;
     $('[data-ac="sem-atendimento"]').hidden = false;
     const e = $('[data-ac-erro-solicitar]');
@@ -263,14 +310,22 @@ Astro.response.headers.set('Cache-Control', 'no-store');
   async function desenharAtendimento(a: Atendimento) {
     $('[data-ac="sem-atendimento"]').hidden = true;
     $('[data-ac="com-atendimento"]').hidden = false;
+    let resumo: string;
     if (a.status === 'waiting') {
       const pos = await posicaoNaFila(a);
+      resumo = pos ? `Na fila: posição ${pos}` : 'Na fila';
       $('[data-ac-status]').textContent = pos ? `Você está na fila: posição ${pos}` : 'Você está na fila';
-      $('[data-ac-status-sub]').textContent = 'Aguarde nesta página. Quando o técnico começar, as mensagens dele aparecem aqui.';
+      $('[data-ac-status-sub]').textContent = 'A conversa fica aberta no canto da tela. Quando o técnico começar, as mensagens dele aparecem lá.';
+      $('[data-ac-j-tecnico]').textContent = resumo;
     } else {
+      resumo = 'Em atendimento';
       $('[data-ac-status]').textContent = 'Em atendimento';
       $('[data-ac-status-sub]').textContent = a.attendedBy ? `Técnico: ${a.attendedBy}` : 'Um técnico está atendendo você.';
+      $('[data-ac-j-tecnico]').textContent = a.attendedBy ? `Você está sendo atendido por ${a.attendedBy}` : 'Em atendimento';
     }
+    $('[data-ac-j-quem]').textContent = [eu?.fullName, eu?.cpf ? mascaraCpf(eu.cpf) : ''].filter(Boolean).join(' • ');
+    $('[data-ac-min-status]').textContent = resumo;
+    if (janela.hidden && barraMin.hidden) mostrarJanela(true);
     const msgs = (a.messages || []) as Mensagem[];
     if (msgs.length === qtdMensagens) return;
     const lista = $('[data-ac-mensagens]');
@@ -284,7 +339,7 @@ Astro.response.headers.set('Cache-Control', 'no-store');
     const sistema = m.senderId === 'system';
     const meu = m.senderType === 'consumer';
     const li = el('li', `ac-msg ${sistema ? 'ac-msg-sistema' : meu ? 'ac-msg-eu' : ''}`);
-    if (!sistema) li.append(el('strong', '', meu ? 'Você' : m.senderName || 'Técnico'));
+    if (!sistema && !meu) li.append(el('strong', '', m.senderName || 'Técnico'));
     if (m.type === 'audio' && m.fileUrl) {
       const audio = document.createElement('audio'); audio.controls = true; audio.preload = 'none';
       linkArquivo(m.fileUrl).then((u) => { if (u) audio.src = u; });
@@ -296,10 +351,12 @@ Astro.response.headers.set('Cache-Control', 'no-store');
         linkArquivo(m.fileUrl).then((u) => { if (u) img.src = u; });
         img.addEventListener('click', () => { if (img.src) window.open(img.src, '_blank', 'noopener'); });
         li.append(img);
+      } else {
+        const b = el('button', 'ac-link', `📄 ${nome}`);
+        b.title = 'Abrir arquivo';
+        b.addEventListener('click', async () => { const u = await linkArquivo(m.fileUrl!); if (u) window.open(u, '_blank', 'noopener'); });
+        li.append(b);
       }
-      const b = el('button', 'ac-link', `Abrir arquivo: ${nome}`);
-      b.addEventListener('click', async () => { const u = await linkArquivo(m.fileUrl!); if (u) window.open(u, '_blank', 'noopener'); });
-      li.append(b);
     } else {
       li.append(document.createTextNode(m.content || ''));
     }
@@ -322,7 +379,7 @@ Astro.response.headers.set('Cache-Control', 'no-store');
   $<HTMLFormElement>('[data-ac-form-msg]').addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!eu || !atual) return;
-    const campo = $<HTMLTextAreaElement>('#ac-texto');
+    const campo = $<HTMLInputElement>('#ac-texto');
     const texto = campo.value.trim();
     if (!texto) return;
     const er = $('[data-ac-erro-msg]');
@@ -333,13 +390,17 @@ Astro.response.headers.set('Cache-Control', 'no-store');
     await atualizarAtendimento();
     const lista = $('[data-ac-mensagens]'); lista.scrollTop = lista.scrollHeight;
   });
-  $<HTMLTextAreaElement>('#ac-texto').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $<HTMLFormElement>('[data-ac-form-msg]').requestSubmit(); }
-  });
+  // Igual ao SigDoc: com texto aparece "enviar"; sem texto, o microfone.
+  const trocarBotao = () => {
+    const tem = !!$<HTMLInputElement>('#ac-texto').value.trim();
+    $('[data-ac-enviar-btn]').hidden = !tem; $('[data-ac-gravar]').hidden = tem;
+  };
+  $('#ac-texto').addEventListener('input', trocarBotao);
+  $('[data-ac-form-msg]').addEventListener('submit', () => setTimeout(trocarBotao, 0));
 
   // ---------- Foto, documento e áudio ----------
   const erroMsg = (t: string) => { $('[data-ac-erro-msg]').textContent = t; };
-  $<HTMLInputElement>('[data-ac-arquivo]').addEventListener('change', async (e) => {
+  document.querySelectorAll<HTMLInputElement>('[data-ac-arquivo]').forEach((entrada) => entrada.addEventListener('change', async (e) => {
     const input = e.currentTarget as HTMLInputElement;
     const arq = input.files?.[0];
     input.value = '';
@@ -348,7 +409,7 @@ Astro.response.headers.set('Cache-Control', 'no-store');
     const r = await enviarArquivo(atual, eu, arq, arq.name, arq.type.startsWith('audio/') ? 'audio' : 'file');
     erroMsg(r.erro ?? '');
     if (!r.erro) { await atualizarAtendimento(); const l = $('[data-ac-mensagens]'); l.scrollTop = l.scrollHeight; }
-  });
+  }));
 
   let gravador: MediaRecorder | null = null;
   let pedacos: BlobPart[] = [];
@@ -437,7 +498,7 @@ Astro.response.headers.set('Cache-Control', 'no-store');
       const info = el('div');
       info.append(el('h3', '', d.documentType || 'Documento'));
       info.append(el('p', '', [dataHora(d.dateTime), d.contentSnippet ? d.contentSnippet.slice(0, 140) : ''].filter(Boolean).join(' · ')));
-      const b = el('button', 'sdc-botao ac-botao-curto', 'Ver PDF');
+      const b = el('button', 'ac-botao-p', 'Ver PDF');
       b.addEventListener('click', async () => { const u = await linkArquivo(d.pdfData!); if (u) window.open(u, '_blank', 'noopener'); });
       div.append(info, b);
       return div;
