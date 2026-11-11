@@ -1006,3 +1006,9 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 - "O atendimento online vai continuar sendo feito no ambiente do SigDoc... aquela interface criada dentro do portal não vai mais continuar."
 - Removidos do portal: página `/area-do-consumidor`, janela de login por cima do portal (`ModalConsumidor`), `lib/sigdoc-cliente.ts` e a chave `config.area_consumidor` (apagada também do Procon Sumaré). O botão "Atendimento online" e os cartões voltam a levar ao login do consumidor do SigDoc (`sigdocconsumidor.com/?entrar=consumidor`), como em D-136. O código fica no histórico do Git (commits de D-139) se um dia for retomado.
 - No SigDoc continua a função `posicao_fila_atendimento` (só leitura, não afeta nada).
+
+**D-141 · 11/11/2026 · Golpes em vídeo: carrossel de "telas de celular" (pedido do William)**
+- "Um carrossel... simulando uma tela vertical, mostrando três telas de uma vez, girando... quando escolher um, abre uma tela maior no lugar do carrossel e reproduz o vídeo; quando fecha, volta para o carrossel."
+- **Bloco `golpes` (genérico; hoje só o Procon Sumaré usa):** os vídeos (Shorts) viram telas em pé (9:16) com a capa do vídeo (`i.ytimg.com/vi/<id>/hqdefault.jpg`, recortada no centro), número, título e botão de play. 3 à vista (centro em destaque, lados menores), gira sozinho a cada 3,5 s, com setas, pontos, teclado (← →) e arrastar no celular. Para de girar com o mouse em cima, com o foco dentro, fora da tela e com "reduzir movimento".
+- Clicar na tela do centro abre o **palco** no lugar do carrossel: vídeo em pé (youtube-nocookie, só carregado no clique), número, título, resumo, "Voltar aos vídeos" e "Próximo golpe" (Esc também fecha). Clicar numa tela do lado primeiro gira até ela. Sem JavaScript, cada tela é um link para o vídeo no YouTube.
+- Privacidade: antes do clique só a imagem de capa vem do YouTube (i.ytimg.com); o player só depois do clique.
