@@ -213,6 +213,29 @@ export async function enviarMensagem(a: Atendimento, c: Consumidor, texto: strin
   return error ? { erro: 'A mensagem não foi enviada. Tente de novo.' } : {};
 }
 
+const LIMITE_ARQUIVO = 15 * 1024 * 1024; // 15 MB
+const EXT_AUDIO: Record<string, string> = { 'audio/mp4': 'm4a', 'audio/webm': 'webm', 'audio/ogg': 'ogg', 'audio/mpeg': 'mp3', 'audio/wav': 'wav' };
+
+/** Foto, documento ou áudio na conversa: mesmo caminho do SigDoc (bucket chat-files, pasta = id do atendimento). */
+export async function enviarArquivo(a: Atendimento, c: Consumidor, arquivo: Blob, nome: string, tipo: 'file' | 'audio'): Promise<{ erro?: string }> {
+  if (arquivo.size > LIMITE_ARQUIVO) return { erro: 'Arquivo grande demais. O limite é 15 MB.' };
+  const sb = sigdoc();
+  const id = crypto.randomUUID();
+  const mime = (arquivo.type || 'application/octet-stream').split(';')[0];
+  const caminho = tipo === 'audio'
+    ? `${a.id}/${id}.${EXT_AUDIO[mime] ?? 'webm'}`
+    : `${a.id}/${id}_${nome.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+  const { error: erroEnvio } = await sb.storage.from('chat-files').upload(caminho, arquivo, { contentType: mime, upsert: false });
+  if (erroEnvio) return { erro: 'Não foi possível enviar o arquivo. Tente de novo.' };
+  const fileUrl = sb.storage.from('chat-files').getPublicUrl(caminho).data.publicUrl;
+  const msg: Mensagem = {
+    id, chatId: a.id, senderId: c.id, senderName: c.fullName, senderType: 'consumer',
+    content: tipo === 'audio' ? 'Mensagem de áudio' : nome, type: tipo, fileUrl, timestamp: new Date().toISOString(),
+  };
+  const { error } = await sb.rpc('append_atendimento_message', { p_id: a.id, p_message: msg, p_claim_if_waiting: false, p_technician_name: null });
+  return error ? { erro: 'O arquivo foi enviado, mas a mensagem não. Tente de novo.' } : {};
+}
+
 export async function encerrarAtendimento(a: Atendimento): Promise<{ erro?: string }> {
   const agora = new Date().toISOString();
   const { error } = await sigdoc().from('atendimentos_online')

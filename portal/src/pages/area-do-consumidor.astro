@@ -62,10 +62,26 @@ Astro.response.headers.set('Cache-Control', 'no-store');
           <form class="ac-enviar" data-ac-form-msg>
             <label class="sr-only" for="ac-texto">Mensagem</label>
             <textarea id="ac-texto" name="texto" rows="2" maxlength="4000" placeholder="Escreva a sua mensagem..."></textarea>
-            <button type="submit" class="sdc-botao">Enviar</button>
+            <div class="ac-botoes-msg">
+              <label class="ac-redondo" title="Enviar foto ou documento">
+                <input type="file" class="sr-only" data-ac-arquivo accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt,audio/*" />
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.4 11.1-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"/></svg>
+                <span class="sr-only">Enviar foto ou documento</span>
+              </label>
+              <button type="button" class="ac-redondo" data-ac-gravar title="Gravar áudio">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 19v3"/></svg>
+                <span class="sr-only">Gravar áudio</span>
+              </button>
+              <button type="submit" class="sdc-botao">Enviar</button>
+            </div>
           </form>
+          <div class="ac-gravando" data-ac-gravando hidden>
+            <span class="ac-ponto"></span><strong>Gravando</strong> <span data-ac-tempo>0:00</span>
+            <button type="button" class="ac-link" data-ac-cancelar-audio>Cancelar</button>
+            <button type="button" class="sdc-botao ac-botao-curto" data-ac-enviar-audio>Enviar áudio</button>
+          </div>
           <p class="ac-erro" role="alert" data-ac-erro-msg></p>
-          <p class="ac-dica">Para enviar fotos, documentos ou áudio, por enquanto use o atendimento pelo <a href="https://sigdocconsumidor.com/?entrar=consumidor" target="_blank" rel="noopener" data-sem-modal>site do SigDoc</a>.</p>
+          <p class="ac-dica">Você pode mandar fotos, PDFs e documentos de até 15 MB, ou gravar um áudio.</p>
         </div>
       </section>
 
@@ -150,6 +166,14 @@ Astro.response.headers.set('Cache-Control', 'no-store');
   .ac-enviar { display: flex; gap: 10px; align-items: stretch; }
   .ac-enviar textarea { flex: 1; font: inherit; padding: 11px 13px; border: 1.5px solid #cfd8d1; border-radius: 14px; resize: vertical; min-height: 52px; }
   .ac-enviar .sdc-botao { width: auto; padding-inline: 22px; }
+  .ac-botoes-msg { display: flex; gap: 8px; align-items: center; }
+  .ac-redondo { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 50%; border: 1.5px solid #cfd8d1; background: #fff; color: var(--cor-secundaria, #05437b); cursor: pointer; }
+  .ac-redondo:hover { background: #f4f7f5; }
+  .ac-redondo:focus-within { outline: 3px solid color-mix(in srgb, var(--cor-primaria, #027538) 35%, transparent); }
+  .ac-gravando { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 14px; background: #fdecea; }
+  .ac-ponto { width: 12px; height: 12px; border-radius: 50%; background: #d92d20; animation: ac-pisca 1s infinite; }
+  @keyframes ac-pisca { 50% { opacity: .25; } }
+  .ac-msg img { display: block; max-width: min(260px, 100%); max-height: 260px; border-radius: 10px; margin-top: 4px; cursor: zoom-in; }
   .ac-dica { margin: 0; font-size: .88rem; color: #6b7a71; }
   .ac-lista { display: grid; gap: 12px; }
   .ac-item { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding: 16px 18px; border: 1px solid #dfe5df; border-radius: 16px; background: #fff; }
@@ -162,12 +186,12 @@ Astro.response.headers.set('Cache-Control', 'no-store');
   .ac-vazio { color: #6b7a71; }
   .ac-form-dados { max-width: 720px; }
   .ac-form-dados input[readonly] { background: #eef2ef; color: #4b5b52; }
-  @media (max-width: 560px) { .ac-enviar { flex-direction: column; } .ac-msg { max-width: 92%; } }
+  @media (max-width: 560px) { .ac-enviar { flex-direction: column; } .ac-botoes-msg .sdc-botao { flex: 1; } .ac-msg { max-width: 92%; } }
 </style>
 
 <script>
   import {
-    situacaoAtual, sair, atendimentoAberto, solicitarAtendimento, lerAtendimento, enviarMensagem, encerrarAtendimento,
+    situacaoAtual, sair, atendimentoAberto, solicitarAtendimento, lerAtendimento, enviarMensagem, enviarArquivo, encerrarAtendimento,
     ouvirAtendimento, posicaoNaFila, historico, documentos, linkArquivo, salvarDados, mascaraCpf, mascaraTelefone, mascaraCep,
     type Consumidor, type Atendimento, type Mensagem,
   } from '../lib/sigdoc-cliente';
@@ -266,7 +290,14 @@ Astro.response.headers.set('Cache-Control', 'no-store');
       linkArquivo(m.fileUrl).then((u) => { if (u) audio.src = u; });
       li.append(audio);
     } else if (m.type === 'file' && m.fileUrl) {
-      const b = el('button', 'ac-link', `Abrir arquivo: ${m.content || 'arquivo'}`);
+      const nome = m.content || 'arquivo';
+      if (/\.(jpe?g|png|webp|gif|heic|heif)$/i.test(nome) || /\.(jpe?g|png|webp|gif)(\?|$)/i.test(m.fileUrl)) {
+        const img = document.createElement('img'); img.alt = nome; img.loading = 'lazy';
+        linkArquivo(m.fileUrl).then((u) => { if (u) img.src = u; });
+        img.addEventListener('click', () => { if (img.src) window.open(img.src, '_blank', 'noopener'); });
+        li.append(img);
+      }
+      const b = el('button', 'ac-link', `Abrir arquivo: ${nome}`);
       b.addEventListener('click', async () => { const u = await linkArquivo(m.fileUrl!); if (u) window.open(u, '_blank', 'noopener'); });
       li.append(b);
     } else {
@@ -305,6 +336,61 @@ Astro.response.headers.set('Cache-Control', 'no-store');
   $<HTMLTextAreaElement>('#ac-texto').addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $<HTMLFormElement>('[data-ac-form-msg]').requestSubmit(); }
   });
+
+  // ---------- Foto, documento e áudio ----------
+  const erroMsg = (t: string) => { $('[data-ac-erro-msg]').textContent = t; };
+  $<HTMLInputElement>('[data-ac-arquivo]').addEventListener('change', async (e) => {
+    const input = e.currentTarget as HTMLInputElement;
+    const arq = input.files?.[0];
+    input.value = '';
+    if (!arq || !eu || !atual) return;
+    erroMsg('Enviando o arquivo...');
+    const r = await enviarArquivo(atual, eu, arq, arq.name, arq.type.startsWith('audio/') ? 'audio' : 'file');
+    erroMsg(r.erro ?? '');
+    if (!r.erro) { await atualizarAtendimento(); const l = $('[data-ac-mensagens]'); l.scrollTop = l.scrollHeight; }
+  });
+
+  let gravador: MediaRecorder | null = null;
+  let pedacos: BlobPart[] = [];
+  let cancelado = false;
+  let relogio: number | undefined;
+  const caixaGravando = $('[data-ac-gravando]');
+  const formMsg = $('[data-ac-form-msg]');
+  const pararRelogio = () => { clearInterval(relogio); caixaGravando.hidden = true; formMsg.hidden = false; };
+  $('[data-ac-gravar]').addEventListener('click', async () => {
+    if (!eu || !atual || gravador) return;
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') { erroMsg('Este navegador não grava áudio. Mande por texto ou como arquivo.'); return; }
+    let fluxo: MediaStream;
+    try { fluxo = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+    catch { erroMsg('Não foi possível usar o microfone. Libere o microfone para este site e tente de novo.'); return; }
+    erroMsg('');
+    // Mesmas escolhas do SigDoc: o navegador escolhe o formato; taxa fixa evita áudio mudo no Chrome do Android.
+    gravador = new MediaRecorder(fluxo, { audioBitsPerSecond: 128000 });
+    pedacos = []; cancelado = false;
+    const tipo = gravador.mimeType || 'audio/mp4';
+    gravador.ondataavailable = (ev) => { if (ev.data && ev.data.size > 0) pedacos.push(ev.data); };
+    gravador.onstop = async () => {
+      fluxo.getTracks().forEach((t) => t.stop());
+      gravador = null; pararRelogio();
+      if (cancelado || !eu || !atual || !pedacos.length) return;
+      erroMsg('Enviando o áudio...');
+      const r = await enviarArquivo(atual, eu, new Blob(pedacos, { type: tipo }), 'audio', 'audio');
+      erroMsg(r.erro ?? '');
+      if (!r.erro) { await atualizarAtendimento(); const l = $('[data-ac-mensagens]'); l.scrollTop = l.scrollHeight; }
+    };
+    gravador.start(250);
+    const inicio = Date.now();
+    const tempo = $('[data-ac-tempo]');
+    tempo.textContent = '0:00';
+    relogio = window.setInterval(() => {
+      const s = Math.floor((Date.now() - inicio) / 1000);
+      tempo.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+      if (s >= 300) gravador?.stop(); // até 5 minutos
+    }, 500);
+    formMsg.hidden = true; caixaGravando.hidden = false;
+  });
+  $('[data-ac-cancelar-audio]').addEventListener('click', () => { cancelado = true; gravador?.stop(); });
+  $('[data-ac-enviar-audio]').addEventListener('click', () => { gravador?.stop(); });
 
   $('[data-ac-encerrar]').addEventListener('click', async () => {
     if (!atual || !confirm('Encerrar este atendimento? Se precisar depois, você pode solicitar um novo.')) return;
