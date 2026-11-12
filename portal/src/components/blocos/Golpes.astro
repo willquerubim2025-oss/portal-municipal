@@ -1,0 +1,171 @@
+---
+// Bloco "golpes" (D-136; carrossel em D-141): vídeos curtos (Shorts) do YouTube em "telas de celular" que giram
+// num carrossel (5 à vista, a do centro maior), girando em círculo. Clicar numa tela abre, no lugar do carrossel, um palco com o vídeo em pé, o título e o
+// resumo; "Voltar aos vídeos" fecha o vídeo e o carrossel volta a girar.
+// O player do YouTube só é carregado depois do clique (domínio youtube-nocookie); antes, só a imagem de capa
+// (i.ytimg.com). Sem JavaScript, cada tela é um link para o vídeo no YouTube. Com "reduzir movimento", não gira sozinho.
+import type { TextosBloco, VideoGolpe } from '../../lib/municipio';
+import TituloBloco from './TituloBloco.astro';
+interface Props { videos?: VideoGolpe[]; textos?: TextosBloco }
+const { textos } = Astro.props;
+// Aceita o código do vídeo ou um endereço do YouTube (watch, youtu.be, shorts, embed).
+const idDe = (v?: string) => {
+  if (!v) return null;
+  const m = v.match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([A-Za-z0-9_-]{11})/) ?? v.match(/^([A-Za-z0-9_-]{11})$/);
+  return m ? m[1] : null;
+};
+const videos = (Astro.props.videos ?? []).filter((v) => v?.titulo).map((v, i) => ({ ...v, id: idDe(v.youtube), n: String(i + 1).padStart(2, '0') }));
+---
+{videos.length > 0 && (
+  <section class="vb-secao vb-golpes" aria-labelledby="vb-t-golpes" data-vb-golpes>
+    <div class="vb-miolo">
+      <TituloBloco id="vb-t-golpes" textos={textos} claro padrao={{ sobretitulo: 'Golpes em vídeo', titulo: 'Assista antes. *Não caia depois.*' }} />
+
+      <div class="vb-carrossel" data-vb-carrossel aria-roledescription="carrossel" aria-label="Vídeos sobre golpes">
+        <div class="vb-carrossel-pista" data-vb-pista>
+          {videos.map((v, i) => (
+            <a class="vb-tela" data-vb-tela data-i={i} data-id={v.id ?? ''} data-titulo={v.titulo} data-resumo={v.resumo ?? ''} data-n={v.n}
+               href={v.id ? `https://www.youtube.com/shorts/${v.id}` : '#vb-t-golpes'} target="_blank" rel="noopener"
+               aria-label={`${v.titulo}${v.id ? ': assistir ao vídeo' : ' (vídeo em breve)'}`}>
+              {v.id
+                ? <img src={`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`} alt="" loading="lazy" decoding="async" onerror="this.remove()" />
+                : <span class="vb-tela-breve">Em breve</span>}
+              <span class="vb-tela-sombra" aria-hidden="true"></span>
+              <span class="vb-tela-n" aria-hidden="true">{v.n}</span>
+              {v.id && <span class="vb-tela-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>}
+              <span class="vb-tela-titulo">{v.titulo}</span>
+            </a>
+          ))}
+        </div>
+        <div class="vb-carrossel-controles">
+          <button type="button" class="vb-seta" data-vb-ant aria-label="Vídeo anterior"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+          <div class="vb-pontos" role="group" aria-label="Escolher vídeo">
+            {videos.map((v, i) => <button type="button" class="vb-ponto" data-vb-ponto={i} aria-label={v.titulo}></button>)}
+          </div>
+          <button type="button" class="vb-seta" data-vb-prox aria-label="Próximo vídeo"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        </div>
+      </div>
+
+      <div class="vb-palco" data-vb-palco hidden aria-live="polite">
+        <div class="vb-palco-video" data-vb-palco-video></div>
+        <div class="vb-palco-texto">
+          <span class="vb-palco-n" data-campo="n" aria-hidden="true"></span>
+          <h3 data-campo="titulo" tabindex="-1"></h3>
+          <p data-campo="resumo"></p>
+          <div class="vb-palco-botoes">
+            <button type="button" class="vb-botao vb-botao-amarelo" data-vb-voltar>Voltar aos vídeos</button>
+            <button type="button" class="vb-botao vb-botao-contorno-claro" data-vb-seguinte>Próximo golpe</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+<script>
+  for (const bloco of document.querySelectorAll<HTMLElement>('[data-vb-golpes]')) {
+    const carrossel = bloco.querySelector<HTMLElement>('[data-vb-carrossel]')!;
+    const telas = [...bloco.querySelectorAll<HTMLAnchorElement>('[data-vb-tela]')];
+    const pontos = [...bloco.querySelectorAll<HTMLButtonElement>('[data-vb-ponto]')];
+    const palco = bloco.querySelector<HTMLElement>('[data-vb-palco]')!;
+    const caixaVideo = bloco.querySelector<HTMLElement>('[data-vb-palco-video]')!;
+    const calmo = matchMedia('(prefers-reduced-motion: reduce)');
+    const n = telas.length;
+    let atual = 0;
+    let timer: number | undefined;
+    let parado = false;
+    let tocando = -1;
+
+    // Cada tela vai para uma "vaga": 0 = centro, ±1 = vizinhas, ±2 = pontas; com mais de 5 vídeos, as outras
+    // ficam escondidas atrás. Gira em círculo: a da ponta esquerda passa para a ponta direita (e vice-versa).
+    const desenhar = () => {
+      telas.forEach((t, i) => {
+        let vaga = (i - atual + n) % n;
+        if (vaga > Math.floor(n / 2)) vaga -= n;
+        const vista = Math.abs(vaga) <= 2;
+        const nova = vista ? String(vaga) : 'fora';
+        const antiga = t.dataset.vaga;
+        // Deu a volta (de um lado para o outro): troca de lado apagada e aparece no lugar novo.
+        if (antiga && antiga !== 'fora' && vista && Math.abs(Number(antiga) - vaga) > 2) {
+          t.classList.add('vb-salto');
+          requestAnimationFrame(() => requestAnimationFrame(() => t.classList.remove('vb-salto')));
+        }
+        t.dataset.vaga = nova;
+        t.tabIndex = vista ? 0 : -1;
+        t.setAttribute('aria-hidden', vista ? 'false' : 'true');
+      });
+      pontos.forEach((p, i) => p.setAttribute('aria-pressed', String(i === atual)));
+    };
+    const ir = (i: number) => { atual = (i + n) % n; desenhar(); agendar(); };
+    const agendar = () => {
+      clearTimeout(timer);
+      if (!parado && !calmo.matches && palco.hidden && n > 1) timer = window.setTimeout(() => ir(atual + 1), 3500);
+    };
+
+    const abrir = (i: number) => {
+      const t = telas[i];
+      const id = t.dataset.id;
+      if (!id) return;
+      clearTimeout(timer);
+      tocando = i;
+      for (const c of ['n', 'titulo', 'resumo']) { const e = palco.querySelector<HTMLElement>(`[data-campo="${c}"]`); if (e) e.textContent = t.dataset[c] ?? ''; }
+      const f = document.createElement('iframe');
+      f.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&playsinline=1`;
+      f.title = t.dataset.titulo ?? 'Vídeo';
+      f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      f.allowFullscreen = true;
+      caixaVideo.replaceChildren(f);
+      carrossel.hidden = true; palco.hidden = false;
+      palco.querySelector<HTMLElement>('h3')?.focus({ preventScroll: true });
+      const topo = bloco.getBoundingClientRect().top;
+      if (topo < 0 || topo > innerHeight * 0.4) bloco.scrollIntoView({ behavior: calmo.matches ? 'auto' : 'smooth', block: 'start' });
+    };
+    const fechar = () => {
+      caixaVideo.replaceChildren();
+      palco.hidden = true; carrossel.hidden = false;
+      if (tocando >= 0) { atual = tocando; desenhar(); telas[tocando].focus({ preventScroll: true }); }
+      tocando = -1;
+      agendar();
+    };
+
+    telas.forEach((t, i) => t.addEventListener('click', (e) => {
+      if (!t.dataset.id) { e.preventDefault(); return; }
+      if (e.ctrlKey || e.metaKey) return;
+      e.preventDefault();
+      // Tela do lado: primeiro gira até ela; a do centro abre o vídeo.
+      if (t.dataset.vaga !== '0') { ir(i); return; }
+      abrir(i);
+    }));
+    bloco.querySelector('[data-vb-ant]')!.addEventListener('click', () => ir(atual - 1));
+    bloco.querySelector('[data-vb-prox]')!.addEventListener('click', () => ir(atual + 1));
+    pontos.forEach((p, i) => p.addEventListener('click', () => ir(i)));
+    bloco.querySelector('[data-vb-voltar]')!.addEventListener('click', fechar);
+    bloco.querySelector('[data-vb-seguinte]')!.addEventListener('click', () => {
+      let i = tocando;
+      for (let k = 0; k < n; k++) { i = (i + 1) % n; if (telas[i].dataset.id) break; }
+      abrir(i);
+    });
+    palco.addEventListener('keydown', (e) => { if (e.key === 'Escape') fechar(); });
+    carrossel.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') { ir(atual + 1); e.preventDefault(); }
+      if (e.key === 'ArrowLeft') { ir(atual - 1); e.preventDefault(); }
+    });
+    // Para de girar com o mouse em cima ou com o foco dentro (acessibilidade: o usuário controla).
+    carrossel.addEventListener('mouseenter', () => { parado = true; clearTimeout(timer); });
+    carrossel.addEventListener('mouseleave', () => { parado = false; agendar(); });
+    carrossel.addEventListener('focusin', () => { parado = true; clearTimeout(timer); });
+    carrossel.addEventListener('focusout', (e) => { if (!carrossel.contains(e.relatedTarget as Node)) { parado = false; agendar(); } });
+    // Arrastar com o dedo no celular.
+    let x0: number | null = null;
+    carrossel.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; parado = true; clearTimeout(timer); }, { passive: true });
+    carrossel.addEventListener('touchend', (e) => {
+      if (x0 != null) { const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40) ir(atual + (dx < 0 ? 1 : -1)); }
+      x0 = null; parado = false; agendar();
+    });
+    // Fora da tela, não gira.
+    new IntersectionObserver(([en]) => { parado = !en.isIntersecting; if (parado) clearTimeout(timer); else agendar(); }).observe(carrossel);
+    calmo.addEventListener('change', agendar);
+    carrossel.classList.add('vb-carrossel-ativo');
+    desenhar();
+    agendar();
+  }
+</script>

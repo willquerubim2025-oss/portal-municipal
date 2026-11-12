@@ -194,6 +194,14 @@ O projeto foi criado com *Automatically expose new tables* **desligado** e *auto
 
 **Security Advisor:** desde a 0016 (12/10/2026), nenhuma função SECURITY DEFINER do schema `public` é executável por anon ou authenticated. Elas ficam em `seguranca`, com invólucros SECURITY INVOKER de mesmo nome em `public`. Sobra só o aviso informativo das tabelas internas fechadas de propósito (`interno.*`, `verificacao_fila`).
 
+## Avaliações do atendimento (0033, D-136)
+| Objeto | Papel |
+|---|---|
+| `avaliacoes` | nota (1 a 5), protocolo (até 40) e comentário (até 1000) opcionais, `criado_em`. Leitura e exclusão: admin da organização e SECKE. Ninguém grava direto |
+| `registrar_avaliacao(org, nota, protocolo, comentario)` | única entrada (visitante): organização ativa e com o bloco `avaliacao` em `config.home.blocos` |
+| `resumo_avaliacoes(org)` | público: `{ total, media, dist[1..5] }` dos últimos 12 meses |
+As duas funções são SECURITY DEFINER no schema `seguranca`, com casca SECURITY INVOKER em `public` (regra da 0016).
+
 ## Storage
 - Bucket público `midias`; a primeira pasta do caminho é o `municipio_id`.
 - Upload só na pasta do próprio município (`municipio_do_arquivo(name)`); exclusão só por publicador ou admin.

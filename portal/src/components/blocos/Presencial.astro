@@ -1,0 +1,63 @@
+---
+// Bloco "presencial" (D-136): endereço, telefone e horário (de config) com o mapa ao lado e uma faixa de chamada.
+// O mapa do Google só carrega depois do clique (privacidade); sem JavaScript, o botão abre o mapa em outra aba.
+import type { BlocoPresencial, Config, TextosBloco } from '../../lib/municipio';
+interface Props { dados?: BlocoPresencial; cfg: Config; textos?: TextosBloco }
+const { dados = {}, cfg, textos = {} } = Astro.props;
+const consulta = dados.mapa ?? cfg.endereco;
+const mapaUrl = consulta ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(consulta)}` : null;
+const mapaEmbed = consulta ? `https://maps.google.com/maps?q=${encodeURIComponent(consulta)}&z=16&output=embed` : null;
+const itens = [
+  cfg.endereco && { rotulo: 'Endereço', texto: cfg.endereco },
+  cfg.telefone && { rotulo: 'Telefone', texto: cfg.telefone, tel: true },
+  cfg.horario && { rotulo: 'Horário', texto: cfg.horario },
+  ...(dados.itens ?? []).filter((i) => i?.rotulo && i?.texto),
+].filter(Boolean) as { rotulo: string; texto: string; tel?: boolean }[];
+const f = dados.faixa;
+const urlOk = (u?: string) => typeof u === 'string' && /^(\/(?!\/)|#|https:\/\/)/.test(u);
+---
+{itens.length > 0 && (
+  <section class="vb-secao vb-presencial" id="atendimento-presencial" aria-labelledby="vb-t-presencial">
+    <div class="vb-miolo">
+      <div class="vb-presencial-grade">
+        <div class="vb-presencial-info">
+          <span class="vb-sobretitulo">{textos.sobretitulo ?? 'Atendimento presencial'}</span>
+          <h2 id="vb-t-presencial">{textos.titulo ?? 'Venha até nós'}</h2>
+          <dl class="vb-dados">
+            {itens.map((i) => (
+              <div><dt>{i.rotulo}</dt><dd>{i.tel ? <a href={`tel:${i.texto.replace(/\D/g, '')}`}>{i.texto}</a> : i.texto}</dd></div>
+            ))}
+          </dl>
+        </div>
+        {mapaUrl && (
+          <div class="vb-mapa" data-vb-mapa data-embed={mapaEmbed}>
+            <div class="vb-mapa-capa">
+              <p>Veja no mapa como chegar.</p>
+              <a class="vb-botao vb-botao-azul" href={mapaUrl} target="_blank" rel="noopener" data-vb-abrir-mapa>Mostrar o mapa<span class="sr-only"> (Google Maps)</span></a>
+              <small>O mapa é do Google e só carrega depois do clique.</small>
+            </div>
+          </div>
+        )}
+      </div>
+      {f?.titulo && (
+        <div class="vb-faixa">
+          <strong>{f.titulo}</strong>
+          {f.texto && <p>{f.texto}</p>}
+          {f.rotulo && urlOk(f.url) && <a class="vb-botao vb-botao-azul" href={f.url}>{f.rotulo}</a>}
+        </div>
+      )}
+    </div>
+  </section>
+)}
+<script>
+  for (const caixa of document.querySelectorAll<HTMLElement>('[data-vb-mapa]')) {
+    caixa.querySelector('[data-vb-abrir-mapa]')?.addEventListener('click', (e) => {
+      const src = caixa.dataset.embed;
+      if (!src) return;
+      e.preventDefault();
+      const f = document.createElement('iframe');
+      f.src = src; f.title = 'Mapa de localização'; f.loading = 'lazy'; f.referrerPolicy = 'no-referrer-when-downgrade';
+      caixa.replaceChildren(f);
+    });
+  }
+</script>

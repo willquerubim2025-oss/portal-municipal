@@ -1,0 +1,54 @@
+---
+// Bloco "avaliacao" (D-136): o cidadão dá uma nota de 1 a 5 ao atendimento. O formulário vai para /avaliar
+// (grava em `avaliacoes` pela função registrar_avaliacao) e volta com ?avaliacao=ok. Ao lado, o resumo:
+// o real (resumo_avaliacoes, últimos 12 meses) ou, numa demonstração, o de `config.home.avaliacao.ilustrativo`.
+import type { BlocoAvaliacao, TextosBloco } from '../../lib/municipio';
+import TituloBloco from './TituloBloco.astro';
+interface Resumo { total: number; media: number | null; dist: number[] }
+interface Props { dados?: BlocoAvaliacao; resumo?: Resumo | null; textos?: TextosBloco; enviada?: string | null }
+const { dados = {}, resumo, textos, enviada } = Astro.props;
+const notas = [[1, 'Muito ruim'], [2, 'Ruim'], [3, 'Regular'], [4, 'Bom'], [5, 'Excelente']] as const;
+const ilustr = dados.ilustrativo;
+const painel = ilustr
+  ? { media: ilustr.media, total: ilustr.total, dist: ilustr.dist ?? [], nota: 'Dados ilustrativos' }
+  : resumo && resumo.total > 0
+    ? { media: (resumo.media ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+        total: resumo.total.toLocaleString('pt-BR'),
+        dist: resumo.dist.map((q) => Math.round((100 * q) / resumo.total)), nota: null }
+    : null;
+---
+<section class="vb-secao vb-avaliacao" id="avaliacao" aria-labelledby="vb-t-avaliacao">
+  <div class="vb-miolo vb-avaliacao-grade">
+    <div>
+      <TituloBloco id="vb-t-avaliacao" textos={textos} claro padrao={{ sobretitulo: 'Sua opinião', titulo: 'Como foi o seu atendimento?', texto: 'Leva menos de um minuto. A sua avaliação ajuda a melhorar o atendimento para todos.' }} />
+      <form class="vb-form-avaliacao" action="/avaliar" method="post">
+        {enviada === 'ok' && <p class="vb-aviso vb-aviso-ok" role="status">Obrigado! Sua avaliação foi registrada.</p>}
+        {enviada === 'erro' && <p class="vb-aviso vb-aviso-erro" role="alert">Não foi possível registrar agora. Escolha uma nota de 1 a 5 e tente de novo.</p>}
+        <fieldset>
+          <legend>Dê uma nota de 1 a 5</legend>
+          <div class="vb-notas">
+            {notas.map(([n, rotulo]) => (
+              <label><input type="radio" name="nota" value={n} required /><span class="vb-nota-caixa"><b>{n}</b><span>{rotulo}</span></span></label>
+            ))}
+          </div>
+        </fieldset>
+        <div class="vb-campo"><label for="vb-protocolo">Número do protocolo (opcional)</label><input id="vb-protocolo" name="protocolo" type="text" maxlength="40" autocomplete="off" /></div>
+        <div class="vb-campo"><label for="vb-comentario">Quer contar mais? (opcional)</label><textarea id="vb-comentario" name="comentario" rows="3" maxlength="1000" placeholder="O que foi bom e o que podemos melhorar"></textarea></div>
+        <p class="vb-privacidade">Não escreva dados pessoais (CPF, telefone, endereço). A avaliação é anônima.</p>
+        <button class="vb-botao vb-botao-azul" type="submit">Enviar avaliação</button>
+      </form>
+    </div>
+    {painel && (
+      <aside class="vb-painel-nota" aria-label="Resultado das avaliações">
+        {painel.nota && <span class="vb-nota vb-nota-clara">{painel.nota}</span>}
+        <div class="vb-media"><strong>{painel.media}</strong><span>de 5 · {painel.total} avaliações<br />nos últimos 12 meses</span></div>
+        <div class="vb-distribuicao">
+          {[5, 4, 3, 2, 1].map((n) => {
+            const pct = painel.dist[n - 1] ?? 0;
+            return <div><span>{n} · {notas[n - 1][1]}</span><span class="vb-dist-trilho"><i style={`width:${pct}%`}></i></span><span>{pct}%</span></div>;
+          })}
+        </div>
+      </aside>
+    )}
+  </div>
+</section>

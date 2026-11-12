@@ -1,0 +1,39 @@
+---
+// Bloco "ranking" (D-136): lista ordenada com barras proporcionais e, ao lado, uma caixa de consulta.
+import type { BlocoRanking, TextosBloco } from '../../lib/municipio';
+import TituloBloco from './TituloBloco.astro';
+interface Props { dados?: BlocoRanking; textos?: TextosBloco }
+const { dados = {}, textos } = Astro.props;
+const itens = (dados.itens ?? []).filter((r) => r?.nome && typeof r.qtd === 'number');
+const maior = Math.max(1, ...itens.map((r) => r.qtd));
+const c = dados.consulta;
+const urlOk = (u?: string) => typeof u === 'string' && /^(\/(?!\/)|https:\/\/)/.test(u);
+---
+{itens.length > 0 && (
+  <section class="vb-secao vb-ranking" aria-labelledby="vb-t-ranking">
+    <div class="vb-miolo vb-ranking-grade">
+      <div>
+        <TituloBloco id="vb-t-ranking" textos={textos} padrao={{ sobretitulo: 'Ranking de reclamações', titulo: 'Onde o consumidor *mais teve problemas*' }} />
+        <ol class="vb-ranking-lista">
+          {itens.map((r) => (
+            <li>
+              <div><div class="vb-ranking-nome">{r.nome}</div><div class="vb-trilho"><i style={`width:${Math.round((100 * r.qtd) / maior)}%`}></i></div></div>
+              <div class="vb-ranking-qtd">{r.qtd.toLocaleString('pt-BR')}<small>{r.rotulo ?? 'reclamações'}</small></div>
+            </li>
+          ))}
+        </ol>
+      </div>
+      {c?.titulo && (
+        <aside class="vb-consulta">
+          <h3>{c.titulo}</h3>
+          {c.texto && <p>{c.texto}</p>}
+          <form action={urlOk(c.url) ? c.url : '/busca'} method="get">
+            <label for="vb-empresa">Nome ou CNPJ da empresa</label>
+            <input id="vb-empresa" name="q" type="search" placeholder="Ex.: nome da loja ou 00.000.000/0001-00" required />
+            <button class="vb-botao vb-botao-azul" type="submit">{c.rotulo ?? 'Consultar empresa'}</button>
+          </form>
+        </aside>
+      )}
+    </div>
+  </section>
+)}

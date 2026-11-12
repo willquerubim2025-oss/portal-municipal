@@ -23,6 +23,18 @@
     "PAINEL_URL": "https://painel-municipal.willquerubim2025.workers.dev"
   },
   "env": {
+    // Demonstração do Procon Sumaré (D-136): mesmo código e mesmo banco da produção, num Worker à parte
+    // (procon-sumare.<conta>.workers.dev), cadastrado em municipio_dominios como homologação (fora dos buscadores).
+    // Publicar: Actions → "Publicar demonstração".
+    "procon-sumare": {
+      "name": "procon-sumare",
+      "images": { "binding": "IMAGES" },
+      "vars": {
+        "SUPABASE_URL": "https://qgywucdnaeheqndcxtho.supabase.co",
+        "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_5hNTishJduD5ApO7MTuUqQ_lqbfTMOF",
+        "PAINEL_URL": "https://painel-municipal.willquerubim2025.workers.dev"
+      }
+    },
     "homologacao": {
       "name": "portal-municipal-homologacao",
       "images": { "binding": "IMAGES" },

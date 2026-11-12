@@ -1,0 +1,19 @@
+---
+// Cabeçalho comum dos blocos de seção própria (D-136): linha pequena, título e texto.
+// No título, o trecho entre *asteriscos* ganha a cor de destaque (o texto vem do banco: sem HTML).
+import type { TextosBloco } from '../../lib/municipio';
+interface Props { id: string; textos?: TextosBloco; padrao: TextosBloco; claro?: boolean }
+const { id, textos = {}, padrao, claro = false } = Astro.props;
+const t = { ...padrao, ...Object.fromEntries(Object.entries(textos).filter(([, v]) => v)) } as TextosBloco;
+const partes = (t.titulo ?? '').split('*');
+const urlOk = (u?: string) => typeof u === 'string' && /^(\/(?!\/)|https:\/\/)/.test(u);
+---
+<div class={claro ? 'vb-cabeca vb-cabeca-clara' : 'vb-cabeca'}>
+  <div>
+    {t.sobretitulo && <span class="vb-sobretitulo">{t.sobretitulo}</span>}
+    <h2 class="vb-titulo" id={id}>{partes.map((p, i) => (i % 2 ? <em>{p}</em> : p))}</h2>
+    {t.texto && <p class="vb-lead">{t.texto}</p>}
+    {t.nota && <span class="vb-nota">{t.nota}</span>}
+  </div>
+  {t.botao && urlOk(t.botao.url) && <a class="vb-botao vb-botao-contorno" href={t.botao.url}>{t.botao.rotulo}</a>}
+</div>

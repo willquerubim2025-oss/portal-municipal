@@ -9,6 +9,8 @@ import '../styles/global.css';
 import '@fontsource/montserrat/latin-600.css';
 import '@fontsource/montserrat/latin-700.css';
 import '@fontsource/montserrat/latin-800.css';
+import '@fontsource/montserrat/latin-800-italic.css';
+import '@fontsource/montserrat/latin-900-italic.css';
 import '@fontsource/source-sans-3/latin-400.css';
 import '@fontsource/source-sans-3/latin-400-italic.css';
 import '@fontsource/source-sans-3/latin-600.css';
@@ -23,6 +25,7 @@ import '@fontsource/raleway/latin-600.css';
 import '@fontsource/raleway/latin-700.css';
 import '@fontsource/raleway/latin-800.css';
 import '../styles/vitrine.css';
+import '../styles/blocos.css';
 import { destaques, menu, type ItemMenu } from '../lib/consultas';
 import Ferramentas from '../components/Ferramentas.astro';
 import { FONTES_DISPONIVEIS, moduloAtivo, nomeCurto } from '../lib/municipio';
@@ -58,6 +61,9 @@ const tituloCompleto = titulo ? `${titulo} — ${m.nome}` : m.nome;
 const desc = descricao || cfg.slogan || `Portal oficial da ${m.nome}: notícias, serviços, legislação e transparência.`;
 const brasao = urlMidia(tema.brasao_path) ?? (tema.brasao_url?.startsWith('https://') ? tema.brasao_url : null);
 const vitrine = tema.layout === 'vitrine';
+// D-136: logotipo horizontal (já com o nome) no cabeçalho claro e no rodapé, no lugar do brasão + nome escrito.
+const logoCab = urlMidia(tema.logo_path);
+const logoRodape = urlMidia(tema.logo_rodape_path);
 const imagemOg = imagem ?? urlMidia(cfg.seo?.imagem_compartilhamento_path) ?? brasao;
 
 const [principal, rodape, alertas] = await Promise.all([
@@ -134,6 +140,7 @@ const estiloTema = [
     cor(tema.cor_letras_cabecalho) && `--v-cab-letras:${tema.cor_letras_cabecalho}`,
     cor(tema.cor_cabecalho) && `--v-cab-fundo:${tema.cor_cabecalho}`,
     cor(tema.cor_cabecalho_texto) && `--v-cab-texto:${tema.cor_cabecalho_texto}`,
+    cor(tema.cor_rodape) && `--v-rodape-fundo:${tema.cor_rodape}`,
     fonte(tema.fonte_titulos) && `--v-fonte-titulos:${fonte(tema.fonte_titulos)}`,
     fonte(tema.fonte_texto) && `--v-fonte-texto:${fonte(tema.fonte_texto)}`,
     fonte(tema.fonte_cabecalho) && `--v-fonte-cab:${fonte(tema.fonte_cabecalho)}`,
@@ -158,13 +165,15 @@ const carrosselCab = vitrine && !claro && cfgCab.carrossel !== false
   ? { intervalo: limitar(cfgCab.intervalo_s, 4, 20, 7), transicao: limitar(cfgCab.transicao_s, 0.3, 3, 2) } : null;
 const sitePrefeitura = vitrine && cfg.site_prefeitura?.startsWith('https://') ? cfg.site_prefeitura : null;
 const botaoCab = claro && cfgCab.botao?.rotulo && /^(\/|https:\/\/)/.test(cfgCab.botao.url ?? '') ? cfgCab.botao : null;
+// D-136: botões só de texto (substituem o botão com ícone quando existem).
+const botoesCab = claro ? (cfgCab.botoes ?? []).filter((b) => b?.rotulo && /^(\/(?!\/)|#|https:\/\/)/.test(b.url ?? '')).slice(0, 3) : [];
 // Faixa colorida sob a barra (D-57): segmentos iguais. Opcional (D-71): só aparece com tema.cores_faixa.
 const coresFaixa = (tema.cores_faixa ?? []).filter((c) => cor(c));
 const faixaCores = coresFaixa.length
   ? `linear-gradient(90deg, ${coresFaixa.map((c, i) => `${c} ${(100 * i) / coresFaixa.length}% ${(100 * (i + 1)) / coresFaixa.length}%`).join(', ')})`
   : undefined;
 const classeHtml = vitrine
-  ? ['vitrine', tema.filtro_destaque === 'neutro' && 'v-filtro-neutro', claro && 'v-claro', claro && fonte(tema.fonte_cabecalho) && 'v-fonte-cab'].filter(Boolean).join(' ')
+  ? ['vitrine', tema.filtro_destaque === 'neutro' && 'v-filtro-neutro', claro && 'v-claro', claro && fonte(tema.fonte_cabecalho) && 'v-fonte-cab', tema.sem_icones && 'v-sem-icones', claro && tema.cabecalho_compacto && 'v-cab-compacto', cor(tema.cor_rodape) && 'v-rodape-cor'].filter(Boolean).join(' ')
   : undefined;
 const caminhoAtual = Astro.url.pathname;
 // "Acesso do servidor" (D-94): leva ao painel deste ambiente (PAINEL_URL do Worker). Sem a variável, não aparece.
@@ -206,6 +215,7 @@ const painelUrl = (() => { try { return getSecret('PAINEL_URL') || null; } catch
 </head>
 <body>
   {homologacao && m.config.faixa_homologacao !== false && <div class="faixa-homologacao" role="note">Ambiente de homologação — conteúdo de teste, não indexado.</div>}
+  {cfg.faixa_topo && <div class="vb-faixa-topo" role="note">{cfg.faixa_topo}</div>}
 
   <!-- Barra de acessibilidade (eMAG 3.1): atalhos numéricos e alto contraste.
        No layout vitrine a barra vira cabeçalho único: os atalhos ficam ocultos até receberem foco
@@ -242,12 +252,18 @@ const painelUrl = (() => { try { return getSecret('PAINEL_URL') || null; } catch
   {claro ? (
   <header class="cabecalho v-cab v-cab-claro">
       <div class="v-cab-linha">
-        <a href="/" class="marca" aria-label={`${m.nome} — página inicial`}>
-          {brasao && <img class="v-cab-claro-brasao" src={brasao} alt="" width="80" height="80" />}
-          <span class="marca-texto">
-            <span class="marca-tipo">{marca1}</span>
-            <span class="marca-nome">{marca2}</span>
-          </span>
+        <a href="/" class={logoCab ? 'marca v-cab-com-logo' : 'marca'} aria-label={`${m.nome} — página inicial`}>
+          {logoCab ? (
+            <img class="v-cab-logo" src={logoCab} alt="" height="64" />
+          ) : (
+            <>
+              {brasao && <img class="v-cab-claro-brasao" src={brasao} alt="" width="80" height="80" />}
+              <span class="marca-texto">
+                <span class="marca-tipo">{marca1}</span>
+                <span class="marca-nome">{marca2}</span>
+              </span>
+            </>
+          )}
         </a>
         <nav id="menu" class="menu-principal" aria-label="Menu principal">
           <details class="menu-movel" open>
@@ -259,7 +275,13 @@ const painelUrl = (() => { try { return getSecret('PAINEL_URL') || null; } catch
           <button type="button" class="v-cab-lupa" data-painel="v-painel-busca" aria-expanded="false" aria-controls="v-painel-busca" aria-label="Buscar no portal" title="Buscar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
           </button>
-          {botaoCab && (
+          {botoesCab.map((b) => (
+            <a class={`v-cab-botao-texto v-cab-botao-${b.estilo === 'contorno' ? 'contorno' : 'cheio'}`} href={b.url}
+               target={b.url.startsWith('https://') ? '_blank' : undefined} rel={b.url.startsWith('https://') ? 'noopener' : undefined}>
+              {b.rotulo}{b.url.startsWith('https://') && <span class="sr-only"> (abre em nova aba)</span>}
+            </a>
+          ))}
+          {botaoCab && !botoesCab.length && (
             <a class="v-cab-fale" href={botaoCab.url}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M19 9h1a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></svg>
               <span>{botaoCab.rotulo}</span>
@@ -400,8 +422,14 @@ const painelUrl = (() => { try { return getSecret('PAINEL_URL') || null; } catch
   <footer id="rodape" class="rodape v-rodape-claro">
     <div class="container v-rod-principal">
       <div class="v-rod-marca">
-        {brasao && <img src={brasao} alt="" width="96" height="96" loading="lazy" />}
-        <p><span class="v-rod-nome">{marca2}</span><span class="v-rod-tipo">{marca1}</span></p>
+        {logoRodape ? (
+          <img class="v-rod-logo" src={logoRodape} alt={m.nome} loading="lazy" />
+        ) : (
+          <>
+            {brasao && <img src={brasao} alt="" width="96" height="96" loading="lazy" />}
+            <p><span class="v-rod-nome">{marca2}</span><span class="v-rod-tipo">{marca1}</span></p>
+          </>
+        )}
       </div>
       <address class="v-rod-contatos">
         {(cfg.email || cfg.telefone) && (

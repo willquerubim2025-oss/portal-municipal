@@ -14,6 +14,16 @@ import FocoVitrine from '../components/vitrine/Foco.astro';
 import CalendarioVitrine from '../components/vitrine/Calendario.astro';
 import SistemasVitrine from '../components/vitrine/Sistemas.astro';
 import type { BlocoHome } from '../lib/municipio';
+import { BLOCOS_PROPRIOS } from '../lib/municipio';
+import { noticiasComCategoria, resumoAvaliacoes } from '../lib/consultas';
+import Acoes from '../components/blocos/Acoes.astro';
+import Numeros from '../components/blocos/Numeros.astro';
+import Ranking from '../components/blocos/Ranking.astro';
+import NoticiasLista from '../components/blocos/NoticiasLista.astro';
+import Golpes from '../components/blocos/Golpes.astro';
+import Direitos from '../components/blocos/Direitos.astro';
+import Avaliacao from '../components/blocos/Avaliacao.astro';
+import Presencial from '../components/blocos/Presencial.astro';
 
 const { municipio: m, dominioPrincipal } = Astro.locals.contexto;
 // Layout vitrine (D-39): a página inicial é montada pelos blocos de config.home, nessa ordem.
@@ -33,13 +43,21 @@ const [banners, ultimas, proximos, atalhosMenu, cards, pessoas, eventosCal, sist
   tem('calendario') && moduloAtivo(m, 'agenda') ? eventosCalendario(m.id, desdeCal, ateCal) : Promise.resolve([]),
   tem('sistemas') ? sistemasHome(m.id) : Promise.resolve([]),
 ]);
+// Blocos de seção própria (D-136): dados só quando o bloco está ligado.
+const home = m.config.home ?? {};
+const [noticiasLista, resumoAval] = await Promise.all([
+  tem('noticias_lista') ? noticiasComCategoria(m.id, 6) : Promise.resolve([]),
+  tem('avaliacao') && !home.avaliacao?.ilustrativo ? resumoAvaliacoes(m.id) : Promise.resolve(null),
+]);
+const proprio = (b: BlocoHome) => BLOCOS_PROPRIOS.includes(b);
+const avaliacaoEnviada = Astro.url.searchParams.get('avaliacao');
 const foco = (m.config.home?.foco ?? []).filter((f) => f?.titulo);
 const titulos = { noticias: 'Notícias', foco: 'Em foco', calendario: 'Eventos', servicos: 'Serviços', agenda: 'Agenda', equipe: 'Equipe gestora', atalhos: 'Acesso rápido', sistemas: 'Sistemas', ...(m.config.home?.titulos ?? {}) };
 const nCores = m.tema.cores_vivas?.length ?? 0;
 // Seções de largura total alternam branco e os tons claros das cores vivas.
 const vazio = (b: BlocoHome) =>
   (b === 'servicos' && cards.length === 0) || (b === 'sistemas' && sistemas.length === 0) || (b === 'equipe' && pessoas.length === 0) ||
-  (b === 'agenda' && !proximos?.itens.length) || (b === 'foco' && foco.length === 0) || (b === 'calendario' && !moduloAtivo(m, 'agenda')) || b === 'destaque';
+  (b === 'agenda' && !proximos?.itens.length) || (b === 'foco' && foco.length === 0) || (b === 'calendario' && !moduloAtivo(m, 'agenda')) || b === 'destaque' || proprio(b);
 // "Em foco" e o calendário têm fundo próprio e ficam fora da alternância.
 // Blocos com fundo cinza (config.home.fundo_cinza; padrão: só o calendário) também ficam fora (D-55).
 const cinza = new Set<BlocoHome>(m.config.home?.fundo_cinza ?? ['calendario']);
@@ -75,6 +93,14 @@ const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: m.n
     <>
       {blocos.map((b) => {
         if (b === 'destaque') return <Destaque banners={banners} titulo={m.nome} slogan={m.config.slogan} compacto={m.config.cabecalho?.estilo !== 'carrossel'} />;
+        if (b === 'acoes') return <Acoes itens={home.acoes} />;
+        if (b === 'numeros') return <Numeros dados={home.numeros} textos={home.textos?.numeros} />;
+        if (b === 'ranking') return <Ranking dados={home.ranking} textos={home.textos?.ranking} />;
+        if (b === 'noticias_lista') return <NoticiasLista noticias={noticiasLista} textos={home.textos?.noticias_lista} />;
+        if (b === 'golpes') return <Golpes videos={home.golpes} textos={home.textos?.golpes} />;
+        if (b === 'direitos') return <Direitos itens={home.direitos} textos={home.textos?.direitos} />;
+        if (b === 'avaliacao') return <Avaliacao dados={home.avaliacao} resumo={resumoAval} textos={home.textos?.avaliacao} enviada={avaliacaoEnviada} />;
+        if (b === 'presencial') return <Presencial dados={home.presencial} cfg={m.config} textos={home.textos?.presencial} />;
         if (vazio(b)) return null;
         return (
           <section class={`v-secao v-bloco-${b} ${fundo(b)}`} aria-labelledby={`titulo-${b}`}>

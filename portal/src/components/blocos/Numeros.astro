@@ -1,0 +1,29 @@
+---
+// Bloco "numeros" (D-136): indicadores grandes sobre fundo escuro e barra de como terminaram os casos.
+import type { BlocoNumeros, TextosBloco } from '../../lib/municipio';
+import TituloBloco from './TituloBloco.astro';
+interface Props { dados?: BlocoNumeros; textos?: TextosBloco }
+const { dados = {}, textos } = Astro.props;
+const itens = (dados.itens ?? []).filter((n) => n?.valor && n?.texto);
+const partes = (dados.desfecho?.partes ?? []).filter((p) => p?.rotulo && typeof p.pct === 'number' && p.pct >= 0);
+const cores = ['var(--vb-verde-vivo)', 'var(--vb-amarelo)', '#e05656', '#7fb2e5'];
+---
+{itens.length > 0 && (
+  <section class="vb-secao vb-numeros" aria-labelledby="vb-t-numeros">
+    <div class="vb-miolo">
+      <TituloBloco id="vb-t-numeros" textos={textos} claro padrao={{ sobretitulo: 'Transparência', titulo: 'Em *números*' }} />
+      <div class="vb-numeros-grade">
+        {itens.map((n) => <div class="vb-numero"><strong>{n.valor}{n.sufixo && <small>{n.sufixo}</small>}</strong><span>{n.texto}</span></div>)}
+      </div>
+      {partes.length > 0 && (
+        <div class="vb-desfecho">
+          <h3>{dados.desfecho?.titulo ?? 'Como terminaram as reclamações'}</h3>
+          <div class="vb-desfecho-barra" role="img" aria-label={partes.map((p) => `${p.rotulo}: ${p.pct}%`).join(', ')}>
+            {partes.map((p, i) => <i style={`width:${p.pct}%;background:${cores[i % cores.length]}`}></i>)}
+          </div>
+          <div class="vb-legenda">{partes.map((p, i) => <span><b style={`background:${cores[i % cores.length]}`}></b>{p.rotulo} · {p.pct}%</span>)}</div>
+        </div>
+      )}
+    </div>
+  </section>
+)}
