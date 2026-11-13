@@ -91,9 +91,15 @@ const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: m.n
   <h1 class="sr-only">{m.nome}</h1>
   {blocos.length > 0 ? (
     <>
-      {blocos.map((b) => {
+      {blocos.map((b, i) => {
+        // D-147: cor alternativa do bloco (config.home.cores) e "ações" fora do destaque (sem sobrepor a imagem).
+        const cor = home.cores?.[b];
+        if (cor && (b === 'golpes' || b === 'numeros')) {
+          const el = b === 'golpes' ? <Golpes videos={home.golpes} textos={home.textos?.golpes} /> : <Numeros dados={home.numeros} textos={home.textos?.numeros} />;
+          return <div class={`vb-cor-${cor}`}>{el}</div>;
+        }
         if (b === 'destaque') return <Destaque banners={banners} titulo={m.nome} slogan={m.config.slogan} compacto={m.config.cabecalho?.estilo !== 'carrossel'} />;
-        if (b === 'acoes') return <Acoes itens={home.acoes} />;
+        if (b === 'acoes') return <Acoes itens={home.acoes} solto={i > 0 && blocos[i - 1] !== 'destaque'} textos={home.textos?.acoes} />;
         if (b === 'numeros') return <Numeros dados={home.numeros} textos={home.textos?.numeros} />;
         if (b === 'ranking') return <Ranking dados={home.ranking} textos={home.textos?.ranking} />;
         if (b === 'noticias_lista') return <NoticiasLista noticias={noticiasLista} textos={home.textos?.noticias_lista} />;

@@ -1,12 +1,16 @@
 ---
 // Bloco "acoes" (D-136): cartões numerados (01, 02...) que sobem sobre o destaque.
-import type { ItemAcao } from '../../lib/municipio';
-interface Props { itens?: ItemAcao[] }
+// Fora do destaque (D-147), vira uma seção comum, com título.
+import type { ItemAcao, TextosBloco } from '../../lib/municipio';
+import TituloBloco from './TituloBloco.astro';
+interface Props { itens?: ItemAcao[]; solto?: boolean; textos?: TextosBloco }
+const { solto = false, textos } = Astro.props;
 const lista = (Astro.props.itens ?? []).filter((a) => a?.titulo && /^(\/(?!\/)|#|https:\/\/)/.test(a.url ?? ''));
 const externo = (u: string) => u.startsWith('https://');
 ---
 {lista.length > 0 && (
-  <section class="vb-acoes" aria-label="Como podemos ajudar">
+  <section class={solto ? 'vb-secao vb-acoes vb-acoes-solto' : 'vb-acoes'} aria-label={solto ? undefined : 'Como podemos ajudar'} aria-labelledby={solto ? 'vb-t-acoes' : undefined}>
+    {solto && <div class="vb-miolo"><TituloBloco id="vb-t-acoes" textos={textos} padrao={{ sobretitulo: 'Atendimento', titulo: 'Como podemos *ajudar você*' }} /></div>}
     <div class="vb-miolo vb-acoes-grade" style={`--vb-colunas:${Math.min(lista.length, 4)}`}>
       {lista.map((a, i) => (
         <a class="vb-acao" href={a.url} target={externo(a.url) ? '_blank' : undefined} rel={externo(a.url) ? 'noopener' : undefined}>

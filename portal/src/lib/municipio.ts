@@ -135,7 +135,9 @@ export interface Config {
     /** Blocos de seção própria (D-136). */
     textos?: Partial<Record<BlocoHome, TextosBloco>>;
     acoes?: ItemAcao[]; numeros?: BlocoNumeros; ranking?: BlocoRanking; golpes?: VideoGolpe[];
-    direitos?: ItemDireito[]; avaliacao?: BlocoAvaliacao; presencial?: BlocoPresencial };
+    direitos?: ItemDireito[]; avaliacao?: BlocoAvaliacao; presencial?: BlocoPresencial;
+    /** D-147: cor de fundo alternativa de blocos de seção própria (hoje: golpes e numeros), para variar o visual entre organizações. */
+    cores?: Partial<Record<BlocoHome, 'azul' | 'verde'>> };
 }
 
 export type Modulo =

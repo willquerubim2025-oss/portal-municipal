@@ -380,3 +380,11 @@
   .vb-noticia-com-foto { grid-template-columns: 1fr; gap: .8rem; }
   .vb-miniatura { width: 100%; aspect-ratio: 16 / 9; }
 }
+
+/* D-147: variações de cor por organização (config.home.cores) e "ações" fora do destaque */
+.vb-cor-azul .vb-golpes { background: color-mix(in srgb, var(--vb-azul) 34%, #020a1c); }
+.vb-cor-azul .vb-golpes::before { background: linear-gradient(115deg, transparent 55%, color-mix(in srgb, var(--vb-azul) 45%, transparent) 55%, color-mix(in srgb, var(--vb-azul) 45%, transparent) 70%, transparent 70%); }
+.vb-cor-verde .vb-numeros { background: linear-gradient(135deg, var(--vb-verde-escuro), var(--vb-verde) 70%); }
+.vb-cor-verde .vb-numeros::after { background: radial-gradient(circle, color-mix(in srgb, var(--vb-amarelo) 30%, transparent), transparent 65%); }
+.vb-acoes-solto { margin-top: 0; padding: 5rem 0 5.5rem; background: var(--vb-azul-claro); }
+.vb-acoes-solto .vb-cabeca { margin-bottom: 2rem; }
