@@ -388,3 +388,4 @@
 .vb-cor-verde .vb-numeros::after { background: radial-gradient(circle, color-mix(in srgb, var(--vb-amarelo) 30%, transparent), transparent 65%); }
 .vb-acoes-solto { margin-top: 0; padding: 5rem 0 5.5rem; background: var(--vb-azul-claro); }
 .vb-acoes-solto .vb-cabeca { margin-bottom: 2rem; }
+.vb-apos-destaque > .vb-secao, .vb-apos-destaque > div > .vb-secao { padding-top: 2.75rem; }

@@ -24,11 +24,14 @@ import Golpes from '../components/blocos/Golpes.astro';
 import Direitos from '../components/blocos/Direitos.astro';
 import Avaliacao from '../components/blocos/Avaliacao.astro';
 import Presencial from '../components/blocos/Presencial.astro';
+import Envolve from '../components/blocos/Envolve.astro';
 
 const { municipio: m, dominioPrincipal } = Astro.locals.contexto;
 // Layout vitrine (D-39): a página inicial é montada pelos blocos de config.home, nessa ordem.
 const blocos: BlocoHome[] = m.tema.layout === 'vitrine' ? (m.config.home?.blocos ?? []) : [];
 const tem = (b: BlocoHome) => blocos.includes(b);
+// Bloco de seção própria logo depois do destaque: menos espaço em cima (D-147).
+const aposDestaque = (i: number) => i > 0 && blocos[i - 1] === 'destaque';
 // Calendário de eventos (D-53): do 1º dia do mês anterior ao fim do 3º mês seguinte.
 const agoraSP = new Date();
 const desdeCal = new Date(Date.UTC(agoraSP.getUTCFullYear(), agoraSP.getUTCMonth() - 1, 1));
@@ -96,17 +99,17 @@ const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: m.n
         const cor = home.cores?.[b];
         if (cor && (b === 'golpes' || b === 'numeros')) {
           const el = b === 'golpes' ? <Golpes videos={home.golpes} textos={home.textos?.golpes} /> : <Numeros dados={home.numeros} textos={home.textos?.numeros} />;
-          return <div class={`vb-cor-${cor}`}>{el}</div>;
+          return <Envolve ativo={aposDestaque(i)}><div class={`vb-cor-${cor}`}>{el}</div></Envolve>;
         }
         if (b === 'destaque') return <Destaque banners={banners} titulo={m.nome} slogan={m.config.slogan} compacto={m.config.cabecalho?.estilo !== 'carrossel'} />;
         if (b === 'acoes') return <Acoes itens={home.acoes} solto={i > 0 && blocos[i - 1] !== 'destaque'} textos={home.textos?.acoes} />;
-        if (b === 'numeros') return <Numeros dados={home.numeros} textos={home.textos?.numeros} />;
-        if (b === 'ranking') return <Ranking dados={home.ranking} textos={home.textos?.ranking} />;
-        if (b === 'noticias_lista') return <NoticiasLista noticias={noticiasLista} textos={home.textos?.noticias_lista} />;
-        if (b === 'golpes') return <Golpes videos={home.golpes} textos={home.textos?.golpes} />;
-        if (b === 'direitos') return <Direitos itens={home.direitos} textos={home.textos?.direitos} />;
-        if (b === 'avaliacao') return <Avaliacao dados={home.avaliacao} resumo={resumoAval} textos={home.textos?.avaliacao} enviada={avaliacaoEnviada} />;
-        if (b === 'presencial') return <Presencial dados={home.presencial} cfg={m.config} textos={home.textos?.presencial} />;
+        if (b === 'numeros') return <Envolve ativo={aposDestaque(i)}><Numeros dados={home.numeros} textos={home.textos?.numeros} /></Envolve>;
+        if (b === 'ranking') return <Envolve ativo={aposDestaque(i)}><Ranking dados={home.ranking} textos={home.textos?.ranking} /></Envolve>;
+        if (b === 'noticias_lista') return <Envolve ativo={aposDestaque(i)}><NoticiasLista noticias={noticiasLista} textos={home.textos?.noticias_lista} /></Envolve>;
+        if (b === 'golpes') return <Envolve ativo={aposDestaque(i)}><Golpes videos={home.golpes} textos={home.textos?.golpes} /></Envolve>;
+        if (b === 'direitos') return <Envolve ativo={aposDestaque(i)}><Direitos itens={home.direitos} textos={home.textos?.direitos} /></Envolve>;
+        if (b === 'avaliacao') return <Envolve ativo={aposDestaque(i)}><Avaliacao dados={home.avaliacao} resumo={resumoAval} textos={home.textos?.avaliacao} enviada={avaliacaoEnviada} /></Envolve>;
+        if (b === 'presencial') return <Envolve ativo={aposDestaque(i)}><Presencial dados={home.presencial} cfg={m.config} textos={home.textos?.presencial} /></Envolve>;
         if (vazio(b)) return null;
         return (
           <section class={`v-secao v-bloco-${b} ${fundo(b)}`} aria-labelledby={`titulo-${b}`}>

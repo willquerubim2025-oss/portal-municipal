@@ -1,0 +1,6 @@
+---
+// Envolve um bloco numa <div class="vb-apos-destaque"> quando `ativo` (bloco logo depois do destaque: menos espaço em cima, D-147).
+interface Props { ativo?: boolean }
+const { ativo = false } = Astro.props;
+---
+{ativo ? <div class="vb-apos-destaque"><slot /></div> : <slot />}
