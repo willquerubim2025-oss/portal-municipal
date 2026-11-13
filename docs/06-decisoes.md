@@ -1052,5 +1052,5 @@ Formato: **D-xx · data · decisão** → motivo → alternativas descartadas. D
 
 **D-147 · 13/11/2026 · Procon Hortolândia com cara própria: outra ordem e outras cores (pedido do William)**
 - "Sumaré é do lado de Hortolândia, a gente não pode fazer sites tão parecidos... inverter as ordens de algumas sessões... muda a cor lá daquela de estatística." Mesmo conjunto de blocos, montado diferente.
-- **Ordem no Procon Hortolândia:** destaque → golpes → notícias → números → ranking → ações ("Como o Procon pode ajudar você") → direitos → avaliação → presencial. No Sumaré as ações sobem sobre o destaque e os golpes vêm depois das notícias.
+- **Ordem no Procon Hortolândia:** destaque → notícias → golpes → números → ranking → ações ("Como o Procon pode ajudar você") → direitos → avaliação → presencial. No Sumaré as ações sobem sobre o destaque e os golpes vêm depois das notícias.
 - **Genérico, opt-in:** `config.home.cores` troca o fundo de blocos (hoje `golpes: 'azul'` e `numeros: 'verde'`; no Sumaré, golpes verde-escuro e números azul). O bloco `acoes` que não vem logo depois do destaque vira uma seção comum, com título (`config.home.textos.acoes`) e fundo azul-claro, em vez de sobrepor a imagem. Sem a chave e na posição de sempre, nada muda (Sumaré e SMEDU iguais).
