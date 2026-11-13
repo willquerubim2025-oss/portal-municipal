@@ -35,6 +35,16 @@
         "PAINEL_URL": "https://painel-municipal.willquerubim2025.workers.dev"
       }
     },
+    // Demonstração do Procon Hortolândia: mesmo esquema do Procon Sumaré (Worker à parte, mesmo banco).
+    "procon-hortolandia": {
+      "name": "procon-hortolandia",
+      "images": { "binding": "IMAGES" },
+      "vars": {
+        "SUPABASE_URL": "https://qgywucdnaeheqndcxtho.supabase.co",
+        "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_5hNTishJduD5ApO7MTuUqQ_lqbfTMOF",
+        "PAINEL_URL": "https://painel-municipal.willquerubim2025.workers.dev"
+      }
+    },
     "homologacao": {
       "name": "portal-municipal-homologacao",
       "images": { "binding": "IMAGES" },

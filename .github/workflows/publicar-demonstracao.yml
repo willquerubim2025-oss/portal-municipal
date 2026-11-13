@@ -1,4 +1,4 @@
-# Publica o portal de DEMONSTRAÇÃO do Procon Sumaré na Cloudflare (D-136), com um botão:
+# Publica um portal de DEMONSTRAÇÃO (Procon Sumaré ou Procon Hortolândia) na Cloudflare (D-136), com um botão:
 # Actions → "Publicar demonstração" → Run workflow. Worker à parte (procon-sumare), mesmo banco da
 # produção; o endereço está em municipio_dominios como homologação (fora dos buscadores).
 # Não mexe no Worker portal-municipal (SMEDU) nem no painel.
@@ -8,6 +8,12 @@ name: Publicar demonstração
 
 on:
   workflow_dispatch:
+    inputs:
+      demonstracao:
+        description: Qual portal de demonstração publicar
+        type: choice
+        default: procon-sumare
+        options: [procon-sumare, procon-hortolandia]
 
 permissions:
   contents: read
@@ -43,9 +49,9 @@ jobs:
       - run: npm ci
       - run: npx astro build
         env:
-          CLOUDFLARE_ENV: procon-sumare
+          CLOUDFLARE_ENV: ${{ inputs.demonstracao || 'procon-sumare' }}
       - name: Conferir que o build é o da demonstração
         run: |
-          grep -q '"name":"procon-sumare"' dist/server/wrangler.json
+          grep -q '"name":"${{ inputs.demonstracao || 'procon-sumare' }}"' dist/server/wrangler.json
           grep -q 'qgywucdnaeheqndcxtho' dist/server/wrangler.json
       - run: npx wrangler deploy

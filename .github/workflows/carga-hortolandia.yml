@@ -1,0 +1,29 @@
+# Envia ao Storage da produção as imagens do portal de demonstração do Procon Hortolândia
+# (pasta carga-hortolandia/). Roda sozinho quando essa pasta muda no ramo de trabalho.
+name: Carga Procon Hortolândia (imagens)
+on:
+  push:
+    paths: [carga-hortolandia/**]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  enviar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.SUPABASE_S3_ID_PRODUCAO }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.SUPABASE_S3_SEGREDO_PRODUCAO }}
+      AWS_DEFAULT_REGION: sa-east-1
+      S3: https://qgywucdnaeheqndcxtho.storage.supabase.co/storage/v1/s3
+      PASTA: 51f94602-94b5-42cc-9bdd-92c7bbe57541/carga
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enviar
+        run: |
+          set -euo pipefail
+          for f in carga-hortolandia/*; do
+            case "$f" in *.png) tipo=image/png ;; *.jpg) tipo=image/jpeg ;; *) continue ;; esac
+            aws s3 cp "$f" "s3://midias/$PASTA/$(basename "$f")" --endpoint-url "$S3" --content-type "$tipo" --cache-control "public, max-age=31536000" --only-show-errors
+            echo "enviado: $PASTA/$(basename "$f") $(stat -c %s "$f")"
+          done
